@@ -38,7 +38,11 @@ java {
     }
 }
 
+group = 'fr.parisnanterre.noah'
+version = '0.0.1'
+
+
 application {
     // Define the main class for the application.
-    mainClass = 'org.example.App'
+    mainClass = 'fr.parisnanterre.noah.App'
 }
