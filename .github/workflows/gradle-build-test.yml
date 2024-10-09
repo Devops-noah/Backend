@@ -29,7 +29,10 @@ jobs:
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-
+    
+    # Permission change command
+    - name: Set execute permission on gradlew
+      run: chmod +x ./gradlew
     # Build project
     - name: Build with Gradle Wrapper
       run: ./gradlew build
