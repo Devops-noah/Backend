@@ -3,12 +3,17 @@
  */
 package fr.parisnanterre.noah;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import org.junit.jupiter.api.Test;
+
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
 public class AppTest {
-    @Test public void appHasAGreeting() {
-        App classUnderTest = new App();
-        assertNotNull("app should have a greeting", classUnderTest.getGreeting());
+    @Test 
+    public void testMain() {
+        // Checks that the main method doesn't throw an exception
+        assertDoesNotThrow(() -> App.main(new String[] {}));
     }
 }

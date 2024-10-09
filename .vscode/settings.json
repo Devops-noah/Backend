@@ -1,3 +1,4 @@
 {
-    "workbench.colorTheme": "Solarized"
+    "workbench.colorTheme": "Solarized",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
