@@ -14,7 +14,19 @@ plugins {
 }
 
 jacoco {
-    toolVersion = "0.8.8" // Use the latest version
+    toolVersion = "0.8.12" // Use the latest version
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport // Generates JaCoCo report after testing
+}
+
+jacocoTestReport {
+    reports {
+        xml.required.set(true) // Necessary for badge services to read reports
+        html.required.set(true)
+    }
 }
 
 repositories {
