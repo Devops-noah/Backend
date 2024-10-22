@@ -18,6 +18,14 @@ jacoco {
     toolVersion = "0.8.12" // Use the latest version
 }
 
+sonar {
+  properties {
+    property "sonar.projectKey", "DaJaime_template-java-API"
+    property "sonar.organization", "dajaime-github"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
+}
+
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport // Generates JaCoCo report after testing
