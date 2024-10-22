@@ -10,7 +10,7 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
     id 'jacoco'
-    id "org.sonarqube" version "4.4.1.3373" // For code quality
+    id "org.sonarqube" version "5.1.0.4882" // For code quality
 
 }
 
@@ -20,10 +20,10 @@ jacoco {
 
 sonar {
   properties {
-    property "sonar.projectKey", "DaJaime_template-java-API"
-    property "sonar.organization", "dajaime-github"
+    property "sonar.projectKey", "Devops-noah_Backend"
+    property "sonar.organization", "devops-noah"
     property "sonar.host.url", "https://sonarcloud.io"
-  }
+    }
 }
 
 test {
