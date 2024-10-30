@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class AppTest {
+public class TravelCarryApplicationTest {
     @Test 
     public void testMain() {
         // Checks that the main method doesn't throw an exception
-        assertDoesNotThrow(() -> App.main(new String[] {}));
+        assertDoesNotThrow(() -> TravelCarryApplication.main(new String[] {}));
     }
 }

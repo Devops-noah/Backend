@@ -12,6 +12,12 @@ plugins {
     id 'jacoco'
     id "org.sonarqube" version "5.1.0.4882" // For code quality
 
+    // Add Spring Boot plugin to support Spring Boot application tasks
+    id 'org.springframework.boot' version '3.3.3'
+
+    // Add dependency management for consistent versions of Spring dependencies
+    id 'io.spring.dependency-management' version '1.1.0'
+
 }
 
 jacoco {
@@ -44,8 +50,16 @@ repositories {
 }
 
 dependencies {
-    // This dependency is used by the application.
+    // These dependencies is used by the application.
+
+    // Spring boot dependency
     implementation 'org.springframework.boot:spring-boot-starter-web:3.3.3'
+
+    // PostgreSQL dependencies
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.3.3'
+    implementation 'org.postgresql:postgresql:42.7.4'
+
+    // Testing dependency
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.3'
 }
 
@@ -62,7 +76,7 @@ testing {
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(22)
     }
 }
 
@@ -72,5 +86,5 @@ version = '0.0.1'
 
 application {
     // Define the main class for the application.
-    mainClass = 'fr.parisnanterre.noah.App'
+    mainClass = 'fr.parisnanterre.noah.TravelCarryApplication'
 }
