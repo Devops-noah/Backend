@@ -1,0 +1,77 @@
+@!include ../commons.style
+@startuml
+
+'Déclaration de la classe GuestUser
+
+class GuestUser {
+- firstName : String
+- lastName : String
+- email : Email
+- password : String
+
++ createAccount()
++ viewAnnouncement()
+}
+
+'Déclaration de la classe User
+class User {
+- userId : String
+- firstName : String
+- lastName : String
+- email : Email
+- password : String
+- telephone : String
+- address : String
+- role : String
+
+
++ login()
++ logout()
++ viewProfile()
++ updateProfile()
++ changePassword()
++ forgotPassword()
++ resetPassword()
++ deleteAccount()
++ viewAnnouncement()
++ defineRole(role : String) : String
+}
+
+'Déclaration de la classe Voyageur
+class Traveler {
+
+'Déclaration de la classe Sender
+
+/'Overriding methods from Annoncement
++createAnnouncement()
+'/
+
+}
+
+class Sender{
+/'Overriding methods from Annoncement
++createAnnouncement()
+'/
+}
+
+class Receiver{
++createReceiptDemand(object: Object)
++confirmReceipt(object: Object) : Boolean
+-notReceived(objectId: String) : Boolean
+-inProgress(objectId: String) : Boolean
+-received(objectId: String) : Boolean
++trackReceiptStatus(objectId : String) : Boolean
+}
+
+User  <|-- Traveler
+User  <|-- Sender
+User <|-- Receiver
+
+'Association User à Voyageur
+User "1" -- "1" Traveler
+'Association User à Sender
+User "1" -- "1" Sender
+'Association User à Receiver
+User "1" -- "1" Receiver
+
+@enduml
