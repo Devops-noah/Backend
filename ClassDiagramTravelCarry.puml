@@ -1,0 +1,87 @@
+@startuml
+!define Relationship_Association -[hidden]->
+
+class Utilisateur {
+    +id : Integer
+    +nom : String
+    +prenom : String
+    +email : String
+    +motDePasse : String
+    +telephone : String
+    +adresse : String
+    +role : Role
+    +authentifier() : Boolean
+    +logout() : Boolean
+    +voirProfile() : String
+    +updateProfile() : String
+    +mdpOublier() : String
+    +changeMdp() : String
+}
+
+class Annonce {
+    +id : Integer
+    +poids : Double
+    +prix : Double
+    +dateCreation : Date
+    +expediteur : Utilisateur
+    +voyageur : Utilisateur
+    +paysDepart : Pays
+    +paysDestination : Pays
+    +createAnnonceExpediteur() : Boolean
+    +createAnnonceVoyageur() : Boolean
+    +afficherAnnoncesParPays(pays : Pays) : Boolean
+    +filtrerAnnonces(criteria : Filtre) : List<Annonce>
+}
+
+class Voyage {
+    +id : Integer
+    +dateDepart : Date
+    +dateArrivee : Date
+    +destination : Pays
+    +poidsDisponible : Double
+    +voyageur : Utilisateur
+    +creerVoyage() : Boolean
+    +modifierVoyage() : Boolean
+    +supprimerVoyage() : Boolean
+}
+
+class Filtre {
+    +dateDepart : Date
+    +prixMax : Double
+    +poidsMin : Double
+    +destination : Pays
+    +appliquerFiltre(annonces : List<Annonce>) : List<Annonce>
+    +trierAnnonces(annonces : List<Annonce>) : List<Annonce>
+}
+
+class Pays {
+    +id : Integer
+    +nom : String
+    +codeISO : String
+    +ville : String
+}
+
+class Role {
+    +Guest
+    +Voyageur
+    +Expediteur
+    +Receveur
+}
+
+class Guest {
+    +inscrire() : Boolean
+    +accesPublic() : void
+}
+
+Utilisateur "1" o-- "1" Role : Aggregation
+Utilisateur "1" -- "0..*" Annonce : Association
+Annonce "1" --> "1" Pays : Association (paysDepart)
+Annonce "1" --> "1" Pays : Association (paysDestination)
+Annonce "1" --> "0..1" Utilisateur : Association (expediteur)
+Annonce "1" --> "0..1" Utilisateur : Association (voyageur)
+Annonce "1" --> "1" Filtre : Association
+Utilisateur "0..1" -- "0..*" Voyage : Association
+Voyage "1" --> "1" Pays : Association (destination)
+Filtre "1" -- "1" Pays : Association
+
+@enduml
