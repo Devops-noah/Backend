@@ -22,14 +22,14 @@ Backend/
 │   │   │               │   ├── UtilisateurController.java        # Handles user-related requests
 │   │   │               │   ├── AnnonceController.java            # Handles annonce-related requests
 │   │   │               │   ├── VoyageController.java             # Handles voyage-related requests
-│   │   │               │   └── FiltreController.java             # Handles filtering functionality
 │   │   │               │   └── PaysController.java               # Handles pays-related requests
 │   │   │               ├── model/                                # Entity classes matching the class diagram
 │   │   │               │   ├── Utilisateur.java                  # User entity with properties and roles
 │   │   │               │   ├── Annonce.java                      # Annonce entity
 │   │   │               │   ├── Voyage.java                       # Voyage entity
-│   │   │               │   ├── Filtre.java                       # Filter entity
 │   │   │               │   └── Pays.java                         # Country entity
+│   │   │               ├── DTO/  
+│   │   │               │   ├── Filtre.java                                                     
 │   │   │               ├── repository/                           # Data access layer (JPA repositories)
 │   │   │               │   ├── UtilisateurRepository.java        # Repository for users
 │   │   │               │   ├── AnnonceRepository.java            # Repository for annonces
@@ -39,7 +39,6 @@ Backend/
 │   │   │               │   ├── UtilisateurService.java           # Service for user-related operations
 │   │   │               │   ├── AnnonceService.java               # Service for annonces
 │   │   │               │   ├── VoyageService.java                # Service for voyages
-│   │   │               │   └── FiltreService.java                # Service for filtering
 │   │   │               ├── security/                             # Security configuration (if applicable)
 │   │   │               │   ├── JwtAuthenticationFilter.java      # JWT filter to validate tokens on requests
 │   │   │               │   ├── JwtTokenProvider.java             # Utility for generating and validating JWT tokens
@@ -48,7 +47,7 @@ Backend/
 │   │   │               │   ├── SecurityConfig.java               # Main security configuration class for HTTP security
 │   │   │               │   └── RolePermissions.java              # Defines permissions for roles (if using role-based access control)
 │   │   └── resources/
-│   │       ├── application.properties                            # Application configuration
+│   │       ├── application.yml                            # Application configuration
 │   │       └── static/                                           # Static files (if needed)
 │   └── test/                                                     # Unit and integration tests
 │       └── java/
