@@ -19,9 +19,33 @@ public class PaysServiceImpl {
         return paysRepository.findAll();
     }
 
+    public Optional<Pays> getPaysById(Integer id) {
+        return paysRepository.findById(id);
+    }
+
     public Pays createPays(Pays pays) {
         return paysRepository.save(pays);
     }
+
+    public Pays updatePays(Integer id, Pays paysDetails) {
+        return paysRepository.findById(id)
+                .map(pays -> {
+                    pays.setNom(paysDetails.getNom());
+                    pays.setCodeISO(paysDetails.getCodeISO());
+                    pays.setVille(paysDetails.getVille());
+                    return paysRepository.save(pays);
+                }).orElseThrow(() -> new RuntimeException("Pays not found"));
+    }
+
+    public void deletePays(Integer id) {
+        paysRepository.deleteById(id);
+    }
+
+    public Optional<Pays> getPaysByNom(String nom) {
+        return paysRepository.findByNom(nom);
+    }
+
+
 
 }
 
