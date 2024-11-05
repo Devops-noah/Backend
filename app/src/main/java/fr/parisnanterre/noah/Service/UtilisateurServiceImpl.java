@@ -35,7 +35,7 @@ public class UtilisateurServiceImpl {
                     utilisateur.setMotDePasse(utilisateurDetails.getMotDePasse());
                     utilisateur.setTelephone(utilisateurDetails.getTelephone());
                     utilisateur.setAdresse(utilisateurDetails.getAdresse());
-                    utilisateur.setRole(utilisateurDetails.getRole());
+                    //utilisateur.setRole(utilisateurDetails.getRole());
                     return utilisateurRepository.save(utilisateur);
 
                 }).orElseThrow(() -> new RuntimeException("Utilisateur not found"));
