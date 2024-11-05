@@ -51,6 +51,17 @@ public class AnnonceController {
         return annonceRepository.findByPaysDepart(paysDepart);
     }
 
+    @GetMapping("/destination")
+    public List<Annonce> getAnnoncesByPaysDestination(@RequestParam Pays paysDest) {
+        return annonceServiceImpl.getAnnoncesByPaysDestination(paysDest);
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/filter")
+    public List<Annonce> getFilteredAnnonces(@RequestBody Filtre filtre) {
+        return annonceServiceImpl.getFilteredAnnonces(filtre);
+    }
+
 
 }
 
