@@ -1,4 +1,4 @@
-package fr.parisnanterre.noah.Controller;
+package fr.parisnanterre.noah.controller;
 
-public class utilisateurController {
+public class UtilisateurController {
 }
