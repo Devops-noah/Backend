@@ -24,7 +24,7 @@ public class Utilisateur {
     private String adresse;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    //private Role role;
 
     // Relationships
     @OneToMany(mappedBy = "expediteur")
