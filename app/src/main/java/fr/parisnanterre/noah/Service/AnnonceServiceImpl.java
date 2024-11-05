@@ -36,6 +36,46 @@ public class AnnonceServiceImpl {
         return annonceRepository.findById(id);
     }
 
+    public void createAnnonce(Annonce annonce) {
+        // Handle paysDepart by checking if it already exists in the database
+        if (annonce.getPaysDepart() != null) {
+            Optional<Pays> existingPaysDepart = paysRepository.findByNom(annonce.getPaysDepart().getNom());
+            if (existingPaysDepart.isPresent()) {
+                annonce.setPaysDepart(existingPaysDepart.get()); // Set existing paysDepart
+            } else {
+                paysRepository.save(annonce.getPaysDepart()); // Save new paysDepart
+            }
+        }
+
+        // Handle paysDestination by checking if it already exists in the database
+        if (annonce.getPaysDestination() != null) {
+            Optional<Pays> existingPaysDestination = paysRepository.findByNom(annonce.getPaysDestination().getNom());
+            if (existingPaysDestination.isPresent()) {
+                annonce.setPaysDestination(existingPaysDestination.get()); // Set existing paysDestination
+            } else {
+                paysRepository.save(annonce.getPaysDestination()); // Save new paysDestination
+            }
+        }
+
+        // Save the Annonce with updated Pays references
+        annonceRepository.save(annonce);
+    }
+
+
+    public Annonce updateAnnonce(Integer id, Annonce annonceDetails) {
+        return annonceRepository.findById(id)
+                .map(annonce -> {
+                    annonce.setPoids(annonceDetails.getPoids());
+                    annonce.setPrix(annonceDetails.getPrix());
+                    annonce.setDateCreation(annonceDetails.getDateCreation());
+                    annonce.setExpediteur(annonceDetails.getExpediteur());
+                    annonce.setVoyageur(annonceDetails.getVoyageur());
+                    annonce.setPaysDepart(annonceDetails.getPaysDepart());
+                    annonce.setPaysDestination(annonceDetails.getPaysDestination());
+                    return annonceRepository.save(annonce);
+                })
+                .orElseThrow(() -> new RuntimeException("Annonce not found"));
+    }
 
 }
 
