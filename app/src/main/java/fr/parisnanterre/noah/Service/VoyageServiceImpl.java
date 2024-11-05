@@ -46,10 +46,29 @@ public class VoyageServiceImpl {
         return voyageRepository.save(voyage);
     }
 
+    public Voyage updateVoyage(Integer id, Voyage voyageDetails) {
+        return voyageRepository.findById(id)
+                .map(voyage -> {
+                    voyage.setDateDepart(voyageDetails.getDateDepart());
+                    voyage.setDateArrivee(voyageDetails.getDateArrivee());
+                    voyage.setDestination(voyageDetails.getDestination());
+                    voyage.setPoidsDisponible(voyageDetails.getPoidsDisponible());
+                    voyage.setVoyageur(voyageDetails.getVoyageur());
+                    return voyageRepository.save(voyage);
+                })
+                .orElseThrow(() -> new RuntimeException("Voyage not found"));
+    }
+
+    public void deleteVoyage(Integer id) {
+        voyageRepository.deleteById(id);
+    }
 
     public List<Voyage> getVoyagesByVoyageur(Utilisateur voyageur) {
         return voyageRepository.findByVoyageur(voyageur);
     }
 
+    public List<Voyage> getVoyagesByDestination(Pays destination) {
+        return voyageRepository.findByDestination(destination);
+    }
 }
 
