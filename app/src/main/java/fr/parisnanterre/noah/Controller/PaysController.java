@@ -33,4 +33,20 @@ public class PaysController {
         return paysServiceImpl.createPays(pays);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Pays> updatePays(@PathVariable Integer id, @RequestBody Pays pays) {
+        return ResponseEntity.ok(paysServiceImpl.updatePays(id, pays));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePays(@PathVariable Integer id) {
+        paysServiceImpl.deletePays(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/nom")
+    public ResponseEntity<Optional<Pays>> getPaysByNom(@RequestParam String nom) {
+        return ResponseEntity.ok(paysServiceImpl.getPaysByNom(nom));
+    }
+
 }
