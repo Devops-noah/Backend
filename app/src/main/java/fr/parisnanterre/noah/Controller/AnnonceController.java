@@ -33,5 +33,16 @@ public class AnnonceController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping
+    public void createAnnonce(@RequestBody Annonce annonce) {
+        annonceServiceImpl.createAnnonce(annonce);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Annonce> updateAnnonce(@PathVariable Integer id, @RequestBody Annonce annonce) {
+        return ResponseEntity.ok(annonceServiceImpl.updateAnnonce(id, annonce));
+    }
+
+
 }
 
