@@ -46,4 +46,25 @@ public class VoyageController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Voyage> updateVoyage(@PathVariable Integer id, @RequestBody Voyage voyage) {
+        return ResponseEntity.ok(voyageServiceImpl.updateVoyage(id, voyage));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVoyage(@PathVariable Integer id) {
+        voyageServiceImpl.deleteVoyage(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/voyageur")
+    public List<Voyage> getVoyagesByVoyageur(@RequestParam Utilisateur voyageur) {
+        return voyageServiceImpl.getVoyagesByVoyageur(voyageur);
+    }
+
+    @GetMapping("/destination")
+    public List<Voyage> getVoyagesByDestination(@RequestParam Pays destination) {
+        return voyageServiceImpl.getVoyagesByDestination(destination);
+    }
+
 }
