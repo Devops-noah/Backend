@@ -85,5 +85,36 @@ public class AnnonceServiceImpl {
         return annonceRepository.findByPaysDepart(paysDepart);
     }
 
+    public List<Annonce> getAnnoncesByPaysDestination(Pays paysDest) {
+        return annonceRepository.findByPaysDestination(paysDest);
+    }
+
+
+    public List<Annonce> getFilteredAnnonces(Filtre filtre) {
+        return annonceRepository.findAll()
+                .stream()
+                .filter(annonce ->
+                        Optional.ofNullable(filtre.getDateDepart())
+                                .map(dateDepart -> Optional.ofNullable(annonce.getDateCreation())
+                                        .map(dateCreation -> !dateCreation.before(dateDepart)) // Checks if dateCreation is on or after dateDepart
+                                        .orElse(false))
+                                .orElse(true))
+                .filter(annonce ->
+                        Optional.ofNullable(filtre.getPrixMax())
+                                .map(prixMax -> annonce.getPrix() <= prixMax)
+                                .orElse(true))
+                .filter(annonce ->
+                        Optional.ofNullable(filtre.getPoidsMin())
+                                .map(poidsMin -> annonce.getPoids() >= poidsMin)
+                                .orElse(true))
+                .filter(annonce ->
+                        Optional.ofNullable(filtre.getDestinationNom())
+                                .map(destinationNom -> Optional.ofNullable(annonce.getPaysDestination())
+                                        .map(paysDestination -> paysDestination.getNom().equalsIgnoreCase(destinationNom)) // Case-insensitive comparison with 'nom'
+                                        .orElse(false))
+                                .orElse(true))
+                .collect(Collectors.toList());
+    }
+
 }
 
