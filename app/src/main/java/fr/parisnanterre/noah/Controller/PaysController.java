@@ -48,5 +48,4 @@ public class PaysController {
     public ResponseEntity<Optional<Pays>> getPaysByNom(@RequestParam String nom) {
         return ResponseEntity.ok(paysServiceImpl.getPaysByNom(nom));
     }
-
 }

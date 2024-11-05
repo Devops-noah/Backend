@@ -6,7 +6,6 @@ class Utilisateur {
     +nom : String
     +prenom : String
     +email : String
-    +motDePasse : String
     +telephone : String
     +adresse : String
     +role : Role
