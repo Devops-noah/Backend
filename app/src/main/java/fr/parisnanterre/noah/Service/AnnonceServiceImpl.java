@@ -77,5 +77,13 @@ public class AnnonceServiceImpl {
                 .orElseThrow(() -> new RuntimeException("Annonce not found"));
     }
 
+    public void deleteAnnonce(Integer id) {
+        annonceRepository.deleteById(id);
+    }
+
+    public List<Annonce> getAnnoncesByPaysDepart(Pays paysDepart) {
+        return annonceRepository.findByPaysDepart(paysDepart);
+    }
+
 }
 
