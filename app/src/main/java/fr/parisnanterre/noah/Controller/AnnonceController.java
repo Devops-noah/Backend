@@ -43,6 +43,14 @@ public class AnnonceController {
         return ResponseEntity.ok(annonceServiceImpl.updateAnnonce(id, annonce));
     }
 
+    public void deleteAnnonce(Integer id) {
+        annonceRepository.deleteById(id);
+    }
+
+    public List<Annonce> getAnnoncesByPaysDepart(Pays paysDepart) {
+        return annonceRepository.findByPaysDepart(paysDepart);
+    }
+
 
 }
 
