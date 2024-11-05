@@ -1,4 +1,12 @@
 package fr.parisnanterre.noah.Repository;
 
-public interface AnnonceRepository {
+import fr.parisnanterre.noah.Entity.Annonce;
+import fr.parisnanterre.noah.Entity.Pays;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface AnnonceRepository extends JpaRepository<Annonce, Integer> {
+    List<Annonce> findByPaysDepart(Pays paysDepart);
+    List<Annonce> findByPaysDestination(Pays paysDest);
 }
