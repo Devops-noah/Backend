@@ -1,4 +1,4 @@
 package fr.parisnanterre.noah.Repository;
 
-public class PaysRepository {
+public interface PaysRepository {
 }
