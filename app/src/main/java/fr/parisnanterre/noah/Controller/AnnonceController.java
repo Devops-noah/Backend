@@ -44,11 +44,11 @@ public class AnnonceController {
     }
 
     public void deleteAnnonce(Integer id) {
-        annonceRepository.deleteById(id);
+        annonceServiceImpl.deleteAnnonce(id);
     }
 
     public List<Annonce> getAnnoncesByPaysDepart(Pays paysDepart) {
-        return annonceRepository.findByPaysDepart(paysDepart);
+        return annonceServiceImpl.getAnnoncesByPaysDepart(paysDepart);
     }
 
     @GetMapping("/destination")
