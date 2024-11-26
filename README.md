@@ -5,6 +5,12 @@
 [![Build & test](https://github.com/Devops-noah/Backend/actions/workflows/gradle-build.yml/badge.svg?branch=main)](https://github.com/Devops-noah/template-java-API/actions/workflows/gradle-build.yml)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
 
 # Backend Api Structure
 
