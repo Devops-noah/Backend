@@ -7,9 +7,11 @@ import fr.parisnanterre.noah.Entity.Voyage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface VoyageRepository extends JpaRepository<Voyage, Integer> {
+public interface VoyageRepository extends JpaRepository<Voyage, Long> {
     List<Voyage> findByVoyageur(Utilisateur voyageur); // Find voyages by user (voyageur)
     List<Voyage> findByDestination(Pays destination); // Find voyages by destination country
+
 }
 

@@ -1,11 +1,14 @@
 // Voyage entity
 package fr.parisnanterre.noah.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.persistence.Id;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -24,13 +27,15 @@ public class Voyage {
 
     private Double poidsDisponible;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "destination_id")
+    @JsonManagedReference("paysVoyageReference")
     private Pays destination;
 
     @ManyToOne
     @JoinColumn(name="voyageur_id")
     private Utilisateur voyageur;
+
 
     // Business Logic
     public boolean creerVoyage(Date dateDepart, Date dateArrivee, Double poidsDisponible, Pays destination, Utilisateur voyageur) {

@@ -127,3 +127,4 @@ tasks.named('asciidoctor').configure {
 tasks.named('build').configure {
     dependsOn tasks.named('asciidoctor')
 }
+

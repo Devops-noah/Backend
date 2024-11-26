@@ -28,7 +28,7 @@ public class VoyageServiceImpl {
         return voyageRepository.findAll();
     }
 
-    public Optional<Voyage> getVoyageById(Integer id) {
+    public Optional<Voyage> getVoyageById(Long id) {
         return voyageRepository.findById(id);
     }
 
@@ -46,7 +46,7 @@ public class VoyageServiceImpl {
         return voyageRepository.save(voyage);
     }
 
-    public Voyage updateVoyage(Integer id, Voyage voyageDetails) {
+    public Voyage updateVoyage(Long id, Voyage voyageDetails) {
         return voyageRepository.findById(id)
                 .map(voyage -> {
                     voyage.setDateDepart(voyageDetails.getDateDepart());
@@ -59,7 +59,7 @@ public class VoyageServiceImpl {
                 .orElseThrow(() -> new RuntimeException("Voyage not found"));
     }
 
-    public void deleteVoyage(Integer id) {
+    public void deleteVoyage(Long id) {
         voyageRepository.deleteById(id);
     }
 

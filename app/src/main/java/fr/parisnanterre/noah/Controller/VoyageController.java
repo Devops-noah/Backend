@@ -25,7 +25,7 @@ public class VoyageController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Voyage> getVoyageById(@PathVariable Integer id) {
+    public ResponseEntity<Voyage> getVoyageById(@PathVariable Long id) {
         return voyageServiceImpl.getVoyageById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -47,12 +47,12 @@ public class VoyageController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Voyage> updateVoyage(@PathVariable Integer id, @RequestBody Voyage voyage) {
+    public ResponseEntity<Voyage> updateVoyage(@PathVariable Long id, @RequestBody Voyage voyage) {
         return ResponseEntity.ok(voyageServiceImpl.updateVoyage(id, voyage));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVoyage(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteVoyage(@PathVariable Long id) {
         voyageServiceImpl.deleteVoyage(id);
         return ResponseEntity.noContent().build();
     }

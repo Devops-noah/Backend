@@ -1,6 +1,7 @@
 // Annonce.controller
 package fr.parisnanterre.noah.Controller;
 
+import fr.parisnanterre.noah.DTO.AnnonceRequest;
 import fr.parisnanterre.noah.DTO.Filtre;
 import fr.parisnanterre.noah.Entity.Annonce;
 import fr.parisnanterre.noah.Entity.Pays;
@@ -17,8 +18,13 @@ import java.util.List;
 @RequestMapping("/api/annonces")
 //@CrossOrigin(origins = "http://localhost:4200") // Enable CORS for Angular frontend
 public class AnnonceController {
-    @Autowired
+
     private AnnonceServiceImpl annonceServiceImpl;
+
+    @Autowired
+    public AnnonceController(AnnonceServiceImpl annonceServiceImpl) {
+        this.annonceServiceImpl = annonceServiceImpl;
+    }
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping
@@ -34,16 +40,24 @@ public class AnnonceController {
     }
 
     @PostMapping
-    public void createAnnonce(@RequestBody Annonce annonce) {
-        annonceServiceImpl.createAnnonce(annonce);
+    public ResponseEntity<?> createAnnonce(@RequestBody AnnonceRequest annonceRequest) {
+        annonceServiceImpl.createAnnonce(
+                annonceRequest.toAnnonce(),
+                annonceRequest.getVoyageId(),
+                annonceRequest.getPaysDepartNom(),
+                annonceRequest.getPaysDestinationNom()
+        );
+        return ResponseEntity.ok("Annonce created successfully");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Annonce> updateAnnonce(@PathVariable Integer id, @RequestBody Annonce annonce) {
-        return ResponseEntity.ok(annonceServiceImpl.updateAnnonce(id, annonce));
+    public ResponseEntity<?> updateAnnonce(@PathVariable Integer id, @RequestBody AnnonceRequest annonceRequest) {
+        Annonce updateAnnonce = annonceServiceImpl.updateAnnonce(id, annonceRequest);
+        return ResponseEntity.ok("Annonce updated successfully");
     }
 
-    public void deleteAnnonce(Integer id) {
+    @DeleteMapping("/{id}")
+    public void deleteAnnonce(@PathVariable Integer id) {
         annonceServiceImpl.deleteAnnonce(id);
     }
 

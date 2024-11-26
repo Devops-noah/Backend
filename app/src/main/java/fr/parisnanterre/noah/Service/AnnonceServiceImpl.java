@@ -1,16 +1,20 @@
 // Annonce service
 package fr.parisnanterre.noah.Service;
 
+import fr.parisnanterre.noah.DTO.AnnonceRequest;
 import fr.parisnanterre.noah.DTO.Filtre;
 import fr.parisnanterre.noah.Entity.Annonce;
 import fr.parisnanterre.noah.Entity.Pays;
+import fr.parisnanterre.noah.Entity.Voyage;
 import fr.parisnanterre.noah.Repository.AnnonceRepository;
 import fr.parisnanterre.noah.Repository.PaysRepository;
+import fr.parisnanterre.noah.Repository.VoyageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,11 +25,13 @@ public class AnnonceServiceImpl {
 
     private AnnonceRepository annonceRepository;
     private PaysRepository paysRepository;
+    private VoyageRepository voyageRepository;
 
     @Autowired
-    public AnnonceServiceImpl(AnnonceRepository annonceRepository, PaysRepository paysRepository) {
+    public AnnonceServiceImpl(AnnonceRepository annonceRepository, PaysRepository paysRepository, VoyageRepository voyageRepository) {
         this.annonceRepository = annonceRepository;
         this.paysRepository = paysRepository;
+        this.voyageRepository = voyageRepository;
     }
 
     public List<Annonce> getAllAnnonces() {
@@ -36,42 +42,78 @@ public class AnnonceServiceImpl {
         return annonceRepository.findById(id);
     }
 
-    public void createAnnonce(Annonce annonce) {
-        // Handle paysDepart by checking if it already exists in the database
-        if (annonce.getPaysDepart() != null) {
-            Optional<Pays> existingPaysDepart = paysRepository.findByNom(annonce.getPaysDepart().getNom());
-            if (existingPaysDepart.isPresent()) {
-                annonce.setPaysDepart(existingPaysDepart.get()); // Set existing paysDepart
-            } else {
-                paysRepository.save(annonce.getPaysDepart()); // Save new paysDepart
-            }
-        }
+    public void createAnnonce(Annonce annonce, Long voyageId, String paysDepartNom, String paysDestinationNom) {
+        // Validate annonce object is not null
+        Objects.requireNonNull(annonce, "Annonce object must not be null");
 
-        // Handle paysDestination by checking if it already exists in the database
-        if (annonce.getPaysDestination() != null) {
-            Optional<Pays> existingPaysDestination = paysRepository.findByNom(annonce.getPaysDestination().getNom());
-            if (existingPaysDestination.isPresent()) {
-                annonce.setPaysDestination(existingPaysDestination.get()); // Set existing paysDestination
-            } else {
-                paysRepository.save(annonce.getPaysDestination()); // Save new paysDestination
-            }
-        }
+        // Log input data for debugging
+        System.out.println("Voyage ID: " + voyageId + ", Pays Depart: " + paysDepartNom + ", Pays Destination: " + paysDestinationNom);
 
-        // Save the Annonce with updated Pays references
+        // Retrieve and set PaysDepart if it exists
+        Optional<Pays> paysDepartOpt = Optional.ofNullable(paysDepartNom)
+                .flatMap(paysRepository::findByNom);
+        paysDepartOpt.ifPresentOrElse(
+                annonce::setPaysDepart,
+                () -> { throw new RuntimeException("PaysDepart with name " + paysDepartNom + " does not exist."); }
+        );
+
+        // Retrieve and set PaysDestination if it exists
+        Optional<Pays> paysDestinationOpt = Optional.ofNullable(paysDestinationNom)
+                .flatMap(paysRepository::findByNom);
+        paysDestinationOpt.ifPresentOrElse(
+                annonce::setPaysDestination,
+                () -> { throw new RuntimeException("PaysDestination with name " + paysDestinationNom + " does not exist."); }
+        );
+
+        // Retrieve and set Voyage if the ID is provided
+        Optional<Voyage> voyageOpt = Optional.ofNullable(voyageId)
+                .flatMap(voyageRepository::findById);
+        System.out.println("voyage opt: " + voyageOpt);
+        voyageOpt.ifPresentOrElse(
+                annonce::setVoyage,
+                () -> { throw new RuntimeException("Voyage with ID " + voyageId + " does not exist."); }
+        );
+
+        // Save the Annonce with existing Pays references
+        System.out.println("annonce: " + annonce.getVoyage());
         annonceRepository.save(annonce);
     }
 
 
-    public Annonce updateAnnonce(Integer id, Annonce annonceDetails) {
+
+    public Annonce updateAnnonce(Integer id, AnnonceRequest annonceRequest) {
         return annonceRepository.findById(id)
                 .map(annonce -> {
-                    annonce.setPoids(annonceDetails.getPoids());
-                    annonce.setPrix(annonceDetails.getPrix());
-                    annonce.setDateCreation(annonceDetails.getDateCreation());
-                    annonce.setExpediteur(annonceDetails.getExpediteur());
-                    annonce.setVoyageur(annonceDetails.getVoyageur());
-                    annonce.setPaysDepart(annonceDetails.getPaysDepart());
-                    annonce.setPaysDestination(annonceDetails.getPaysDestination());
+                    annonce.setPoids(annonceRequest.getPoids() != null ? annonceRequest.getPoids() : annonce.getPoids());
+                    annonce.setPrix(annonceRequest.getPrix() != null ? annonceRequest.getPrix() : annonce.getPrix());
+                    annonce.setDateCreation(annonce.getDateCreation());
+                    annonce.setExpediteur(annonce.getExpediteur());
+                    annonce.setVoyageur(annonce.getVoyageur());
+
+                    // Update PaysDepart if a new one is provided
+                    Optional<Pays> paysDepartOpt = Optional.ofNullable(annonceRequest.getPaysDepartNom())
+                            .flatMap(paysRepository::findByNom);
+                    paysDepartOpt.ifPresentOrElse(
+                            annonce::setPaysDepart,
+                            () -> { throw new RuntimeException("PaysDepart with name " + annonceRequest.getPaysDepartNom() + " does not exist."); }
+                    );
+
+                    // Update PaysDestination if a new one is provided
+                    Optional<Pays> paysDestinationOpt = Optional.ofNullable(annonceRequest.getPaysDestinationNom())
+                            .flatMap(paysRepository::findByNom);
+                    paysDestinationOpt.ifPresentOrElse(
+                            annonce::setPaysDestination,
+                            () -> { throw new RuntimeException("PaysDestination with name " + annonceRequest.getPaysDestinationNom() + " does not exist."); }
+                    );
+
+                    // Update Voyage if a new one is provided
+                    Optional<Voyage> voyageOpt = Optional.ofNullable(annonceRequest.getVoyageId())
+                            .flatMap(voyageRepository::findById);
+                    voyageOpt.ifPresentOrElse(
+                            annonce::setVoyage,
+                            () -> { throw new RuntimeException("Voyage with ID " + annonceRequest.getVoyageId() + " does not exist."); }
+                    );
+
                     return annonceRepository.save(annonce);
                 })
                 .orElseThrow(() -> new RuntimeException("Annonce not found"));
@@ -91,12 +133,15 @@ public class AnnonceServiceImpl {
 
 
     public List<Annonce> getFilteredAnnonces(Filtre filtre) {
-        return annonceRepository.findAll()
-                .stream()
+        // Fetch all annonces with voyages included
+        List<Annonce> annoncesWithVoyage = annonceRepository.findAllWithVoyage();
+
+        // Apply filters to the result list
+        return annoncesWithVoyage.stream()
                 .filter(annonce ->
                         Optional.ofNullable(filtre.getDateDepart())
-                                .map(dateDepart -> Optional.ofNullable(annonce.getDateCreation())
-                                        .map(dateCreation -> !dateCreation.before(dateDepart)) // Checks if dateCreation is on or after dateDepart
+                                .map(dateDepart -> Optional.ofNullable(annonce.getVoyage())
+                                        .map(voyage -> !voyage.getDateDepart().before(dateDepart)) // Assuming you want to compare with voyage's dateDepart
                                         .orElse(false))
                                 .orElse(true))
                 .filter(annonce ->
@@ -110,11 +155,13 @@ public class AnnonceServiceImpl {
                 .filter(annonce ->
                         Optional.ofNullable(filtre.getDestinationNom())
                                 .map(destinationNom -> Optional.ofNullable(annonce.getPaysDestination())
-                                        .map(paysDestination -> paysDestination.getNom().equalsIgnoreCase(destinationNom)) // Case-insensitive comparison with 'nom'
+                                        .map(paysDestination -> paysDestination.getNom().equalsIgnoreCase(destinationNom)) // Checks by destination name
                                         .orElse(false))
                                 .orElse(true))
                 .collect(Collectors.toList());
     }
+
+
 
 }
 

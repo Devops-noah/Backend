@@ -1,5 +1,7 @@
 package fr.parisnanterre.noah.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.persistence.Id;
 import lombok.*;
@@ -34,22 +36,31 @@ public class Annonce {
     @JoinColumn(name = "voyageur_id")
     private Utilisateur voyageur;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "pays_depart_id")
+    @JsonManagedReference("paysDepartAnnonceReference")
     private Pays paysDepart;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "pays_destination_id")
+    @JsonManagedReference("paysDestinationAnnonceReference")
     private Pays paysDestination;
 
+    @ManyToOne(fetch = FetchType.EAGER) // or FetchType.LAZY if you handle the fetch explicitly in the query
+    @JoinColumn(name = "voyage_id", referencedColumnName = "id") // Ensure this matches your actual column name
+    private Voyage voyage;
+
     // Business Logic
-    public boolean createAnnonceExpediteur(Utilisateur expediteur, Double poids, Double prix, Pays paysDepart, Pays paysDestination) {
+    public boolean createAnnonceExpediteur(Utilisateur expediteur, Double poids, Double prix, Pays paysDepart, Pays paysDestination, Voyage voyage) {
         this.expediteur = expediteur;
         this.poids = poids;
         this.prix = prix;
         this.paysDepart = paysDepart;
         this.paysDestination = paysDestination;
         this.dateCreation = new Date();
+        this.voyage = voyage;
         return true;
     }
+
+
 }
