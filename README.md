@@ -11,6 +11,7 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
 
 # Backend Api Structure
 
