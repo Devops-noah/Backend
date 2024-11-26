@@ -1,7 +1,10 @@
 # Backend
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE.txt)
+[![Release](https://github.com/Devops-noah/Backend/releases/tag/v1.0.0)]
 
 [![Build & test](https://github.com/Devops-noah/Backend/actions/workflows/gradle-build.yml/badge.svg?branch=main)](https://github.com/Devops-noah/template-java-API/actions/workflows/gradle-build.yml)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
 
 # Backend Api Structure
 
