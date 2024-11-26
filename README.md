@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE.txt)
 ![Latest release](https://img.shields.io/github/v/release/Devops-noah/Backend)
 
-[![Build & test](https://github.com/Devops-noah/Backend/tree/main/.github/workflows/gradle-build.yml/badge.svg?branch=main)](https://github.com/Devops-noah/Backend/tree/main/.github/workflows/gradle-build.yml)
+[![Java CI Gradle build and test](https://github.com/Devops-noah/Backend/actions/workflows/gradle-build-test.yml/badge.svg)](https://github.com/Devops-noah/Backend/actions/workflows/gradle-build-test.yml)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Devops-noah_Backend&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Devops-noah_Backend)
