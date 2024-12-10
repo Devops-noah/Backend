@@ -46,10 +46,10 @@ public class VoyageController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Voyage> updateVoyage(@PathVariable Long id, @RequestBody Voyage voyage) {
-        return ResponseEntity.ok(voyageServiceImpl.updateVoyage(id, voyage));
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Voyage> updateVoyage(@PathVariable Long id, @RequestBody Voyage voyage) {
+//        return ResponseEntity.ok(voyageServiceImpl.updateVoyage(id, voyage));
+//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVoyage(@PathVariable Long id) {

@@ -1,4 +1,4 @@
-package main.java.fr.parisnanterre.noah.Controller;
+package fr.parisnanterre.noah.Controller;
 
 public class HelloController {
 }
