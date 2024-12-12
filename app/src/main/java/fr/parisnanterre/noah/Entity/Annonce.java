@@ -29,6 +29,9 @@ public class Annonce {
     private LocalDate datePublication;
 
     @NotNull
+    private Double poidsDisponible;
+
+    @NotNull
     @ManyToOne
     private Voyageur voyageur;
 

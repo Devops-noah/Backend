@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -31,18 +32,22 @@ public class VoyageController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/{destinationId}")
-    public ResponseEntity<Voyage> createVoyage(@RequestBody Voyage voyage, @PathVariable Integer destinationId) {
-        System.out.println("Received request to create a voyage");
+    @PostMapping
+    public ResponseEntity<?> createVoyage(
+            @RequestBody Voyage voyage,
+            @RequestParam Integer destinationId,
+            Principal principal) {
         try {
-            // Call the createVoyage method in the service
-            Voyage createdVoyage = voyageServiceImpl.createVoyage(voyage, destinationId);
-            System.out.println("Voyage created successfully");
-            return ResponseEntity.ok(createdVoyage); // Return the created Voyage with status 200 OK
+            // Get the email of the logged-in user
+            String email = principal.getName();
+
+            // Call the service method to create the Voyage
+            Voyage createdVoyage = voyageServiceImpl.createVoyage(voyage, destinationId, email);
+
+            // Return the created Voyage
+            return ResponseEntity.ok(createdVoyage);
         } catch (RuntimeException e) {
-            System.out.println("Error: " + e.getMessage());
-            // Handle any exception, such as "Pays not found"
-            return ResponseEntity.status(404).body(null); // Return a 404 error if destination is not found
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -51,20 +56,20 @@ public class VoyageController {
 //        return ResponseEntity.ok(voyageServiceImpl.updateVoyage(id, voyage));
 //    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVoyage(@PathVariable Long id) {
-        voyageServiceImpl.deleteVoyage(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/voyageur")
-    public List<Voyage> getVoyagesByVoyageur(@RequestParam Utilisateur voyageur) {
-        return voyageServiceImpl.getVoyagesByVoyageur(voyageur);
-    }
-
-    @GetMapping("/destination")
-    public List<Voyage> getVoyagesByDestination(@RequestParam Pays destination) {
-        return voyageServiceImpl.getVoyagesByDestination(destination);
-    }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteVoyage(@PathVariable Long id) {
+//        voyageServiceImpl.deleteVoyage(id);
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//    @GetMapping("/voyageur")
+//    public List<Voyage> getVoyagesByVoyageur(@RequestParam Utilisateur voyageur) {
+//        return voyageServiceImpl.getVoyagesByVoyageur(voyageur);
+//    }
+//
+//    @GetMapping("/destination")
+//    public List<Voyage> getVoyagesByDestination(@RequestParam Pays destination) {
+//        return voyageServiceImpl.getVoyagesByDestination(destination);
+//    }
 
 }

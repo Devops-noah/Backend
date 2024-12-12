@@ -1,8 +1,14 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/travel_carry_db
-    username: travelcarry
-    password: travel_carry
+    # This is for local postgresql
+#    url: jdbc:postgresql://localhost:5432/travel_carry_db
+#    username: travelcarry
+#    password: travel_carry
+
+    # This if for Neon online postgresql database
+    url: jdbc:postgresql://ep-old-sun-a2rixr7y.eu-central-1.aws.neon.tech/travel_carry_db?sslmode=require
+    username: travel_carry_db_owner
+    password: NeTmSU7EqO2J
   jpa:
     hibernate:
       ddl-auto: update
