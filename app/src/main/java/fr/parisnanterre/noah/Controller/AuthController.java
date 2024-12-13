@@ -1,7 +1,5 @@
 package fr.parisnanterre.noah.Controller;
 
-
-
 import fr.parisnanterre.noah.DTO.AuthenticationRequest;
 import fr.parisnanterre.noah.DTO.AuthenticationResponse;
 import fr.parisnanterre.noah.Entity.Role;
@@ -71,6 +69,32 @@ public class AuthController {
 
         String jwt = jwtUtil.generateToken(authentication.getName());
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
+    }
+    @GetMapping("/me")
+    public ResponseEntity<?> getUserDetails(Authentication authentication) {
+        // Obtenir l'utilisateur connecté à partir du contexte d'authentification
+        String email = authentication.getName();
+
+        // Rechercher l'utilisateur dans la base de données
+        Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findByEmail(email);
+        if (utilisateurOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("status", "error", "message", "User not found")
+            );
+        }
+
+        Utilisateur utilisateur = utilisateurOpt.get();
+
+        // Créer une réponse utilisateur simplifiée
+        Map<String, Object> response = Map.of(
+                "id", utilisateur.getId(),
+                "nom", utilisateur.getNom(),
+                "prenom", utilisateur.getPrenom(),
+                "email", utilisateur.getEmail(),
+                "role", utilisateur.getRole().getName()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
 //    @PostMapping("/login")
