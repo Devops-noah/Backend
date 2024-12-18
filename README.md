@@ -88,20 +88,20 @@ Backend/
 
 ## 🚀 Installation et Configuration
 
-1. Prérequis
+### 1. Prérequis
 
     Java 21 installé sur votre machine.
     Gradle installé.
     PostgreSQL pour la base de données.
-### 3. Installation des Dépendances
+### 2. Installation des Dépendances
 
 Clonez le projet et installez les dépendances avec Gradle :
 
-git clone https://github.com/votre-repo/Backend.git
+git clone https://github.com/Devops-noah/Backend.git
 cd Backend
 ./gradlew build
 
-### 4. Exécution de l'Application
+### 3. Exécution de l'Application
 
 Lancez l'application avec Gradle :
 
@@ -129,7 +129,7 @@ Le fichier .jar sera disponible dans le dossier build/libs/ et pourra être exé
 
 java -jar build/libs/travelcarry.jar
 
-🔧 Tests
+#🔧 Tests
 
 Pour exécuter les tests unitaires et d'intégration, utilisez la commande suivante :
 
