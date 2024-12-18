@@ -109,17 +109,17 @@ Lancez l'application avec Gradle :
 
 L'API sera disponible à l'adresse :
 http://localhost:8080
-# 🔐 Sécurité
+## 🔐 Sécurité
 
     L'application utilise JWT pour sécuriser les endpoints.
     Lors de la connexion (/api/auth/login), un token JWT est généré. Ce token doit être inclus dans l'en-tête Authorization pour chaque requête protégée.
 
-# 📄 Documentation des API
+## 📄 Documentation des API
 
     Swagger UI est disponible pour tester et explorer les endpoints.
     Accédez à http://localhost:8080/swagger-ui.html une fois l'application démarrée.
 
-# 🚀 Lancement en Production
+## 🚀 Lancement en Production
 
 Pour générer un fichier .jar exécutable, utilisez Gradle :
 
@@ -129,20 +129,20 @@ Le fichier .jar sera disponible dans le dossier build/libs/ et pourra être exé
 
 java -jar build/libs/travelcarry.jar
 
-#🔧 Tests
+## 🔧 Tests
 
 Pour exécuter les tests unitaires et d'intégration, utilisez la commande suivante :
 
 ./gradlew test
 
-# 📢 Fonctionnalités Principales
+## 📢 Fonctionnalités Principales
 
     Authentification sécurisée (Spring Security + JWT).
     Gestion des colis : création, soumission et validation.
     Notifications des feedbacks pour les expéditeurs.
     Gestion des annonces et voyages pour les voyageurs.
 
-# 🛠️ Outils de Développement
+## 🛠️ Outils de Développement
 
     IDE : IntelliJ IDEA / Eclipse / VS Code.
     Base de Données : PostgreSQL.
