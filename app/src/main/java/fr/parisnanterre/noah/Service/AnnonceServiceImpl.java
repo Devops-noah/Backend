@@ -2,6 +2,7 @@
 package fr.parisnanterre.noah.Service;
 
 //import fr.parisnanterre.noah.DTO.AnnonceRequest;
+import fr.parisnanterre.noah.DTO.AnnonceDTO;
 import fr.parisnanterre.noah.DTO.Filtre;
 import fr.parisnanterre.noah.Entity.*;
 import fr.parisnanterre.noah.Repository.AnnonceRepository;
@@ -29,10 +30,11 @@ public class AnnonceServiceImpl {
     private UtilisateurRepository utilisateurRepository;
 
     @Autowired
-    public AnnonceServiceImpl(AnnonceRepository annonceRepository, PaysRepository paysRepository, VoyageRepository voyageRepository) {
+    public AnnonceServiceImpl(AnnonceRepository annonceRepository, PaysRepository paysRepository, VoyageRepository voyageRepository, UtilisateurRepository utilisateurRepository) {
         this.annonceRepository = annonceRepository;
         this.paysRepository = paysRepository;
         this.voyageRepository = voyageRepository;
+        this.utilisateurRepository = utilisateurRepository;
     }
 
     public List<Annonce> getAllAnnonces() {
@@ -43,7 +45,7 @@ public class AnnonceServiceImpl {
         return annonceRepository.findById(id);
     }
 
-    public void createAnnonce(Annonce annonce, Long voyageId, String paysDepartNom, String paysDestinationNom) {
+    public void createAnnonce(Annonce annonce,  Long voyageId, String paysDepartNom, String paysDestinationNom) {
         // Validate annonce object is not null
         Objects.requireNonNull(annonce, "Annonce object must not be null");
 
@@ -140,7 +142,6 @@ public class AnnonceServiceImpl {
     public List<Annonce> getAnnoncesByPaysDestination(Pays paysDest) {
         return annonceRepository.findByPaysDestination(paysDest);
     }
-
 
 
 //    public List<Annonce> getFilteredAnnonces(Filtre filtre) {

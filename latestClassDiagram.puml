@@ -1,0 +1,175 @@
+@startuml
+class Utilisateur {
+    - id : long
+    - nom : string
+    - prenom : string
+    - email : string
+    - motDePasse : string
+    - telephone : string
+    - adresse : string
+    - role : Rôle
+    ---
+    + seConnecter(email : string, motDePasse : string) : bool
+    + seDeconnecter() : void
+    + voirProfil() : string
+    # mettreAJourProfil(nom : string, email : string, telephone : string) : bool
+    - validerEmail(email : string) : bool
+    - validerPermissions(utilisateur : Utilisateur) : bool
+    + mdpOublier(email : string) : string
+    + changerMotDePasse(ancienMdp : string, nouveauMdp : string) : bool
+}
+
+class Voyageur {
+    - annonces : List<Annonce>
+    ---
+    + creerAnnonce(paysDepart : string, paysArrivee : string, dateDepart : date, dateArrivee : date) : Annonce
+    + supprimerAnnonce(idAnnonce : int) : bool
+    + consulterDemandes(idAnnonce : int) : List<Demande>
+    + accepterDemande(idDemande : int) : bool
+    + refuserDemande(idDemande : int) : bool
+}
+
+class Expediteur {
+    - demandes : List<Demande>
+    ---
+    + rechercherAnnonces(filtre : dict) : List<Annonce>
+    + envoyerDemande(idAnnonce : int, objet : Objet) : Demande
+    + annulerDemande(idDemande : int) : bool
+    + consulterStatutDemande(idDemande : int) : string
+}
+
+class InformationColis {
+    + poids: float
+    + dimensions: string
+    + nature: string
+    + categorie: string
+    + datePriseEnCharge: date
+    + plageHoraire: string
+    ---
+    + remplirDetails(poids: float, dimensions: string, nature: string, categorie: string, date: date, plageHoraire: string) : void
+    + verifierChamps() : bool
+    + soumettreDemande() : Feedback
+}
+
+class Feedback {
+    + message: string
+    + type: enum {Confirmation, Erreur}
+    ---
+    + afficherMessage() : void
+}
+
+class Notification {
+    - id : int
+    - destinataire : Utilisateur
+    - message : string
+    - typeNotification : enum {DemandeService, Livraison, RetourExperience}
+    - dateEnvoi : datetime
+    - lue : bool
+    - livraisonAssociee : Livraison
+    - notationAssociee : Notation
+    ---
+    + envoyerNotification(destinataire : Utilisateur, message : string, typeNotification : enum) : void
+    + associerLivraison(livraison : Livraison) : void
+    + associerNotation(notation : Notation) : void
+    + consulterNotification() : string
+    + marquerCommeLue() : void
+    + filtrerAnnonces(annonces : List<Annonce>, dateDepart : date, prixMax : float, poidsMin : float, destination : Pays) : List<Annonce>
+}
+
+class Livraison {
+    - id : int
+    - expéditeur : Utilisateur
+    - voyageur : Utilisateur
+    - receveur : Utilisateur
+    - dateEnvoi : datetime
+    - dateReception : datetime
+    - statut : enum {EnCours, Livrée, Annulée}
+    ---
+    + enregistrerLivraison(expéditeur : Utilisateur, voyageur : Utilisateur, receveur : Utilisateur, dateEnvoi : datetime, dateReception : datetime, statut : enum) : void
+    + marquerCommeLivrée() : void
+}
+
+class Notation {
+    - id : int
+    - utilisateur : Utilisateur
+    - livraisonId : int
+    - notePonctualite : int
+    - noteEtatObjet : int
+    - noteCommunication : int
+    - commentaire : string
+    ---
+    + creerNotation(livraisonId : int, utilisateur : Utilisateur, notePonctualite : int, noteEtatObjet : int, noteCommunication : int, commentaire : string) : bool
+    + calculerNoteGlobale() : float
+}
+
+class Rôle {
+    - id : int
+    - nom : string
+    ---
+    + getRolesDisponibles() : List<Role>
+}
+
+class Annonce {
+    - id : int
+    - dateCreation : date
+    - voyageur : Voyageur
+    - paysDepart : Pays
+    - paysArrivee : Pays
+    - demandes : List<Demande>
+    ---
+    + creerAnnonceVoyageur(voyage : Voyage) : bool
+    + afficherAnnoncesParPays(pays : Pays) : bool
+    + ajouterDemande(demande : Demande) : void
+    + supprimerDemande(idDemande : int) : bool
+    + obtenirDemandes() : List<Demande>
+    + mettreAJourAnnonce(paysDepart : string, paysArrivee : string, dateDepart : date, dateArrivee : date) : bool
+    - verifierConflitDates(dateDepart : date, dateArrivee : date) : bool
+}
+
+class Demande {
+    - id : int
+    - expéditeur : Utilisateur
+    - statut : enum {EN_ATTENTE, ACCEPTE, REFUSE}
+    - annonce : Annonce
+    ---
+    + mettreAJourStatut(nouveauStatut : string) : void
+    + consulterDetails() : dict
+}
+
+class Pays {
+    - id : int
+    - nom : string
+    - codeISO : string
+    - villes : List<string>
+    ---
+    + afficherPays() : string
+    + ajouterVille(nomVille : string) : bool
+}
+
+class Voyage {
+    - id : int
+    - dateDepart : date
+    - dateArrivee : date
+    - destination : Pays
+    - voyageur : Utilisateur
+    ---
+    + creerVoyage(dateDepart : date, dateArrivee : date, destination : Pays) : bool
+    + voirDetailsVoyage() : string
+}
+
+Utilisateur --> InformationColis : "remplit"
+InformationColis --> Feedback : "génère"
+Feedback --> Utilisateur : "notifie"
+
+Utilisateur <|-- Voyageur
+Utilisateur <|-- Expediteur
+Utilisateur "1" -- "1" Rôle : "possède"
+Voyageur "1" -- "0.." Annonce : "créée"
+Annonce "1" --> "0..*" Demande : "contient"
+Annonce "0..*" --> "1" Pays : "relié"
+Annonce "1" --> "1" Utilisateur : "créée par"
+Voyage "1" --> "1" Pays : "dessert"
+Notification "1" *-- "1" Utilisateur : "notifie"
+Livraison "1" --> "1..*" Notification : "génère"
+Livraison "1" --> "0..*" Notation : "associe"
+@enduml

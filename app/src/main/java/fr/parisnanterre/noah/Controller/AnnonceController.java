@@ -2,13 +2,19 @@
 package fr.parisnanterre.noah.Controller;
 
 //import fr.parisnanterre.noah.DTO.AnnonceRequest;
+import fr.parisnanterre.noah.DTO.AnnonceDTO;
 import fr.parisnanterre.noah.DTO.Filtre;
 import fr.parisnanterre.noah.Entity.Annonce;
 import fr.parisnanterre.noah.Entity.Pays;
+import fr.parisnanterre.noah.Entity.Utilisateur;
+import fr.parisnanterre.noah.Entity.Voyageur;
+import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import fr.parisnanterre.noah.Service.AnnonceServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +26,14 @@ import java.util.List;
 //@CrossOrigin(origins = "http://localhost:4200") // Enable CORS for Angular frontend
 public class AnnonceController {
 
-    private AnnonceServiceImpl annonceServiceImpl;
+    private final AnnonceServiceImpl annonceServiceImpl;
+    private final UtilisateurRepository utilisateurRepository;
 
     @Autowired
-    public AnnonceController(AnnonceServiceImpl annonceServiceImpl) {
+    public AnnonceController(AnnonceServiceImpl annonceServiceImpl, UtilisateurRepository utilisateurRepository) {
         this.annonceServiceImpl = annonceServiceImpl;
+        this.utilisateurRepository = utilisateurRepository;
+        System.out.println("AnnonceController: UtilisateurRepository bean injected successfully.");
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
@@ -41,21 +50,47 @@ public class AnnonceController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createAnnonce(
-            @Valid @RequestBody Annonce annonce,
-            @RequestParam Long voyageId,
-            @RequestParam String paysDepartNom,
-            @RequestParam String paysDestinationNom
-    ) {
+    public ResponseEntity<?> createAnnonce(@RequestBody AnnonceDTO annonceDTO) {
         try {
-            // Create the Annonce
-            annonceServiceImpl.createAnnonce(annonce, voyageId, paysDepartNom, paysDestinationNom);
+            // Get authenticated user (voyageur) from the security context
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName(); // Assuming the email is unique
+            System.out.println("email value: " + email);
+
+            Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            System.out.println("utilisateur value: " + utilisateur);
+            System.out.println("AnnonceServiceImpl: utilisateurRepository is " + (utilisateurRepository == null ? "null" : "not null"));
+
+            // Check if the user is a Voyageur
+            if (!(utilisateur instanceof Voyageur)) {
+                throw new RuntimeException("Only Voyageurs can create annonces");
+            }
+            Voyageur voyageur = (Voyageur) utilisateur;
+
+            // Map DTO to Annonce entity
+            Annonce annonce = new Annonce();
+            annonce.setDateDepart(annonceDTO.getDateDepart());
+            annonce.setDateArrivee(annonceDTO.getDateArrivee());
+            annonce.setDatePublication(annonceDTO.getDatePublication());
+            annonce.setPoidsDisponible(annonceDTO.getPoidsDisponible());
+            annonce.setVoyageur(voyageur); // Set the authenticated Voyageur
+
+            // Call the service to save the annonce
+            annonceServiceImpl.createAnnonce(
+                    annonce,
+                    annonceDTO.getVoyageId() != null ? annonceDTO.getVoyageId().longValue() : null,
+                    annonceDTO.getPaysDepartNom(),
+                    annonceDTO.getPaysDestinationNom()
+            );
+
             return ResponseEntity.ok("Annonce created successfully");
         } catch (RuntimeException e) {
-            // Handle invalid requests (e.g., non-Voyageurs trying to create an annonce)
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
 
 //    @PutMapping("/{id}")

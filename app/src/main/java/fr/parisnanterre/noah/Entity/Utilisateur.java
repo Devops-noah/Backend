@@ -57,27 +57,34 @@ public abstract class Utilisateur {
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false) // Foreign key for Role
+    @ToString.Exclude
     private Role role; // Single Role for the user
 
     @OneToMany(mappedBy = "expediteur", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Livraison> livraisonsExpediteur;
 
     @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Livraison> livraisonsVoyageur;
 
 //    @OneToMany(mappedBy = "receveur", cascade = CascadeType.ALL)
 //    private List<Livraison> livraisonsReceveur;
 
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Notation> notations;
 
     @OneToMany(mappedBy = "expediteur", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Demande> demandes;
 
     @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Annonce> annonces;
 
     @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Voyage> voyages;
 
 }
