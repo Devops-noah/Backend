@@ -2,6 +2,7 @@ package fr.parisnanterre.noah.config;
 
 import fr.parisnanterre.noah.Service.CustomUserDetailsService;
 import fr.parisnanterre.noah.util.JwtAuthenticationFilter;
+import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,10 +40,10 @@ public class SecurityConfig {
                     return corsConfig;
                 }))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/annonces").permitAll() // Allow public access to `getAllAnnonces`
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/notations/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
