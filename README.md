@@ -15,6 +15,9 @@
 
 # Backend Api Structure
 
+## 🚀 Travel Carry - Backend
+
+Ce projet constitue la partie Backend de l'application Travel Carry, développée avec Spring Boot. Il gère les API pour la gestion des utilisateurs, des colis et des voyages.
 ```
 Backend/
 ├── app
@@ -71,6 +74,80 @@ Backend/
 ```
 
 ## Api Documentation
+
+## 🛠️ Technologies Utilisées
+
+    Spring Boot : Framework principal pour le backend.
+    Spring Data JPA : Accès à la base de données.
+    Spring Security : Gestion de l'authentification et de l'autorisation.
+    JWT (JSON Web Tokens) : Sécurité pour l'authentification.
+    PostgreSQL : Base de données relationnelle.
+    Gradle : Outil de gestion des dépendances.
+    Lombok : Réduction de la verbosité dans le code.
+    Swagger : Documentation interactive des API.
+
+## 🚀 Installation et Configuration
+
+### 1. Prérequis
+
+    Java 21 installé sur votre machine.
+    Gradle installé.
+    PostgreSQL pour la base de données.
+### 2. Installation des Dépendances
+
+Clonez le projet et installez les dépendances avec Gradle :
+
+git clone https://github.com/Devops-noah/Backend.git
+cd Backend
+./gradlew build
+
+### 3. Exécution de l'Application
+
+Lancez l'application avec Gradle :
+
+./gradlew bootRun
+
+L'API sera disponible à l'adresse :
+http://localhost:8080
+## 🔐 Sécurité
+
+    L'application utilise JWT pour sécuriser les endpoints.
+    Lors de la connexion (/api/auth/login), un token JWT est généré. Ce token doit être inclus dans l'en-tête Authorization pour chaque requête protégée.
+
+## 📄 Documentation des API
+
+    Swagger UI est disponible pour tester et explorer les endpoints.
+    Accédez à http://localhost:8080/swagger-ui.html une fois l'application démarrée.
+
+## 🚀 Lancement en Production
+
+Pour générer un fichier .jar exécutable, utilisez Gradle :
+
+./gradlew build
+
+Le fichier .jar sera disponible dans le dossier build/libs/ et pourra être exécuté avec :
+
+java -jar build/libs/travelcarry.jar
+
+## 🔧 Tests
+
+Pour exécuter les tests unitaires et d'intégration, utilisez la commande suivante :
+
+./gradlew test
+
+## 📢 Fonctionnalités Principales
+
+    Authentification sécurisée (Spring Security + JWT).
+    Gestion des colis : création, soumission et validation.
+    Notifications des feedbacks pour les expéditeurs.
+    Gestion des annonces et voyages pour les voyageurs.
+
+## 🛠️ Outils de Développement
+
+    IDE : IntelliJ IDEA / Eclipse / VS Code.
+    Base de Données : PostgreSQL.
+    Postman : Test des API.
+
 
 + Add "org.springdoc:springdoc-openapi-ui" dependency
 + Fill AnnonceController class with tags (It is for all Controller)
