@@ -143,34 +143,42 @@ public class AnnonceServiceImpl {
 
 
 
-//    public List<Annonce> getFilteredAnnonces(Filtre filtre) {
-//        // Fetch all annonces with voyages included
-//        List<Annonce> annoncesWithVoyage = annonceRepository.findAllWithVoyage();
-//
-//        // Apply filters to the result list
-//        return annoncesWithVoyage.stream()
-//                .filter(annonce ->
-//                        Optional.ofNullable(filtre.getDateDepart())
-//                                .map(dateDepart -> Optional.ofNullable(annonce.getVoyage())
-//                                        .map(voyage -> !voyage.getDateDepart().before(dateDepart)) // Assuming you want to compare with voyage's dateDepart
-//                                        .orElse(false))
-//                                .orElse(true))
-//                .filter(annonce ->
-//                        Optional.ofNullable(filtre.getPrixMax())
-//                                .map(prixMax -> annonce.getPrix() <= prixMax)
-//                                .orElse(true))
-//                .filter(annonce ->
-//                        Optional.ofNullable(filtre.getPoidsMin())
-//                                .map(poidsMin -> annonce.getPoids() >= poidsMin)
-//                                .orElse(true))
-//                .filter(annonce ->
-//                        Optional.ofNullable(filtre.getDestinationNom())
-//                                .map(destinationNom -> Optional.ofNullable(annonce.getPaysDestination())
-//                                        .map(paysDestination -> paysDestination.getNom().equalsIgnoreCase(destinationNom)) // Checks by destination name
-//                                        .orElse(false))
-//                                .orElse(true))
-//                .collect(Collectors.toList());
-//    }
+    public List<Annonce> getFilteredAnnonces(Filtre filtre) {
+        // Fetch all annonces with voyages included
+        List<Annonce> annoncesWithVoyage = annonceRepository.findAllWithVoyage();
+
+        // Apply filters to the result list
+        return annoncesWithVoyage.stream()
+                .filter(annonce ->
+                        // Filter by dateDepart
+                        Optional.ofNullable(filtre.getDateDepart())
+                                .map(dateDepart -> Optional.ofNullable(annonce.getVoyage())
+                                        .map(voyage -> !voyage.getDateDepart().before(dateDepart)) // Voyage dateDepart >= filtre dateDepart
+                                        .orElse(false))
+                                .orElse(true))
+                .filter(annonce ->
+                        // Filter by dateArrivee
+                        Optional.ofNullable(filtre.getDateArrivee())
+                                .map(dateArrivee -> Optional.ofNullable(annonce.getVoyage())
+                                        .map(voyage -> !voyage.getDateArrivee().after(dateArrivee)) // Voyage dateArrivee <= filtre dateArrivee
+                                        .orElse(false))
+                                .orElse(true))
+                .filter(annonce ->
+                        // Filter by paysDepart
+                        Optional.ofNullable(filtre.getPaysDepart())
+                                .map(paysDepart -> Optional.ofNullable(annonce.getPaysDepart())
+                                        .map(pays -> pays.getNom().equalsIgnoreCase(paysDepart)) // Matches by paysDepart name
+                                        .orElse(false))
+                                .orElse(true))
+                .filter(annonce ->
+                        // Filter by paysDestination
+                        Optional.ofNullable(filtre.getPaysDestination())
+                                .map(paysDestination -> Optional.ofNullable(annonce.getPaysDestination())
+                                        .map(pays -> pays.getNom().equalsIgnoreCase(paysDestination)) // Matches by paysDestination name
+                                        .orElse(false))
+                                .orElse(true))
+                .collect(Collectors.toList());
+    }
 
 
 

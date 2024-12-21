@@ -40,6 +40,7 @@ public class SecurityConfig {
                 }))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/annonces").permitAll() // Allow public access to `getAllAnnonces`
+                        .requestMatchers("/api/annonces/filter").permitAll()
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()

@@ -40,6 +40,12 @@ public class AnnonceController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/filter")
+    public List<Annonce> getFilteredAnnonces(@Valid @RequestBody Filtre filtre) {
+        return annonceServiceImpl.getFilteredAnnonces(filtre);
+    }
+
     @PostMapping
     public ResponseEntity<?> createAnnonce(
             @Valid @RequestBody Annonce annonce,
