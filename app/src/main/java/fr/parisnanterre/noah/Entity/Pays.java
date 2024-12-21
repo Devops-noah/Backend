@@ -25,15 +25,13 @@ public class Pays {
     private String ville;
 
     @OneToMany(mappedBy = "paysDepart", cascade = CascadeType.REMOVE)
-    @JsonBackReference("paysDepartAnnonceReference")
     private List<Annonce> annoncesAsDepart;
 
     @OneToMany(mappedBy = "paysDestination", cascade = CascadeType.REMOVE)
-    @JsonBackReference("paysDestinationAnnonceReference")
     private List<Annonce> annoncesAsDestination;
 
     @OneToMany(mappedBy = "destination", cascade = CascadeType.REMOVE)
-    @JsonBackReference("paysVoyageReference")
+    @ToString.Exclude
     private List<Voyage> voyages;
 }
 

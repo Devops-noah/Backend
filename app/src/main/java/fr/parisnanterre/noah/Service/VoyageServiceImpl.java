@@ -4,7 +4,9 @@ package fr.parisnanterre.noah.Service;
 import fr.parisnanterre.noah.Entity.Pays;
 import fr.parisnanterre.noah.Entity.Utilisateur;
 import fr.parisnanterre.noah.Entity.Voyage;
+import fr.parisnanterre.noah.Entity.Voyageur;
 import fr.parisnanterre.noah.Repository.PaysRepository;
+import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import fr.parisnanterre.noah.Repository.VoyageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,11 +19,13 @@ import java.util.Optional;
 public class VoyageServiceImpl {
 
     private final VoyageRepository voyageRepository;
+    private final UtilisateurRepository utilisateurRepository;
     private final PaysRepository paysRepository;
     @Autowired
-    public VoyageServiceImpl(VoyageRepository voyageRepository, PaysRepository paysRepository) {
+    public VoyageServiceImpl(VoyageRepository voyageRepository, PaysRepository paysRepository, UtilisateurRepository utilisateurRepository) {
         this.voyageRepository = voyageRepository;
         this.paysRepository = paysRepository;
+        this.utilisateurRepository = utilisateurRepository;
     }
 
     public List<Voyage> getAllVoyages() {
@@ -33,42 +37,32 @@ public class VoyageServiceImpl {
     }
 
 
-    public Voyage createVoyage(Voyage voyage, Integer destinationId) {
+    public Voyage createVoyage(Voyage voyage, Integer destinationId, String email) {
+        // Find the Logged-in user
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+               .orElseThrow(() -> new RuntimeException("User with email " + email + " not found"));
+
+        // Ensure the user is a Voyageur
+        if (!(utilisateur instanceof Voyageur)) {
+            throw new RuntimeException("Only Voyageurs can create voyages");
+        }
+
         // Fetch the existing Pays instance by ID
-        Pays existingPays = paysRepository.findById(destinationId)
+        Pays existingPays= paysRepository.findById(destinationId)
                 .orElseThrow(() -> new RuntimeException("Pays with ID " + destinationId + " not found"));
+
         System.out.println("existingPays: " + existingPays);
 
         // Set the existing Pays as the destination of the Voyage
         voyage.setDestination(existingPays);
 
-        // Save and return the Voyage
+        // Set the logged-in Voyageur as the owner of the Voyage
+        voyage.setVoyageur(utilisateur);
+
+        // Save the voyage
         return voyageRepository.save(voyage);
     }
 
-    public Voyage updateVoyage(Long id, Voyage voyageDetails) {
-        return voyageRepository.findById(id)
-                .map(voyage -> {
-                    voyage.setDateDepart(voyageDetails.getDateDepart());
-                    voyage.setDateArrivee(voyageDetails.getDateArrivee());
-                    voyage.setDestination(voyageDetails.getDestination());
-                    voyage.setPoidsDisponible(voyageDetails.getPoidsDisponible());
-                    voyage.setVoyageur(voyageDetails.getVoyageur());
-                    return voyageRepository.save(voyage);
-                })
-                .orElseThrow(() -> new RuntimeException("Voyage not found"));
-    }
 
-    public void deleteVoyage(Long id) {
-        voyageRepository.deleteById(id);
-    }
-
-    public List<Voyage> getVoyagesByVoyageur(Utilisateur voyageur) {
-        return voyageRepository.findByVoyageur(voyageur);
-    }
-
-    public List<Voyage> getVoyagesByDestination(Pays destination) {
-        return voyageRepository.findByDestination(destination);
-    }
 }
 

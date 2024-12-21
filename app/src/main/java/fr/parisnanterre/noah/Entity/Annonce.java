@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -17,50 +20,38 @@ public class Annonce {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double poids;
-    private Double prix;
+    @NotNull
+    private Date dateDepart;
+    @NotNull
+    private Date dateArrivee;
 
-    @Temporal(TemporalType.DATE)
-    private Date dateCreation;
+    @NotNull
+    private LocalDate datePublication;
 
-    @PrePersist
-    protected void onCreate() {
-        this.dateCreation = new Date();
-    }
+    @NotNull
+    private Double poidsDisponible;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "expediteur_id")
-    private Utilisateur expediteur;
+    private Voyageur voyageur;
 
-    @ManyToOne
-    @JoinColumn(name = "voyageur_id")
-    private Utilisateur voyageur;
+    @NotNull
+    @OneToMany(mappedBy = "annonce", cascade = CascadeType.ALL)
+    private List<Demande> demandes;
 
-    @ManyToOne
-    @JoinColumn(name = "pays_depart_id")
-    @JsonManagedReference("paysDepartAnnonceReference")
-    private Pays paysDepart;
-
-    @ManyToOne
-    @JoinColumn(name = "pays_destination_id")
-    @JsonManagedReference("paysDestinationAnnonceReference")
-    private Pays paysDestination;
-
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER) // or FetchType.LAZY if you handle the fetch explicitly in the query
     @JoinColumn(name = "voyage_id", referencedColumnName = "id") // Ensure this matches your actual column name
     private Voyage voyage;
 
-    // Business Logic
-    public boolean createAnnonceExpediteur(Utilisateur expediteur, Double poids, Double prix, Pays paysDepart, Pays paysDestination, Voyage voyage) {
-        this.expediteur = expediteur;
-        this.poids = poids;
-        this.prix = prix;
-        this.paysDepart = paysDepart;
-        this.paysDestination = paysDestination;
-        this.dateCreation = new Date();
-        this.voyage = voyage;
-        return true;
-    }
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "pays_destination_id")
+    private Pays paysDestination;
 
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "pays_depart_id", nullable = false)
+    private Pays paysDepart;
 
 }

@@ -19,7 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.List;
 
-
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {

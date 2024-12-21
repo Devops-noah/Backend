@@ -10,6 +10,7 @@ public class Notation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+<<<<<<< HEAD
     @ManyToOne
     @JoinColumn(name = "livraison_id", nullable = false)
     private Livraison livraison;
@@ -43,3 +44,16 @@ public class Notation {
 
 
 
+=======
+    private int livraisonId;
+    private int notePonctualite;
+    private int noteEtatObjet;
+    private int noteCommunication;
+    private String commentaire;
+
+    @ManyToOne
+    @JoinColumn(name = "utilisateur_id")
+    private Utilisateur utilisateur;
+
+}
+>>>>>>> authentification
