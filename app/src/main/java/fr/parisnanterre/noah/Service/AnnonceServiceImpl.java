@@ -1,8 +1,9 @@
 // Annonce service
 package fr.parisnanterre.noah.Service;
 
-//import fr.parisnanterre.noah.DTO.AnnonceRequest;
+import fr.parisnanterre.noah.DTO.AnnonceRequest;
 import fr.parisnanterre.noah.DTO.Filtre;
+import fr.parisnanterre.noah.DTO.AnnonceResponseDto;
 import fr.parisnanterre.noah.Entity.*;
 import fr.parisnanterre.noah.Repository.AnnonceRepository;
 import fr.parisnanterre.noah.Repository.PaysRepository;
@@ -23,20 +24,35 @@ import java.util.stream.Collectors;
 public class AnnonceServiceImpl {
 
 
-    private AnnonceRepository annonceRepository;
-    private PaysRepository paysRepository;
-    private VoyageRepository voyageRepository;
-    private UtilisateurRepository utilisateurRepository;
+    private final AnnonceRepository annonceRepository;
+    private final PaysRepository paysRepository;
+    private final VoyageRepository voyageRepository;
+    private final UtilisateurRepository utilisateurRepository;
 
     @Autowired
-    public AnnonceServiceImpl(AnnonceRepository annonceRepository, PaysRepository paysRepository, VoyageRepository voyageRepository) {
+    public AnnonceServiceImpl(AnnonceRepository annonceRepository, PaysRepository paysRepository, VoyageRepository voyageRepository, UtilisateurRepository utilisateurRepository) {
         this.annonceRepository = annonceRepository;
         this.paysRepository = paysRepository;
         this.voyageRepository = voyageRepository;
+        this.utilisateurRepository = utilisateurRepository;
     }
 
-    public List<Annonce> getAllAnnonces() {
-        return annonceRepository.findAll();
+    public List<AnnonceResponseDto> getAllAnnonces() {
+        List<Annonce> annonces = annonceRepository.findAll();
+
+        // Map Annonce to fr.parisnanterre.noah.DTO.AnnonceRequest.AnnonceResponse
+        return annonces.stream().map(annonce -> {
+            AnnonceResponseDto response = new AnnonceResponseDto();
+            response.setId(annonce.getId());
+            response.setDateDepart(annonce.getDateDepart());
+            response.setDateArrivee(annonce.getDateArrivee());
+            response.setDatePublication(annonce.getDatePublication());
+            response.setPoidsDisponible(annonce.getPoidsDisponible());
+            response.setPaysDepart(annonce.getPaysDepart() != null ? annonce.getPaysDepart().getNom() : null);
+            response.setPaysDestination(annonce.getPaysDestination() != null ? annonce.getPaysDestination().getNom() : null);
+            response.setVoyageId(String.valueOf(annonce.getVoyage() != null ? annonce.getVoyage().getId() : null));
+            return response;
+        }).collect(Collectors.toList());
     }
 
     public Optional<Annonce> getAnnonceById(Integer id) {
@@ -44,6 +60,23 @@ public class AnnonceServiceImpl {
     }
 
     public void createAnnonce(Annonce annonce, Long voyageId, String paysDepartNom, String paysDestinationNom) {
+        // Log the incoming Annonce object for debugging
+        System.out.println("Annonce in Service: " + annonce);
+        System.out.println("Voyage ID: " + voyageId);
+        System.out.println("Pays Depart: " + paysDepartNom);
+        System.out.println("Pays Destination: " + paysDestinationNom);
+
+        // If Annonce is null or not initialized properly, throw an exception
+        if (annonce == null) {
+            throw new IllegalArgumentException("Annonce object is null");
+        }
+
+        // Check if the voyageId is valid
+        if (voyageId == null) {
+            throw new IllegalArgumentException("Voyage ID is null");
+        }
+
+
         // Validate annonce object is not null
         Objects.requireNonNull(annonce, "Annonce object must not be null");
 
@@ -91,7 +124,7 @@ public class AnnonceServiceImpl {
 
 
 
-//    public Annonce updateAnnonce(Integer id, AnnonceRequest annonceRequest) {
+//    public Annonce updateAnnonce(Integer id, fr.parisnanterre.noah.DTO.AnnonceRequest annonceRequest) {
 //        return annonceRepository.findById(id)
 //                .map(annonce -> {
 //                    annonce.setPoids(annonceRequest.getPoids() != null ? annonceRequest.getPoids() : annonce.getPoids());

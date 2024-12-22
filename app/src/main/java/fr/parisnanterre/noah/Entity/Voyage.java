@@ -1,6 +1,7 @@
 package fr.parisnanterre.noah.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -20,17 +21,19 @@ public class Voyage {
     private Date dateArrivee;
 
     @OneToMany(mappedBy = "voyage")
-    @JsonManagedReference // Forward serialization for Voyage -> Annonce
+    @JsonIgnore // Forward serialization for Voyage -> Annonce
     @ToString.Exclude // Avoid recursion in toString()
     private List<Annonce> annonces;
 
     @ManyToOne
     @JoinColumn(name = "destination_id")
+    @JsonIgnore
     @ToString.Exclude // Prevent recursive `toString()`
     private Pays destination;
 
     @ManyToOne
     @JoinColumn(name = "voyageur_id")
+    @JsonIgnore
     @ToString.Exclude
     private Utilisateur voyageur;
 }

@@ -1,5 +1,6 @@
 package fr.parisnanterre.noah.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,6 +17,7 @@ public class Demande {
     private Utilisateur expediteur;
 
     @ManyToOne
+    @JsonBackReference
     private Annonce annonce;
 
     @Enumerated(EnumType.STRING)
