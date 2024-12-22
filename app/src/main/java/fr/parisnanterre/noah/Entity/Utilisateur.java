@@ -80,5 +80,7 @@ public abstract class Utilisateur {
     @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
     private List<Voyage> voyages;
 
+
+
 }
 

@@ -84,43 +84,21 @@ public class AuthController {
         }
 
         Utilisateur utilisateur = utilisateurOpt.get();
-
+        System.out.println("utilisateur list: " + utilisateur);
         // Créer une réponse utilisateur simplifiée
         Map<String, Object> response = Map.of(
                 "id", utilisateur.getId(),
                 "nom", utilisateur.getNom(),
                 "prenom", utilisateur.getPrenom(),
                 "email", utilisateur.getEmail(),
-                "role", utilisateur.getRole().getName()
+                //"voyageur", utilisateur.getVoyageur,
+                "role", utilisateur.getRole().getName(),
+                "type", utilisateur.getClass().getSimpleName().toLowerCase()
         );
 
         return ResponseEntity.ok(response);
     }
 
-//    @PostMapping("/login")
-//    public String login(@RequestBody AuthenticationRequest request) {
-//        System.out.println("jjdsjjedjsdlllsuewoesl");
-//        try {
-//            // Authentication the user
-//            Authentication authentication = authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(
-//                            request.getEmail(),
-//                            request.getMotDePasse()
-//                    )
-//            );
-//
-//            // Generate JWT token
-//            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-//            String jwt = jwtUtil.generateToken(authentication.getName());
-//            System.out.println("Jwt value: " + jwt);
-//
-//            // Return response
-//            return ResponseEntity.ok(new AuthenticationResponse(jwt));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials"));
-//        }
-
-   // }
 
 
 }
