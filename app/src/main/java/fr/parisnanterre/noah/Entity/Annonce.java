@@ -19,11 +19,6 @@ public class Annonce {
     private Long id;
 
     @NotNull
-    private Date dateDepart;
-    @NotNull
-    private Date dateArrivee;
-
-    @NotNull
     private Date datePublication;
 
     @NotNull
@@ -46,17 +41,5 @@ public class Annonce {
     @JsonIgnore // Prevent recursion for Voyage -> Annonce
     @ToString.Exclude // Avoid recursion in toString()
     private Voyage voyage;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnore
-    @JoinColumn(name = "pays_destination_id")
-    private Pays paysDestination;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnore
-    @JoinColumn(name = "pays_depart_id", nullable = false)
-    private Pays paysDepart;
 
 }

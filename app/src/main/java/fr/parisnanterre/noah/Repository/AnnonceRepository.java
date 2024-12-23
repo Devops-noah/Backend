@@ -13,6 +13,8 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Integer> {
     @Query("SELECT a FROM Annonce a LEFT JOIN FETCH a.voyage")
     List<Annonce> findAllWithVoyage();
 
-    List<Annonce> findByPaysDepart(Pays paysDepart);
-    List<Annonce> findByPaysDestination(Pays paysDest);
+    List<Annonce> findByVoyagePaysDepartNom(String paysDepartNom);
+
+    List<Annonce> findByVoyagePaysDestinationNom(String paysDestinationNom);
+
 }

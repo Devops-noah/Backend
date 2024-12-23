@@ -2,7 +2,7 @@
 package fr.parisnanterre.noah.Controller;
 
 import fr.parisnanterre.noah.DTO.AnnonceRequest;
-import fr.parisnanterre.noah.DTO.AnnonceResponseDto;
+import fr.parisnanterre.noah.DTO.AnnonceResponse;
 import fr.parisnanterre.noah.DTO.Filtre;
 import fr.parisnanterre.noah.Entity.Annonce;
 import fr.parisnanterre.noah.Entity.Pays;
@@ -12,12 +12,13 @@ import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import fr.parisnanterre.noah.Service.AnnonceServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -40,12 +41,12 @@ public class AnnonceController {
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping
-    public ResponseEntity<List<AnnonceResponseDto>> getAllAnnonces() {
+    public ResponseEntity<List<AnnonceResponse>> getAllAnnonces() {
         return ResponseEntity.ok(annonceServiceImpl.getAllAnnonces());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Annonce> getAnnonceById(@PathVariable Integer id) {
+    public ResponseEntity<AnnonceResponse> getAnnonceById(@PathVariable Integer id) {
         return annonceServiceImpl.getAnnonceById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -57,37 +58,24 @@ public class AnnonceController {
         return annonceServiceImpl.getFilteredAnnonces(filtre);
     }
 
-    @PostMapping
-    public ResponseEntity<?> createAnnonce(@Valid @RequestBody AnnonceRequest annonceRequest) {
+    @PostMapping("/{voyageId}")
+    public ResponseEntity<?> createAnnonce(@PathVariable Integer voyageId, @Valid @RequestBody AnnonceRequest annonceRequest, Principal principal) {
         try {
-            // Log the incoming request
-            System.out.println("Received request: " + annonceRequest);
+            // Extract email of the logged-in user
+            String email = principal.getName();
 
-            // Create a new Annonce object from the request data
+            // Create a new Annonce object (this could be passed from the frontend as well)
             Annonce annonce = new Annonce();
-            annonce.setDateDepart(annonceRequest.getDateDepart());  // Convert string to Date
-            annonce.setDateArrivee(annonceRequest.getDateArrivee()); // Convert string to Date
-            annonce.setDatePublication(annonceRequest.getDatePublication()); // Convert string to Date
-            annonce.setPoidsDisponible(annonceRequest.getPoidsDisponible());
 
-            // Fetch the Voyageur (replace 1L with dynamic ID if available)
-            Voyageur voyageur = (Voyageur) utilisateurRepository.findById(1L)
-                    .orElseThrow(() -> new RuntimeException("Voyageur not found"));
-            annonce.setVoyageur(voyageur);
+            // Call the service to create the Annonce
+            AnnonceResponse response = annonceServiceImpl.createAnnonce(annonce, annonceRequest, email, voyageId);
+            System.out.println("annonce response received: " + response);
 
-            // Ensure the fields are set properly
-            System.out.println("Annonce details: " + annonce);
+            // Return the response with the created Annonce data
+            return ResponseEntity.ok(response);
 
-            // Call service to create annonce
-            annonceServiceImpl.createAnnonce(
-                    annonce,
-                    annonceRequest.getVoyageId(),
-                    annonceRequest.getPaysDepart(),
-                    annonceRequest.getPaysDestination()
-            );
-
-            return ResponseEntity.ok("Annonce created successfully");
         } catch (Exception e) {
+            // Handle error and return bad request response with the error message
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
@@ -105,13 +93,13 @@ public class AnnonceController {
         annonceServiceImpl.deleteAnnonce(id);
     }
 
-    public List<Annonce> getAnnoncesByPaysDepart(Pays paysDepart) {
-        return annonceServiceImpl.getAnnoncesByPaysDepart(paysDepart);
+    public List<Annonce> getAnnoncesByPaysDepart(String paysDepartNom) {
+        return annonceServiceImpl.getAnnoncesByPaysDepart(paysDepartNom);
     }
 
     @GetMapping("/destination")
-    public List<Annonce> getAnnoncesByPaysDestination(@RequestParam Pays paysDest) {
-        return annonceServiceImpl.getAnnoncesByPaysDestination(paysDest);
+    public List<Annonce> getAnnoncesByPaysDestination(String paysDestinationNom) {
+        return annonceServiceImpl.getAnnoncesByPaysDestination(paysDestinationNom);
     }
 
 //    @CrossOrigin(origins = "http://localhost:3000")

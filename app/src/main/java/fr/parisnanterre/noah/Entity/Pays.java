@@ -24,20 +24,14 @@ public class Pays {
     private String codeISO;
 
     private String ville;
-
     @OneToMany(mappedBy = "paysDepart", cascade = CascadeType.REMOVE)
-    @JsonIgnore // Prevent serialization to avoid recursion
-    @ToString.Exclude // Avoid recursion in toString()
-    private List<Annonce> annoncesAsDepart;
+    @JsonIgnore
+    @ToString.Exclude
+    private List<Voyage> voyagesDepart;
 
     @OneToMany(mappedBy = "paysDestination", cascade = CascadeType.REMOVE)
-    @JsonIgnore // Prevent serialization to avoid recursion
-    @ToString.Exclude // Avoid recursion in toString()
-    private List<Annonce> annoncesAsDestination;
-
-    @OneToMany(mappedBy = "destination", cascade = CascadeType.REMOVE)
-    @JsonIgnore // Prevent serialization to avoid recursion
-    @ToString.Exclude // Avoid recursion in toString()
-    private List<Voyage> voyages;
+    @JsonIgnore
+    @ToString.Exclude
+    private List<Voyage> voyagesDestination;
 }
 
