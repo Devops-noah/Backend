@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/notations").authenticated()
                         .requestMatchers("/api/pays/**").authenticated()
                         .requestMatchers("/api/voyages/**").authenticated()
+                        .requestMatchers("/api/utilisateurs/profile").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

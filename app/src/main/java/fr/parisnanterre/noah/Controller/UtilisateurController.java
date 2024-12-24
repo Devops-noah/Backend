@@ -1,11 +1,13 @@
 package fr.parisnanterre.noah.Controller;
 
+import fr.parisnanterre.noah.DTO.UtilisateurProfileResponse;
 import fr.parisnanterre.noah.Entity.Utilisateur;
 import fr.parisnanterre.noah.Service.UtilisateurServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -17,6 +19,14 @@ public class UtilisateurController {
     @GetMapping
     public List<Utilisateur> getAllUtilisateurs() {
         return utilisateurService.getAllUtilisateurs();
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UtilisateurProfileResponse> getLoggedInUserProfile(Principal principal) {
+        // Get the email of the currently authenticated user
+        String email = principal.getName(); // This comes from Spring Security
+        UtilisateurProfileResponse profile = utilisateurService.getUserProfile(email);
+        return ResponseEntity.ok(profile);
     }
 
 //    @GetMapping("/{id}")

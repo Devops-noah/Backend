@@ -7,6 +7,8 @@ import fr.parisnanterre.noah.Entity.RoleType;
 import fr.parisnanterre.noah.Entity.Utilisateur;
 import fr.parisnanterre.noah.Repository.RoleRepository;
 import fr.parisnanterre.noah.Repository.UtilisateurRepository;
+import fr.parisnanterre.noah.Service.CustomUserDetails;
+import fr.parisnanterre.noah.Service.CustomUserDetailsService;
 import fr.parisnanterre.noah.util.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -67,9 +69,15 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getMotDePasse())
         );
 
-        String jwt = jwtUtil.generateToken(authentication.getName());
-        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+        // Extract user details
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String userType = userDetails.getUserType();  // Get the user type (expediteur/voyageur)
+
+        String jwt = jwtUtil.generateToken(authentication.getName(), userType);  // Pass userType to token generation
+        return ResponseEntity.ok(new AuthenticationResponse(jwt, userType));  // Include userType in the response
     }
+
+
     @GetMapping("/me")
     public ResponseEntity<?> getUserDetails(Authentication authentication) {
         // Obtenir l'utilisateur connecté à partir du contexte d'authentification

@@ -1,9 +1,9 @@
 package fr.parisnanterre.noah.Service;
 
-import fr.parisnanterre.noah.Entity.Role;
+import fr.parisnanterre.noah.Entity.Expediteur;
 import fr.parisnanterre.noah.Entity.Utilisateur;
+import fr.parisnanterre.noah.Entity.Voyageur;
 import fr.parisnanterre.noah.Repository.UtilisateurRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UtilisateurRepository utilisateurRepository;
+    private Utilisateur utilisateur;
 
     public CustomUserDetailsService(UtilisateurRepository utilisateurRepository) {
         this.utilisateurRepository = utilisateurRepository;
@@ -30,11 +31,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         // Convert the role to a GrantedAuthority
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(utilisateur.getRole().getName().name());
 
-        // Return the UserDetails object with username, password, and role
-        return User.builder()
-                .username(utilisateur.getEmail())
-                .password(utilisateur.getMotDePasse())
-                .authorities(authority) // Assign role as authority
-                .build();
+        return new CustomUserDetails(utilisateur, authority);  // return CustomUserDetails instead of User
+
     }
+
 }
