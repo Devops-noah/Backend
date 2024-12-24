@@ -12,6 +12,7 @@ public class InformationColis {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private float poids;
     private String dimensions;

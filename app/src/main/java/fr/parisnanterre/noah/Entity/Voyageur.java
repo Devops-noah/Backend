@@ -4,9 +4,11 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = false) // Add this to remove the warning
 @DiscriminatorValue("voyageur")
 public class Voyageur extends Utilisateur{
     // Voyageur-specific methods

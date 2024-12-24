@@ -3,13 +3,14 @@ package fr.parisnanterre.noah.Entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @Data
-@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false) // Add this to remove the warning
 @DiscriminatorValue("expediteur")
 public class Expediteur extends Utilisateur{
     // Expediteur-specific methods
