@@ -1,6 +1,7 @@
 package fr.parisnanterre.noah.Controller;
 
 import fr.parisnanterre.noah.DTO.VoyageRequest;
+import fr.parisnanterre.noah.DTO.VoyageResponse;
 import fr.parisnanterre.noah.Entity.Pays;
 import fr.parisnanterre.noah.Entity.Utilisateur;
 import fr.parisnanterre.noah.Entity.Voyage;
@@ -22,8 +23,9 @@ public class VoyageController {
         this.voyageServiceImpl = voyageServiceImpl;
     }
 
+    // GET endpoint to fetch all voyages
     @GetMapping
-    public List<Voyage> getAllVoyages() {
+    public List<VoyageResponse> getAllVoyages() {
         return voyageServiceImpl.getAllVoyages();
     }
 
@@ -62,25 +64,52 @@ public class VoyageController {
         }
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Voyage> updateVoyage(@PathVariable Long id, @RequestBody Voyage voyage) {
-//        return ResponseEntity.ok(voyageServiceImpl.updateVoyage(id, voyage));
-//    }
+    @PutMapping("/update/{voyageId}")
+    public ResponseEntity<?> updateVoyage(
+            @PathVariable Integer voyageId,
+            @RequestBody VoyageRequest voyageRequest,
+            Principal principal) {
+        try {
+            // Get the email of the logged-in user
+            String email = principal.getName();
 
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteVoyage(@PathVariable Long id) {
-//        voyageServiceImpl.deleteVoyage(id);
-//        return ResponseEntity.noContent().build();
-//    }
-//
-//    @GetMapping("/voyageur")
-//    public List<Voyage> getVoyagesByVoyageur(@RequestParam Utilisateur voyageur) {
-//        return voyageServiceImpl.getVoyagesByVoyageur(voyageur);
-//    }
-//
-//    @GetMapping("/destination")
-//    public List<Voyage> getVoyagesByDestination(@RequestParam Pays destination) {
-//        return voyageServiceImpl.getVoyagesByDestination(destination);
-//    }
+            // Call the service to update the voyage
+            Voyage updatedVoyage = voyageServiceImpl.updateVoyage(voyageId, voyageRequest, email);
+
+            // Return the updated voyage
+            return ResponseEntity.ok(updatedVoyage);
+        } catch (RuntimeException e) {
+            // Return a 400 (Bad Request) with the exception message
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            // Catch-all for unexpected errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
+        }
+    }
+
+    // Delete voyage
+    @DeleteMapping("/delete/{voyageId}")
+    public ResponseEntity<?> deleteVoyage(
+            @PathVariable Integer voyageId,
+            Principal principal) {
+        try {
+            // Get the email of the logged-in user
+            String email = principal.getName();
+
+            // Call the service to delete the voyage
+            voyageServiceImpl.deleteVoyage(voyageId, email);
+
+            // Return a success response
+            return ResponseEntity.ok("Voyage deleted successfully");
+        } catch (RuntimeException e) {
+            // Return a 400 (Bad Request) with the exception message
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            // Catch-all for unexpected errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
+        }
+    }
+
+
 
 }

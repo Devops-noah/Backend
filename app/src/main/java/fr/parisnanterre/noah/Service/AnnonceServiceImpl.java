@@ -12,6 +12,7 @@ import fr.parisnanterre.noah.Repository.VoyageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -173,47 +174,108 @@ public class AnnonceServiceImpl {
 
 
 
-//    public Annonce updateAnnonce(Integer id, fr.parisnanterre.noah.DTO.AnnonceRequest annonceRequest) {
-//        return annonceRepository.findById(id)
-//                .map(annonce -> {
-//                    annonce.setPoids(annonceRequest.getPoids() != null ? annonceRequest.getPoids() : annonce.getPoids());
-//                    annonce.setPrix(annonceRequest.getPrix() != null ? annonceRequest.getPrix() : annonce.getPrix());
-//                    annonce.setDateCreation(annonce.getDateCreation());
-//                    annonce.setExpediteur(annonce.getExpediteur());
-//                    annonce.setVoyageur(annonce.getVoyageur());
-//
-//                    // Update PaysDepart if a new one is provided
-//                    Optional<Pays> paysDepartOpt = Optional.ofNullable(annonceRequest.getPaysDepartNom())
-//                            .flatMap(paysRepository::findByNom);
-//                    paysDepartOpt.ifPresentOrElse(
-//                            annonce::setPaysDepart,
-//                            () -> { throw new RuntimeException("PaysDepart with name " + annonceRequest.getPaysDepartNom() + " does not exist."); }
-//                    );
-//
-//                    // Update PaysDestination if a new one is provided
-//                    Optional<Pays> paysDestinationOpt = Optional.ofNullable(annonceRequest.getPaysDestinationNom())
-//                            .flatMap(paysRepository::findByNom);
-//                    paysDestinationOpt.ifPresentOrElse(
-//                            annonce::setPaysDestination,
-//                            () -> { throw new RuntimeException("PaysDestination with name " + annonceRequest.getPaysDestinationNom() + " does not exist."); }
-//                    );
-//
-//                    // Update Voyage if a new one is provided
-//                    Optional<Voyage> voyageOpt = Optional.ofNullable(annonceRequest.getVoyageId())
-//                            .flatMap(voyageRepository::findById);
-//                    voyageOpt.ifPresentOrElse(
-//                            annonce::setVoyage,
-//                            () -> { throw new RuntimeException("Voyage with ID " + annonceRequest.getVoyageId() + " does not exist."); }
-//                    );
-//
-//                    return annonceRepository.save(annonce);
-//                })
-//                .orElseThrow(() -> new RuntimeException("Annonce not found"));
-//    }
+    public AnnonceResponse updateAnnonce(Integer annonceId, AnnonceRequest annonceRequest, String email) {
+        // Fetch the Voyageur by email
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Voyageur not found"));
 
-    public void deleteAnnonce(Integer id) {
-        annonceRepository.deleteById(id);
+        // Check if the user is a Voyageur
+        if (!(utilisateur instanceof Voyageur)) {
+            throw new RuntimeException("Only Voyageurs can update annonces");
+        }
+
+        // Fetch the existing Annonce
+        Annonce existingAnnonce = annonceRepository.findById(annonceId)
+                .orElseThrow(() -> new RuntimeException("Annonce with ID " + annonceId + " not found"));
+
+        // Ensure the logged-in Voyageur owns the Annonce
+        if (!existingAnnonce.getVoyageur().equals(utilisateur)) {
+            throw new RuntimeException("The Annonce does not belong to the logged-in Voyageur");
+        }
+
+        // Update the Annonce fields
+        existingAnnonce.setDatePublication(annonceRequest.getDatePublication());
+        existingAnnonce.setPoidsDisponible(annonceRequest.getPoidsDisponible());
+
+        // Save the updated Annonce
+        Annonce updatedAnnonce = annonceRepository.save(existingAnnonce);
+
+        // Build and return the response DTO
+        AnnonceResponse response = new AnnonceResponse();
+        response.setId(updatedAnnonce.getId());
+        response.setDatePublication(updatedAnnonce.getDatePublication());
+        response.setPoidsDisponible(updatedAnnonce.getPoidsDisponible());
+        response.setDateDepart(updatedAnnonce.getVoyage().getDateDepart()); // Get from Voyage
+        response.setDateArrivee(updatedAnnonce.getVoyage().getDateArrivee()); // Get from Voyage
+        response.setPaysDepart(updatedAnnonce.getVoyage().getPaysDepart().getNom()); // Get from Voyage
+        response.setPaysDestination(updatedAnnonce.getVoyage().getPaysDestination().getNom()); // Get from Voyage
+        response.setVoyageId(updatedAnnonce.getVoyage().getId());
+
+        return response;
+
     }
+
+    public void deleteAnnonce(Integer annonceId, String email) {
+        // Fetch the Voyageur by email
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Voyageur not found"));
+
+        // Check if the user is a Voyageur
+        if (!(utilisateur instanceof Voyageur)) {
+            throw new RuntimeException("Only Voyageurs can delete annonces");
+        }
+
+        // Fetch the existing Annonce
+        Annonce existingAnnonce = annonceRepository.findById(annonceId)
+                .orElseThrow(() -> new RuntimeException("Annonce with ID " + annonceId + " not found"));
+
+        // Ensure the logged-in Voyageur owns the Annonce
+        if (!existingAnnonce.getVoyageur().equals(utilisateur)) {
+            throw new RuntimeException("The Annonce does not belong to the logged-in Voyageur");
+        }
+
+        // Delete the Annonce
+        annonceRepository.delete(existingAnnonce);
+    }
+
+    public void deleteAnnonces(List<Integer> annonceIds, String email) {
+        // Validate user
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Fetch and delete specific annonces
+        List<Annonce> annonces = annonceRepository.findAllById(annonceIds);
+        for (Annonce annonce : annonces) {
+            // Ensure the annonces belong to the user
+            if (!annonce.getVoyageur().equals(utilisateur)) {
+                throw new RuntimeException("You are not authorized to delete this annonce");
+            }
+        }
+        annonceRepository.deleteAll(annonces);
+    }
+
+    @Transactional
+    public void deleteAllAnnonces(String email) {
+        // Fetch the Utilisateur (Voyageur) by email
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utilisateur not found"));
+
+        // Ensure the logged-in user is a Voyageur
+        if (!(utilisateur instanceof Voyageur)) {
+            throw new RuntimeException("Only Voyageurs can delete annonces");
+        }
+
+        // Delete all annonces belonging to the logged-in Voyageur
+        List<Annonce> annonces = annonceRepository.findByVoyageur((Voyageur) utilisateur);
+        if (annonces.isEmpty()) {
+            throw new RuntimeException("No annonces found for the provided user");
+        }
+
+        // Delete the annonces
+        annonceRepository.deleteAll(annonces);
+    }
+
+
 
     public List<Annonce> getAnnoncesByPaysDepart(String paysDepart) {
         return annonceRepository.findByVoyagePaysDepartNom(paysDepart);

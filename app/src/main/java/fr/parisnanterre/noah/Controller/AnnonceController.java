@@ -82,16 +82,79 @@ public class AnnonceController {
 
 
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<?> updateAnnonce(@PathVariable Integer id, @RequestBody fr.parisnanterre.noah.DTO.AnnonceRequest annonceRequest) {
-//        Annonce updateAnnonce = annonceServiceImpl.updateAnnonce(id, annonceRequest);
-//        return ResponseEntity.ok("Annonce updated successfully");
-//    }
+    @PutMapping("/update/{annonceId}")
+    public ResponseEntity<?> updateAnnonce(@PathVariable Integer annonceId, @Valid @RequestBody AnnonceRequest annonceRequest, Principal principal) {
+        try {
+            // Extract email of the logged-in user
+            String email = principal.getName();
 
-    @DeleteMapping("/{id}")
-    public void deleteAnnonce(@PathVariable Integer id) {
-        annonceServiceImpl.deleteAnnonce(id);
+            // Call the service to update the Annonce
+            AnnonceResponse response = annonceServiceImpl.updateAnnonce(annonceId, annonceRequest, email);
+            System.out.println("Updated annonce response received: " + response);
+
+            // Return the response with the updated Annonce data
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            // Handle error and return bad request response with the error message
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
     }
+
+    @DeleteMapping("/delete/{annonceId}")
+    public ResponseEntity<?> deleteAnnonce(@PathVariable Integer annonceId, Principal principal) {
+        try {
+            // Extract email of the logged-in user
+            String email = principal.getName();
+
+            // Call the service to delete the single annonce
+            annonceServiceImpl.deleteAnnonce(annonceId, email);
+
+            // Return success response
+            return ResponseEntity.ok("Annonce deleted successfully");
+        } catch (Exception e) {
+            // Handle error and return bad request response with the error message
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    // Delete specific annonces
+    @DeleteMapping("/delete/selected-annonces")
+    public ResponseEntity<?> deleteAnnonces(@RequestBody List<Integer> annonceIds, Principal principal) {
+        try {
+            if (annonceIds == null || annonceIds.isEmpty()) {
+                throw new IllegalArgumentException("Annonce IDs cannot be empty");
+            }
+            // Get logged-in user's email
+            String email = principal.getName();
+
+            // Call service to delete specific annonces
+            annonceServiceImpl.deleteAnnonces(annonceIds, email);
+
+            return ResponseEntity.ok("Selected annonces deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    // Delete all annonces
+    @DeleteMapping("/delete/all")
+    public ResponseEntity<?> deleteAllAnnonces(Principal principal) {
+        try {
+            // Get the logged-in user's email
+            String email = principal.getName();
+
+            // Call the service to delete all annonces
+            annonceServiceImpl.deleteAllAnnonces(email);
+
+            return ResponseEntity.ok("All annonces deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+
+
 
     public List<Annonce> getAnnoncesByPaysDepart(String paysDepartNom) {
         return annonceServiceImpl.getAnnoncesByPaysDepart(paysDepartNom);
