@@ -1,13 +1,17 @@
 package fr.parisnanterre.noah.config;
 
+import fr.parisnanterre.noah.Entity.Utilisateur;
+import fr.parisnanterre.noah.Service.CustomUserDetails;
 import fr.parisnanterre.noah.Service.CustomUserDetailsService;
 import fr.parisnanterre.noah.util.JwtAuthenticationFilter;
 import jakarta.servlet.Filter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -39,6 +43,7 @@ public class SecurityConfig {
                     return corsConfig;
                 }))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/annonces").permitAll() // Allow public access to `getAllAnnonces`
                         .requestMatchers("/api/annonces/**").authenticated()
                         .requestMatchers("/api/annonces/filter").permitAll()
@@ -53,6 +58,19 @@ public class SecurityConfig {
                         .requestMatchers("/api/utilisateurs/profile").authenticated()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            String message = "Access Denied";
+
+                            if (authException instanceof DisabledException) {
+                                message = authException.getMessage(); // "User account is disabled"
+                            }
+
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // HTTP 403
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"" + message + "\"}");
+                        })
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -64,6 +82,19 @@ public class SecurityConfig {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
+
+        // Add a UserDetailsChecker to validate the account status
+        authProvider.setPreAuthenticationChecks(userDetails -> {
+            if (userDetails instanceof CustomUserDetails) {
+                Utilisateur utilisateur = ((CustomUserDetails) userDetails).getUtilisateur();
+                if (!utilisateur.isEnabled()) {
+                    throw new DisabledException("User account is disabled");
+                }
+            } else {
+                throw new ClassCastException("Expected CustomUserDetails but got " + userDetails.getClass());
+            }
+        });
+
         return authProvider;
     }
 
@@ -76,4 +107,6 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
 }

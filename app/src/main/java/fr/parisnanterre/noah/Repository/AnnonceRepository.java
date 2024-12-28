@@ -24,5 +24,9 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Integer> {
     // Custom query to delete all annonces associated with a specific Voyageur
     void deleteByVoyageur(Voyageur voyageur);
 
+    List<Annonce> findByApproved(boolean approved);
+
+    List<Annonce> findBySuspended(boolean suspended);
+
 
 }

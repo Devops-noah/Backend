@@ -1,5 +1,6 @@
 package fr.parisnanterre.noah.Service;
 
+import fr.parisnanterre.noah.Entity.AdminType;
 import fr.parisnanterre.noah.Entity.Expediteur;
 import fr.parisnanterre.noah.Entity.Utilisateur;
 import fr.parisnanterre.noah.Entity.Voyageur;
@@ -27,7 +28,10 @@ public class CustomUserDetails extends User implements UserDetails {
             return "voyageur";
         } else if (utilisateur instanceof Expediteur) {
             return "expediteur";
+        } else if (utilisateur instanceof AdminType) {
+            return "admin";
         }
+
         return null; // or throw an exception if neither is found
     }
 }

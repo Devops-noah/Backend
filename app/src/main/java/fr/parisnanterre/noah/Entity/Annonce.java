@@ -24,6 +24,10 @@ public class Annonce {
     @NotNull
     private Double poidsDisponible;
 
+    private boolean approved = false; // Default to false, must be approved by admin
+
+    private boolean suspended = false; // Default to false, can be toggled by admin
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnore // Prevent serialization of voyageur to avoid recursion

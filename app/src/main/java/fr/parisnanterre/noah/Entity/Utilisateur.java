@@ -28,7 +28,8 @@ import java.util.Set;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = Voyageur.class, name = "voyageur"),
-        @JsonSubTypes.Type(value = Expediteur.class, name = "expediteur")
+        @JsonSubTypes.Type(value = Expediteur.class, name = "expediteur"),
+        @JsonSubTypes.Type(value = AdminType.class, name = "admin")
 })
 public abstract class Utilisateur {
     @Id
@@ -54,6 +55,9 @@ public abstract class Utilisateur {
 
     private String telephone;
     private String adresse;
+
+  
+    private boolean enabled = true; // Default to true (enabled)
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false) // Foreign key for Role
