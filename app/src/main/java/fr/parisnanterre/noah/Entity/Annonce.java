@@ -46,4 +46,22 @@ public class Annonce {
     @ToString.Exclude // Avoid recursion in toString()
     private Voyage voyage;
 
+    // Getter and Setter for 'approved'
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
+    }
+
+    // Getter and Setter for 'suspended'
+    public boolean isSuspended() {
+        return suspended;
+    }
+
+    public void setSuspended(boolean suspended) {
+        this.suspended = suspended;
+    }
+
 }

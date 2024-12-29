@@ -29,9 +29,9 @@ public class AdminAnnonceController {
     }
 
     // Approve an annonce
-    @PutMapping("/approve/{id}")
+    @PutMapping("/approve/{annonceId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> approveAnnonce(@PathVariable("id") Integer annonceId) {
+    public ResponseEntity<?> approveAnnonce(@PathVariable Integer annonceId) {
         try {
             Annonce approvedAnnonce = adminServiceImpl.approveAnnonce(annonceId);
             return ResponseEntity.ok(approvedAnnonce);
@@ -57,9 +57,9 @@ public class AdminAnnonceController {
     }
 
     // Suspend an annonce
-    @PutMapping("/suspend/{id}")
+    @PutMapping("/suspend/{annonceId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> suspendAnnonce(@PathVariable("id") Integer annonceId) {
+    public ResponseEntity<?> suspendAnnonce(@PathVariable Integer annonceId) {
         try {
             Annonce suspendedAnnonce = adminServiceImpl.suspendAnnonce(annonceId);
             return ResponseEntity.ok(suspendedAnnonce);

@@ -2,10 +2,7 @@ package fr.parisnanterre.noah.Service;
 
 import fr.parisnanterre.noah.DTO.AnnonceResponse;
 import fr.parisnanterre.noah.DTO.UtilisateurProfileResponse;
-import fr.parisnanterre.noah.Entity.Expediteur;
-import fr.parisnanterre.noah.Entity.Utilisateur;
-import fr.parisnanterre.noah.Entity.Voyage;
-import fr.parisnanterre.noah.Entity.Voyageur;
+import fr.parisnanterre.noah.Entity.*;
 import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,6 +74,8 @@ public class UtilisateurServiceImpl {
 
             // For Expediteur, display a message
             profile.setMessage("L'utilisateur est un expediteur. Les colis ne sont pas disponibles pour le moment.");
+        } else if (utilisateur instanceof AdminType) {
+            profile.setType("admin"); // Set type ass "admin"
         }
 
         return profile;

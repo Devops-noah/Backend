@@ -118,7 +118,7 @@ public class AdminServiceImpl {
     public Annonce approveAnnonce(Integer annonceId) {
         Annonce annonce = annonceRepository.findById(annonceId)
                 .orElseThrow(() -> new IllegalArgumentException("Annonce not found with ID: " + annonceId));
-        annonce.setApproved(true);
+        annonce.setApproved(!annonce.isApproved());
         return annonceRepository.save(annonce);
     }
 
@@ -130,11 +130,11 @@ public class AdminServiceImpl {
         annonceRepository.deleteById(annonceId);
     }
 
-    // Suspend an annonce
+    // Suspend or resume an annonce (toggle suspended state based on 'suspend' parameter)
     public Annonce suspendAnnonce(Integer annonceId) {
         Annonce annonce = annonceRepository.findById(annonceId)
                 .orElseThrow(() -> new IllegalArgumentException("Annonce not found with ID: " + annonceId));
-        annonce.setSuspended(true);
+        annonce.setSuspended(!annonce.isSuspended()); // Set suspended state to true or false based on the parameter
         return annonceRepository.save(annonce);
     }
 
