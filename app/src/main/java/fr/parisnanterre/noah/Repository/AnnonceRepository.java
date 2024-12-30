@@ -19,14 +19,12 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Integer> {
     List<Annonce> findByVoyagePaysDestinationNom(String paysDestinationNom);
 
     // Find all annonces associated with a specific Voyageur
+    // Fetch all annonces where approved = true and suspended = false
+    @Query("SELECT a FROM Annonce a JOIN FETCH a.voyage v WHERE a.approved = true AND a.suspended = false")
     List<Annonce> findByVoyageur(Voyageur voyageur);
 
     // Custom query to delete all annonces associated with a specific Voyageur
     void deleteByVoyageur(Voyageur voyageur);
-
-    List<Annonce> findByApproved(boolean approved);
-
-    List<Annonce> findBySuspended(boolean suspended);
 
 
 }

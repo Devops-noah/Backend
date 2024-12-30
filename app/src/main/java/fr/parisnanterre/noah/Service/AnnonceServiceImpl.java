@@ -40,12 +40,24 @@ public class AnnonceServiceImpl {
     public List<AnnonceResponse> getAllAnnonces() {
         List<Annonce> annonces = annonceRepository.findAllWithVoyage();
 
+        // Filter out non-approved and suspended annonces
+        annonces = annonces.stream()
+                .filter(annonce -> annonce.isApproved() && !annonce.isSuspended())
+                .collect(Collectors.toList());
+
+        // Log to ensure filtering is working
+        annonces.forEach(annonce -> {
+            System.out.println("Annonce ID: " + annonce.getId() + " | Approved: " + annonce.isApproved() + " | Suspended: " + annonce.isSuspended());
+        });
+
         // Map Annonce to fr.parisnanterre.noah.DTO.AnnonceRequest.AnnonceResponse
         return annonces.stream().map(annonce -> {
             AnnonceResponse response = new AnnonceResponse();
             response.setId(annonce.getId());
             response.setDatePublication(annonce.getDatePublication());
             response.setPoidsDisponible(annonce.getPoidsDisponible());
+            response.setApproved(annonce.isApproved());
+            response.setSuspended(annonce.isSuspended());
 
             // Retrieve Voyage information
             if (annonce.getVoyage() != null) {

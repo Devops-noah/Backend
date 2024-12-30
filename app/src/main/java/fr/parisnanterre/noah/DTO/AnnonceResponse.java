@@ -17,5 +17,8 @@ public class AnnonceResponse {
         private Integer voyageurId;
         private String voyageurNom;
         private String voyageurEmail;
+        private boolean approved;
+        private boolean suspended;
+
 
 }

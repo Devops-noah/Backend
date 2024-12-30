@@ -1,5 +1,6 @@
 package fr.parisnanterre.noah.Controller.admin;
 
+import fr.parisnanterre.noah.DTO.AnnonceResponse;
 import fr.parisnanterre.noah.Entity.Annonce;
 import fr.parisnanterre.noah.Service.admin.AdminServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,8 @@ public class AdminAnnonceController {
     // Get all annonces
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Annonce>> getAllAnnonces() {
-        List<Annonce> annonces = adminServiceImpl.getAllAnnonces();
+    public ResponseEntity<List<AnnonceResponse>> getAllAnnonces() {
+        List<AnnonceResponse> annonces = adminServiceImpl.getAllAnnonces();
         return ResponseEntity.ok(annonces);
     }
 

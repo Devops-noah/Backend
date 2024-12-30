@@ -1,5 +1,6 @@
 package fr.parisnanterre.noah.Service.admin;
 
+import fr.parisnanterre.noah.DTO.AnnonceResponse;
 import fr.parisnanterre.noah.Entity.*;
 import fr.parisnanterre.noah.Repository.AnnonceRepository;
 import fr.parisnanterre.noah.Repository.RoleRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminServiceImpl {
@@ -110,8 +112,50 @@ public class AdminServiceImpl {
     // --- Annonce Management ---
 
     // Get all annonces
-    public List<Annonce> getAllAnnonces() {
-        return annonceRepository.findAll();
+    public List<AnnonceResponse> getAllAnnonces() {
+        return annonceRepository.findAll().stream()
+                .map(this::mapToAnnonceResponse)
+                .collect(Collectors.toList());
+    }
+
+    private AnnonceResponse mapToAnnonceResponse(Annonce annonce) {
+        AnnonceResponse response = new AnnonceResponse();
+        response.setId(annonce.getId());
+        response.setDatePublication(annonce.getDatePublication());
+        response.setPoidsDisponible(annonce.getPoidsDisponible());
+        response.setApproved(annonce.isApproved());
+        response.setSuspended(annonce.isSuspended());
+
+        // Retrieve Voyage information
+        if (annonce.getVoyage() != null) {
+            Voyage voyage = annonce.getVoyage();
+
+            // Use dateDepart and dateArrivee from the Voyage
+            response.setDateDepart(voyage.getDateDepart());
+            response.setDateArrivee(voyage.getDateArrivee());
+
+            // Retrieve paysDepart and paysDestination from the Voyage
+            response.setPaysDepart(voyage.getPaysDepart() != null ? voyage.getPaysDepart().getNom() : null);
+            response.setPaysDestination(voyage.getPaysDestination() != null ? voyage.getPaysDestination().getNom() : null);
+
+            // Set Voyage ID
+            response.setVoyageId(voyage.getId());
+        } else {
+            // Handle case where Voyage is null
+            response.setDateDepart(null);
+            response.setDateArrivee(null);
+            response.setPaysDepart(null);
+            response.setPaysDestination(null);
+            response.setVoyageId(null);
+        }
+        // Retrieve Voyageur information using UtilisateurRepository
+        if (annonce.getVoyageur() != null) {
+            // Assuming the Voyageur entity has getId() and getName() methods
+            response.setVoyageurId(Math.toIntExact(annonce.getVoyageur().getId()));
+            response.setVoyageurNom(annonce.getVoyageur().getNom());
+            response.setVoyageurEmail(annonce.getVoyageur().getEmail());
+        }
+        return response;
     }
 
     // Approve an annonce
