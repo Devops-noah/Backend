@@ -2,7 +2,6 @@ package fr.parisnanterre.noah.Entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.util.Date;
 
 @Entity
@@ -15,13 +14,17 @@ public class InformationColis {
     private Long id;
 
     private float poids;
-    private String dimensions;
+    private String dimensions; // Longueur x Largeur x Hauteur
     private String nature;
     private String categorie;
     private Date datePriseEnCharge;
     private String plageHoraire;
 
     @ManyToOne
-    @JoinColumn(name = "demande_id")
-    private Demande demande;
+    @JoinColumn(name = "annonce_id", nullable = false)
+    private Annonce annonce; // Liée à une annonce
+
+    @ManyToOne
+    @JoinColumn(name = "expediteur_id", nullable = false)
+    private Utilisateur expediteur; // L'expéditeur ayant proposé le colis
 }

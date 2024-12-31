@@ -72,9 +72,10 @@ public class AuthController {
         // Extract user details
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         String userType = userDetails.getUserType();  // Get the user type (expediteur/voyageur)
+        Long userId = userDetails.getId(); // Ajoutez ceci si vous avez un getter pour l'ID utilisateur
+        String jwt = jwtUtil.generateToken(userDetails.getUsername(), userType, userId);
 
-        String jwt = jwtUtil.generateToken(authentication.getName(), userType);  // Pass userType to token generation
-        return ResponseEntity.ok(new AuthenticationResponse(jwt, userType));  // Include userType in the response
+        return ResponseEntity.ok(new AuthenticationResponse(jwt, userType, userId));
     }
 
 

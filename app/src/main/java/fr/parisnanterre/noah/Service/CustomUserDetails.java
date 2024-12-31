@@ -34,4 +34,9 @@ public class CustomUserDetails extends User implements UserDetails {
 
         return null; // or throw an exception if neither is found
     }
+
+    public Long getId() {
+        return utilisateur.getId(); // Supposons que votre objet Utilisateur a un champ id
+    }
+
 }
