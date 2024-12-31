@@ -6,10 +6,10 @@ import fr.parisnanterre.noah.Service.InformationColisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/information_colis")
@@ -17,17 +17,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class InformationColisController {
     private final InformationColisService informationColisService;
 
-    @PostMapping
+    @PostMapping("/{annonceId}")
     public HttpEntity<InformationColisResponse> proposerColis(
-            @RequestBody InformationColisRequest colisRequest) {
+            @PathVariable Long annonceId,
+            @RequestBody InformationColisRequest colisRequest,
+            Authentication authentication) {
         try {
-            // Appel au service pour traiter la demande
-            InformationColisResponse response = informationColisService.proposerColis(colisRequest);
-            return ResponseEntity.ok(response); // Retourner un statut 200 avec la réponse
+            // Retrieve the authenticated user's email
+            String email = authentication.getName();
+            System.out.println("Authenticated email: " + email); // Log the email for debugging
+
+            InformationColisResponse response = informationColisService.proposerColis(colisRequest, email, annonceId);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             InformationColisResponse errorResponse = new InformationColisResponse();
             errorResponse.setMessage(e.getMessage());
-            return ResponseEntity.badRequest().body(errorResponse); // Retourner un statut 400 avec l'erreur
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
 }

@@ -56,7 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/voyages").authenticated()
                         .requestMatchers("/api/voyages/**").authenticated()
                         .requestMatchers("/api/utilisateurs/profile").authenticated()
-                        .requestMatchers("/api/information_colis").hasRole("EXPEDITEUR") // Autorisation pour les expéditeurs
+                        .requestMatchers("/api/information_colis/**").authenticated() // Autorisation pour les expéditeurs
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
