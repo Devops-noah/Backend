@@ -49,7 +49,7 @@ public class InformationColisService {
         informationColis.setCategorie(colisRequest.getCategorie());
         informationColis.setDatePriseEnCharge(colisRequest.getDatePriseEnCharge());
         informationColis.setPlageHoraire(colisRequest.getPlageHoraire());
-        //informationColis.setAnnonce(annonce);
+        informationColis.setAnnonce(annonce);
         informationColis.setExpediteur((Expediteur) utilisateur); // Set the expediteur
 
         // Save the entity in the database
