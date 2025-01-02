@@ -1,36 +1,30 @@
 package fr.parisnanterre.noah.Entity;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Data
+@Table(name = "notifications")
 public class Notification {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String message;
-    private LocalDateTime dateEnvoi;
-    private boolean lue;
+
+    private boolean isRead;
+
+    private Date createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "destinataire_id")
-    private Utilisateur destinataire;
-
-    @Enumerated(EnumType.STRING)
-    private TypeNotification typeNotification;
+    @JoinColumn(name = "voyageur_id", nullable = false)
+    private Utilisateur voyageur;
 
     @ManyToOne
-    @JoinColumn(name = "livraison_associee_id")
-    private Livraison livraisonAssociee;
-
-    @ManyToOne
-    @JoinColumn(name = "notation_associee_id")
-    private Notation notationAssociee;
+    @JoinColumn(name = "information_colis_id", nullable = false)
+    private InformationColis informationColis; // Lien avec InformationColis
 }

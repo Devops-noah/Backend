@@ -36,7 +36,6 @@ public class Annonce {
 
     //@NotNull
     @OneToMany(mappedBy = "annonce", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Demande> demandes;
 
     @NotNull

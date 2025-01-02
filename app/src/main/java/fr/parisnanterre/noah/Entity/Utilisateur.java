@@ -78,12 +78,12 @@ public abstract class Utilisateur {
     @OneToMany(mappedBy = "expediteur", cascade = CascadeType.ALL)
     private List<Demande> demandes;
 
+
     @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
     private List<Annonce> annonces;
 
     @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
     private List<Voyage> voyages;
-
 
 
 }

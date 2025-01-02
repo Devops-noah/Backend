@@ -23,6 +23,8 @@ public class InformationColisService {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
+    @Autowired
+    private NotificationService notificationService; // Ajout du service Notification
 
     public InformationColisResponse proposerColis(InformationColisRequest colisRequest, String email, Long annonceId) throws Exception {
         // Retrieve the logged-in user by email
@@ -54,6 +56,12 @@ public class InformationColisService {
 
         // Save the entity in the database
         InformationColis savedColis = informationColisRepository.save(informationColis);
+
+        // Create a notification for the voyageur
+        Utilisateur voyageur = annonce.getVoyageur();
+        String notificationMessage = "Nouvelle demande pour votre annonce publiée le " + annonce.getDatePublication();
+
+        notificationService.createNotification(voyageur, notificationMessage, savedColis.getId());
 
         // Create a response DTO
         InformationColisResponse response = new InformationColisResponse();

@@ -1,8 +1,9 @@
 package fr.parisnanterre.noah.Entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.Date;
 
 @Entity
 @Data
@@ -13,14 +14,19 @@ public class Demande {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "expediteur_id")
-    private Utilisateur expediteur;
+    @JoinColumn(name = "information_colis_id", nullable = false)
+    private InformationColis informationColis; // Lié à un colis
 
     @ManyToOne
-    @JsonBackReference
-    private Annonce annonce;
+    @JoinColumn(name = "voyageur_id", nullable = false)
+    private Utilisateur voyageur; // Voyageur lié à la demande
+
+    @ManyToOne
+    @JoinColumn(name = "expediteur_id", nullable = false)
+    private Utilisateur expediteur; // Expéditeur qui a initié la demande
 
     @Enumerated(EnumType.STRING)
-    private Statut statut;
+    private Statut status; // Statut de la demande : EN_ATTENTE, ACCEPTE, REFUSE
 
+    private Date createdAt;
 }
