@@ -35,8 +35,8 @@ public class Annonce {
     private Voyageur voyageur;
 
     //@NotNull
-    @OneToMany(mappedBy = "annonce", cascade = CascadeType.ALL)
-    private List<Demande> demandes;
+    //@OneToMany(mappedBy = "annonce", cascade = CascadeType.ALL)
+    //private List<Demande> demandes;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER) // or FetchType.LAZY if you handle the fetch explicitly in the query
