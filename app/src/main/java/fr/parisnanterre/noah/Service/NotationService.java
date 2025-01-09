@@ -39,7 +39,7 @@ public class NotationService {
 
         // Mapper les champs du DTO vers une entité Notation
         Notation notation = new Notation();
-        notation.setLivraison(livraison);
+       notation.setLivraison(livraison);
         notation.setNotePonctualite(notationDto.getNotePonctualite());
         notation.setNoteEtatObjet(notationDto.getNoteEtatObjet());
         notation.setNoteCommunication(notationDto.getNoteCommunication());
