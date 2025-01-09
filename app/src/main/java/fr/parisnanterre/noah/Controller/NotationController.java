@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotationController {
 
-    private final NotationService notationService;
+    /*private final NotationService notationService;
     private final LivraisonService livraisonService;
 
     // Créer une notation à partir d'un NotationDto
@@ -40,5 +40,5 @@ public class NotationController {
         Livraison livraison = livraisonService.getLivraisonById(livraisonId);
         Double globalNote = notationService.calculateGlobalNote(livraison);
         return ResponseEntity.ok(globalNote);
-    }
+    }*/
 }
