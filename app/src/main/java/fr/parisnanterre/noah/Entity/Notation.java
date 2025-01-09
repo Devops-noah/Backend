@@ -6,7 +6,7 @@ import lombok.Data;
 @Entity
 @Data
 public class Notation {
-    @Id
+    /*@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
@@ -38,5 +38,5 @@ public class Notation {
             throw new IllegalStateException("La notation est autorisée uniquement pour les livraisons avec un statut 'LIVREE'.");
         }
         this.noteGlobale = calculateNoteGlobale();
-    }
+    }*/
 }

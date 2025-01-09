@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotationService {
 
-    private final NotationRepository notationRepository;
+    /*private final NotationRepository notationRepository;
     private final LivraisonService livraisonService;
 
     // Crée une notation à partir d'une entité Notation
@@ -67,5 +67,5 @@ public class NotationService {
                 .mapToDouble(Notation::getNoteGlobale)
                 .average()
                 .orElse(0.0);
-    }
+    }*/
 }

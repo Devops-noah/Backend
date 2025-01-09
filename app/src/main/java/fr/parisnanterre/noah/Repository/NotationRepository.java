@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface NotationRepository extends JpaRepository<Notation, Integer> {
-    List<Notation> findByLivraison(Livraison livraison);
+    /*List<Notation> findByLivraison(Livraison livraison);*/
 }
 
