@@ -1,44 +1,50 @@
 package fr.parisnanterre.noah.Controller;
 
-import fr.parisnanterre.noah.DTO.NotationDto;
-import fr.parisnanterre.noah.Entity.Livraison;
 import fr.parisnanterre.noah.Entity.Notation;
-import fr.parisnanterre.noah.Service.LivraisonService;
+import fr.parisnanterre.noah.Request.NotationRequest;
 import fr.parisnanterre.noah.Service.NotationService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/notations")
-@RequiredArgsConstructor
+@RequestMapping("/notations")
 public class NotationController {
 
-    /*private final NotationService notationService;
-    private final LivraisonService livraisonService;
+    @Autowired
+    private NotationService notationService;
 
-    // Créer une notation à partir d'un NotationDto
-    @PostMapping
-    public ResponseEntity<Notation> createNotation(@RequestBody NotationDto notationDto) {
-        Notation createdNotation = notationService.createNotationFromDto(notationDto);
-        return ResponseEntity.ok(createdNotation);
+    // API pour ajouter ou mettre à jour une notation
+    @PostMapping("/update-or-create")
+    public ResponseEntity<Notation> updateOrCreateNotation(@RequestBody NotationRequest notationRequest) {
+        try {
+            Notation notation = notationService.updateOrCreateNotation(notationRequest);
+            return ResponseEntity.ok(notation);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
     }
 
-    // Récupérer les notations par livraison
-    @GetMapping("/livraison/{livraisonId}")
-    public ResponseEntity<List<Notation>> getNotationsByLivraison(@PathVariable int livraisonId) {
-        Livraison livraison = livraisonService.getLivraisonById(livraisonId);
-        List<Notation> notations = notationService.getNotationsByLivraison(livraison);
+    // API pour récupérer toutes les notations
+    @GetMapping("/")
+    public ResponseEntity<List<Notation>> getAllNotations() {
+        List<Notation> notations = notationService.getAllNotations();
         return ResponseEntity.ok(notations);
     }
 
-    // Calculer la note globale pour une livraison
-    @GetMapping("/livraison/{livraisonId}/global-note")
-    public ResponseEntity<Double> getGlobalNoteByLivraison(@PathVariable int livraisonId) {
-        Livraison livraison = livraisonService.getLivraisonById(livraisonId);
-        Double globalNote = notationService.calculateGlobalNote(livraison);
-        return ResponseEntity.ok(globalNote);
-    }*/
+    // API pour récupérer les notations par utilisateur
+    @GetMapping("/user/{utilisateurId}")
+    public ResponseEntity<List<Notation>> getNotationsByUtilisateurId(@PathVariable Long utilisateurId) {
+        List<Notation> notations = notationService.getNotationsByUtilisateurId(utilisateurId);
+        return ResponseEntity.ok(notations);
+    }
+
+    // API pour récupérer les 3 dernières notations
+    @GetMapping("/last-three")
+    public ResponseEntity<List<Notation>> getLastThreeNotations() {
+        List<Notation> notations = notationService.getLastThreeNotations();
+        return ResponseEntity.ok(notations);
+    }
 }

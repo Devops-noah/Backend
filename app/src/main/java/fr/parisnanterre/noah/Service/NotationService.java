@@ -1,71 +1,66 @@
 package fr.parisnanterre.noah.Service;
 
-import fr.parisnanterre.noah.DTO.NotationDto;
-import fr.parisnanterre.noah.Entity.Livraison;
 import fr.parisnanterre.noah.Entity.Notation;
-import fr.parisnanterre.noah.Entity.StatutLivraison;
+import fr.parisnanterre.noah.Entity.Utilisateur;
 import fr.parisnanterre.noah.Repository.NotationRepository;
-import lombok.RequiredArgsConstructor;
+import fr.parisnanterre.noah.Repository.UtilisateurRepository;
+import fr.parisnanterre.noah.DTO.NotationRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class NotationService {
 
-    /*private final NotationRepository notationRepository;
-    private final LivraisonService livraisonService;
+    @Autowired
+    private NotationRepository notationRepository;
 
-    // Crée une notation à partir d'une entité Notation
-    public Notation createNotation(Notation notation) {
-        Livraison livraison = notation.getLivraison();
-        if (livraison == null || livraison.getStatut() != StatutLivraison.LIVREE) {
-            throw new IllegalStateException("La notation est autorisée uniquement pour les livraisons avec un statut 'LIVREE'.");
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
+
+    // Méthode pour ajouter ou mettre à jour une notation
+    public Notation updateOrCreateNotation(NotationRequest notationRequest) throws Exception {
+        Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findById(notationRequest.getUtilisateurId());
+        if (!utilisateurOpt.isPresent()) {
+            throw new Exception("Utilisateur non trouvé");
         }
 
-        // Calcul automatique de la note globale grâce à @PrePersist
-        return notationRepository.save(notation);
-    }
+        Utilisateur utilisateur = utilisateurOpt.get();
 
-    // Crée une notation à partir d'un NotationDto
-    public Notation createNotationFromDto(NotationDto notationDto) {
-        Livraison livraison = livraisonService.getLivraisonById(notationDto.getLivraisonId());
-
-        // Validation du statut de la livraison
-        if (livraison == null || livraison.getStatut() != StatutLivraison.LIVREE) {
-            throw new IllegalStateException("La notation est autorisée uniquement pour les livraisons avec un statut 'LIVREE'.");
+        // Vérification si l'utilisateur a déjà une notation
+        List<Notation> notations = utilisateur.getNotations();
+        if (!notations.isEmpty()) {
+            // Si une notation existe déjà, on la met à jour
+            Notation existingNotation = notations.get(0);
+            existingNotation.setNote(notationRequest.getNote());
+            existingNotation.setCommentaire(notationRequest.getCommentaire());
+            existingNotation.setDatePublication(notationRequest.getDatePublication());
+            return notationRepository.save(existingNotation);
+        } else {
+            // Si aucune notation, on crée une nouvelle
+            Notation newNotation = new Notation();
+            newNotation.setNote(notationRequest.getNote());
+            newNotation.setCommentaire(notationRequest.getCommentaire());
+            newNotation.setDatePublication(notationRequest.getDatePublication());
+            newNotation.setUtilisateur(utilisateur);
+            return notationRepository.save(newNotation);
         }
-
-        // Mapper les champs du DTO vers une entité Notation
-        Notation notation = new Notation();
-        notation.setLivraison(livraison);
-        notation.setNotePonctualite(notationDto.getNotePonctualite());
-        notation.setNoteEtatObjet(notationDto.getNoteEtatObjet());
-        notation.setNoteCommunication(notationDto.getNoteCommunication());
-        notation.setCommentaire(notationDto.getCommentaire());
-        // NoteGlobale sera calculée automatiquement via @PrePersist
-
-        // Sauvegarde dans le repository
-        return notationRepository.save(notation);
     }
 
-    // Récupère les notations associées à une livraison
-    public List<Notation> getNotationsByLivraison(Livraison livraison) {
-        return notationRepository.findByLivraison(livraison);
+    // Méthode pour récupérer toutes les notations
+    public List<Notation> getAllNotations() {
+        return notationRepository.findAll();
     }
 
-    // Calcul de la note globale pour une livraison
-    public Double calculateGlobalNote(Livraison livraison) {
-        List<Notation> notations = getNotationsByLivraison(livraison);
-        if (notations.isEmpty()) {
-            return null;
-        }
+    // Méthode pour récupérer les notations par utilisateur
+    public List<Notation> getNotationsByUtilisateurId(Long utilisateurId) {
+        return notationRepository.findByUtilisateurId(utilisateurId);
+    }
 
-        // Moyenne des notes globales
-        return notations.stream()
-                .mapToDouble(Notation::getNoteGlobale)
-                .average()
-                .orElse(0.0);
-    }*/
+    // Méthode pour récupérer les 3 dernières notations (si disponibles)
+    public List<Notation> getLastThreeNotations() {
+        return notationRepository.findTop3ByOrderByDatePublicationDesc();
+    }
 }
