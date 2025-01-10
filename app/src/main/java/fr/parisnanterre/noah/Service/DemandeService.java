@@ -1,6 +1,8 @@
 package fr.parisnanterre.noah.Service;
 
+import fr.parisnanterre.noah.DTO.DemandeRequest;
 import fr.parisnanterre.noah.Entity.Demande;
+import fr.parisnanterre.noah.DTO.DemandeResponse; // Importer la classe DemandeResponse
 import fr.parisnanterre.noah.Entity.InformationColis;
 import fr.parisnanterre.noah.Entity.Statut;
 import fr.parisnanterre.noah.Entity.Utilisateur;
@@ -29,30 +31,50 @@ public class DemandeService {
         return demandeRepository.findByVoyageurId(voyageur.getId());
     }
 
+    // Récupérer les demandes pour un expéditeur spécifique
+    public List<Demande> getDemandesByExpediteur(String expediteurEmail) {
+        Utilisateur expediteur = utilisateurRepository.findByEmail(expediteurEmail)
+                .orElseThrow(() -> new RuntimeException("Expéditeur non trouvé"));
+        return demandeRepository.findByExpediteurId(expediteur.getId());
+    }
+
     // Créer une nouvelle demande
     @Transactional
-    public Demande createDemande(Long colisId, Long voyageurId, String expediteurEmail) {
-        // Récupérer le colis
+    public DemandeResponse createDemande(DemandeRequest demandeRequest, Long colisId, String expediteurEmail) {
+        System.out.println("blalalalalalalal");
+        // Récupérer le colis à partir de l'ID
         InformationColis colis = informationColisRepository.findById(colisId)
                 .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
 
-        // Récupérer le voyageur
-        Utilisateur voyageur = utilisateurRepository.findById(voyageurId)
-                .orElseThrow(() -> new RuntimeException("Voyageur non trouvé"));
-
-        // Récupérer l'expéditeur
+        // Récupérer l'expéditeur authentifié à partir de l'email
         Utilisateur expediteur = utilisateurRepository.findByEmail(expediteurEmail)
                 .orElseThrow(() -> new RuntimeException("Expéditeur non trouvé"));
 
+        // Vérifier si l'expéditeur est bien autorisé à créer une demande pour ce colis
+        if (!colis.getExpediteur().equals(expediteur)) {
+            throw new RuntimeException("L'expéditeur n'est pas autorisé à créer une demande pour ce colis");
+        }
+
         // Créer la demande
         Demande demande = new Demande();
-        demande.setInformationColis(colis);
-        demande.setVoyageur(voyageur);
-        demande.setExpediteur(expediteur);
+        demande.setInformationColis(colis); // Lien entre la demande et le colis
+        demande.setExpediteur(expediteur); // L'expéditeur qui a proposé le colis
         demande.setStatus(Statut.EN_ATTENTE); // Par défaut, en attente
         demande.setCreatedAt(new Date());
 
-        return demandeRepository.save(demande);
+        System.out.println("demande : " + demande);
+
+        // Sauvegarder la demande dans la base de données
+        Demande savedDemande = demandeRepository.save(demande);
+
+        // Retourner la réponse sous forme de DTO
+        DemandeResponse response = new DemandeResponse();
+        response.setId(savedDemande.getId());
+        response.setExpediteurEmail(savedDemande.getExpediteur().getEmail());
+        response.setStatus(savedDemande.getStatus());
+        response.setCreatedAt(savedDemande.getCreatedAt());
+
+        return response;
     }
 
 
