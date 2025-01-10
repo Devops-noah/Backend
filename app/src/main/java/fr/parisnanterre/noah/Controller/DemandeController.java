@@ -1,6 +1,8 @@
 package fr.parisnanterre.noah.Controller;
 
 import fr.parisnanterre.noah.Entity.Demande;
+import fr.parisnanterre.noah.DTO.DemandeResponse;  // Importer le DTO
+import fr.parisnanterre.noah.DTO.DemandeRequest;
 import fr.parisnanterre.noah.Entity.Statut;
 import fr.parisnanterre.noah.Service.DemandeService;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +21,16 @@ public class DemandeController {
     private final DemandeService demandeService;
 
     /**
-     * Récupérer les demandes pour le voyageur connecté.
+     * Récupérer les demandes pour l'expéditeur connecté.
      */
     @GetMapping
-    public ResponseEntity<List<Demande>> getDemandesByVoyageur(Authentication authentication) {
+    public ResponseEntity<List<Demande>> getDemandesByExpediteur(Authentication authentication) {
         try {
-            // Récupérer l'email de l'utilisateur connecté
+            // Récupérer l'email de l'utilisateur connecté (l'expéditeur)
             String email = authentication.getName();
-            System.out.println("Authenticated email: " + email);
 
-            // Appeler le service pour récupérer les demandes
-            List<Demande> demandes = demandeService.getDemandesByVoyageur(email);
+            // Appeler le service pour récupérer les demandes de cet expéditeur
+            List<Demande> demandes = demandeService.getDemandesByExpediteur(email);
             return ResponseEntity.ok(demandes);
         } catch (Exception e) {
             // En cas d'erreur, retourner une réponse HTTP 400
@@ -38,25 +39,49 @@ public class DemandeController {
     }
 
     /**
-     * Créer une nouvelle demande.
+     * Créer une nouvelle demande (l'expéditeur crée la demande pour son colis).
      */
-    @PostMapping("/{colisId}/voyageur/{voyageurId}")
-    public ResponseEntity<Demande> createDemande(
+    @PostMapping("/{colisId}")
+    public ResponseEntity<DemandeResponse> createDemande(
             @PathVariable Long colisId,
-            @PathVariable Long voyageurId,
+            @RequestBody DemandeRequest demandeRequest,
             Authentication authentication) {
+        System.out.println("Authentication: " + authentication);
+
         try {
-            // Récupérer l'email de l'expéditeur connecté
+
+            // Vérifier que l'utilisateur est authentifié
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(403).body(null); // Retourner 403 si non authentifié
+            }
+
+            // Récupérer l'email de l'expéditeur authentifié
             String expediteurEmail = authentication.getName();
 
-            // Créer la demande
-            Demande demande = demandeService.createDemande(colisId, voyageurId, expediteurEmail);
-            return ResponseEntity.ok(demande);
+            // Créer la demande avec l'email de l'expéditeur
+            DemandeResponse demandeResponse = demandeService.createDemande(demandeRequest, colisId, expediteurEmail);
+
+            return ResponseEntity.ok(demandeResponse); // Retourner la demande en réponse
         } catch (Exception e) {
-            // En cas d'erreur, retourner une réponse HTTP 400
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(null); // Si une erreur se produit, retour de l'erreur 400
         }
     }
+
+    /**
+     * Tester la création de demande en passant directement les paramètres (sans authentification).
+     */
+//    @PostMapping("/testDemande")
+//    public ResponseEntity<DemandeResponse> testCreateDemande(@RequestParam Long colisId, @RequestParam String expediteurEmail) {
+//        System.out.println("Test de la création de demande");
+//        try {
+//            DemandeResponse response = demandeService.createDemande(demandeRcolisId, expediteurEmail);
+//            System.out.println("Demande créée avec succès: " + response);
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            System.out.println("Erreur lors de la création de la demande: " + e.getMessage());
+//            return ResponseEntity.badRequest().body(null);
+//        }
+//    }
 
     /**
      * Mettre à jour le statut d'une demande.

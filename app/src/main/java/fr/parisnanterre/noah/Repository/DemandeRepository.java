@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface DemandeRepository extends JpaRepository<Demande, Long> {
     List<Demande> findByVoyageurId(Long voyageurId);
+    List<Demande> findByExpediteurId(Long expediteurId);
+
 }
