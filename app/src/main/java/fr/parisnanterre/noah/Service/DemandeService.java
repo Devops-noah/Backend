@@ -45,6 +45,7 @@ public class DemandeService {
         // Récupérer le colis à partir de l'ID
         InformationColis colis = informationColisRepository.findById(colisId)
                 .orElseThrow(() -> new RuntimeException("Colis non trouvé"));
+        System.out.println("test colis value: " + colis.getAnnonce().getVoyageur().getNom());
 
         // Récupérer l'expéditeur authentifié à partir de l'email
         Utilisateur expediteur = utilisateurRepository.findByEmail(expediteurEmail)
@@ -61,11 +62,13 @@ public class DemandeService {
         demande.setExpediteur(expediteur); // L'expéditeur qui a proposé le colis
         demande.setStatus(Statut.EN_ATTENTE); // Par défaut, en attente
         demande.setCreatedAt(new Date());
+        demande.setVoyageur(colis.getAnnonce().getVoyageur()); // Le voyageur pour lequel la demande est proposée
 
         System.out.println("demande : " + demande);
 
         // Sauvegarder la demande dans la base de données
         Demande savedDemande = demandeRepository.save(demande);
+        System.out.println("save demande: " + savedDemande);
 
         // Retourner la réponse sous forme de DTO
         DemandeResponse response = new DemandeResponse();
@@ -73,6 +76,8 @@ public class DemandeService {
         response.setExpediteurEmail(savedDemande.getExpediteur().getEmail());
         response.setStatus(savedDemande.getStatus());
         response.setCreatedAt(savedDemande.getCreatedAt());
+        response.setVoyageurNom(String.valueOf(colis.getAnnonce().getVoyageur().getNom()));
+        System.out.println("reponse demande: " + response);
 
         return response;
     }

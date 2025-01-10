@@ -11,4 +11,6 @@ public class DemandeResponse {
     private String expediteurEmail;
     private Statut status;
     private Date createdAt;
+    private String voyageurNom;
+
 }
