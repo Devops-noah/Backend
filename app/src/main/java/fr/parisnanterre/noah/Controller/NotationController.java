@@ -1,7 +1,7 @@
 package fr.parisnanterre.noah.Controller;
 
 import fr.parisnanterre.noah.Entity.Notation;
-import fr.parisnanterre.noah.Request.NotationRequest;
+import fr.parisnanterre.noah.DTO.NotationRequest;
 import fr.parisnanterre.noah.Service.NotationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
