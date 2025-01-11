@@ -15,12 +15,15 @@ public class UtilisateurProfileResponse {
     private String adresse;
     private String type;
 
-    // For Voyageur
+    // Pour le type Voyageur
     private List<AnnonceResponse> annonces;
     private List<Voyage> voyages;
 
-    // Expediteur-specific fields
-    //private List<ColisResponse> colis;
-    // Message for Expediteur or general cases
+    // Message spécifique pour l'Expediteur ou autres cas généraux
     private String message;
+
+    // Champ ajouté pour le nombre de notifications non lues
+    private int notificationCount;
+
+
 }

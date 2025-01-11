@@ -1,5 +1,6 @@
 package fr.parisnanterre.noah.Service;
-
+import fr.parisnanterre.noah.DTO.DemandeRequest;
+import fr.parisnanterre.noah.DTO.DemandeResponse;
 import fr.parisnanterre.noah.DTO.InformationColisRequest;
 import fr.parisnanterre.noah.DTO.InformationColisResponse;
 import fr.parisnanterre.noah.Entity.*;
@@ -9,7 +10,7 @@ import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Date;
 
 @Service
 public class InformationColisService {
@@ -24,47 +25,51 @@ public class InformationColisService {
     private UtilisateurRepository utilisateurRepository;
 
     @Autowired
-    private NotificationService notificationService; // Ajout du service Notification
+    private DemandeService demandeService; // Service pour créer la demande
+
+    @Autowired
+    private NotificationService notificationService; // Service pour envoyer des notifications
 
     public InformationColisResponse proposerColis(InformationColisRequest colisRequest, String email, Long annonceId) throws Exception {
-        // Retrieve the logged-in user by email
+        // Récupérer l'utilisateur authentifié par email
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User with email " + email + " not found"));
-        System.out.println("utilisateur value: " + utilisateur);
+                .orElseThrow(() -> new RuntimeException("Utilisateur avec email " + email + " non trouvé"));
 
-        // Ensure the user is an Expediteur
+        // Vérifier que l'utilisateur est bien un expéditeur
         if (!(utilisateur instanceof Expediteur)) {
-            throw new RuntimeException("Only an Expediteur can propose a colis");
+            throw new RuntimeException("Seul un expéditeur peut proposer un colis");
         }
 
-        // Validate the existence of the related annonce
+        // Récupérer l'annonce associée
         Annonce annonce = annonceRepository.findById(Math.toIntExact(annonceId))
-                .orElseThrow(() -> new Exception("Voyage with ID " + annonceId + " not found"));
+                .orElseThrow(() -> new Exception("Annonce avec ID " + annonceId + " non trouvée"));
 
-        // Create the InformationColis entity
+        // Créer l'entité InformationColis
         InformationColis informationColis = new InformationColis();
         informationColis.setPoids(colisRequest.getPoids());
-        informationColis.setDimensions(
-                colisRequest.getLongueur() + "x" + colisRequest.getLargeur() + "x" + colisRequest.getHauteur()
-        );
+        informationColis.setDimensions(colisRequest.getLongueur() + "x" + colisRequest.getLargeur() + "x" + colisRequest.getHauteur());
         informationColis.setNature(colisRequest.getNature());
         informationColis.setCategorie(colisRequest.getCategorie());
         informationColis.setDatePriseEnCharge(colisRequest.getDatePriseEnCharge());
         informationColis.setPlageHoraire(colisRequest.getPlageHoraire());
         informationColis.setAnnonce(annonce);
-        informationColis.setExpediteur((Expediteur) utilisateur); // Set the expediteur
+        informationColis.setExpediteur((Expediteur) utilisateur); // Définir l'expéditeur
 
-
-        // Save the entity in the database
+        // Sauvegarder l'InformationColis dans la base de données
+        // Créer et sauvegarder l'information colis
         InformationColis savedColis = informationColisRepository.save(informationColis);
 
-        // Create a notification for the voyageur
-        Utilisateur voyageur = annonce.getVoyageur();
-        String notificationMessage = "Nouvelle demande pour votre annonce publiée le " + annonce.getDatePublication();
+// Créer automatiquement la demande associée
+        String expediteurEmail = utilisateur.getEmail();  // Utiliser l'email de l'expéditeur
+        DemandeRequest demandeRequest = new DemandeRequest();
+        demandeRequest.setExpediteurEmail(expediteurEmail);  // L'email de l'expéditeur
+        demandeRequest.setStatus(Statut.EN_ATTENTE);  // Le statut de la demande (par défaut)
+        demandeRequest.setCreatedAt(new Date());  // Date de création de la demande
 
-        notificationService.createNotification(voyageur, notificationMessage, savedColis.getId());
+// Appeler le service DemandeService pour créer la demande
+        DemandeResponse demandeResponse = demandeService.createDemande(demandeRequest, savedColis.getId(), expediteurEmail);
 
-        // Create a response DTO
+// Retourner la réponse avec l'information colis et la demande créée
         InformationColisResponse response = new InformationColisResponse();
         response.setId(savedColis.getId());
         response.setPoids(savedColis.getPoids());
@@ -73,7 +78,8 @@ public class InformationColisService {
         response.setCategorie(savedColis.getCategorie());
         response.setDatePriseEnCharge(savedColis.getDatePriseEnCharge());
         response.setPlageHoraire(savedColis.getPlageHoraire());
-        response.setMessage("Colis proposé avec succès !");
+        response.setDemande(demandeResponse); // Inclure la demande dans la réponse
+
         return response;
     }
 }
