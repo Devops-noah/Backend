@@ -25,7 +25,25 @@ public class Segment {
     @Column(nullable = true)
     private Long chaineId; // ID de la chaîne associée (null si non utilisé)
 
-    @ManyToOne
-    @JoinColumn(name = "voyage_id", nullable = false)
-    private Voyage voyage; // Voyage associé à ce segment
+    private Long voyageId; // ID du voyage (au lieu de l'entité Voyage)
+
+    private Long annonceId; // ID de l'annonce (au lieu de l'entité Annonce)
+
+    // Getter et Setter pour 'voyageId'
+    public Long getVoyageId() {
+        return voyageId;
+    }
+
+    public void setVoyageId(Long voyageId) {
+        this.voyageId = voyageId;
+    }
+
+    // Getter et Setter pour 'annonceId'
+    public Long getAnnonceId() {
+        return annonceId;
+    }
+
+    public void setAnnonceId(Long annonceId) {
+        this.annonceId = annonceId;
+    }
 }

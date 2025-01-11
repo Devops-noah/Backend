@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/annonces").permitAll() // Allow public access to `getAllAnnonces`
+                        .requestMatchers("/api/demandeTransfert/recherche").permitAll()
                         .requestMatchers("/api/annonces/**").authenticated()
                         .requestMatchers("/api/annonces/filter").permitAll()
                         .requestMatchers("/api/auth/register").permitAll()
