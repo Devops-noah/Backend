@@ -39,6 +39,7 @@ public class AnnonceServiceImpl {
 
     public List<AnnonceResponse> getAllAnnonces() {
         List<Annonce> annonces = annonceRepository.findAllWithVoyage();
+        System.out.println("annonces: " + annonces);
 
         // Filter out non-approved and suspended annonces
         annonces = annonces.stream()
@@ -49,6 +50,7 @@ public class AnnonceServiceImpl {
         annonces.forEach(annonce -> {
             System.out.println("Annonce ID: " + annonce.getId() + " | Approved: " + annonce.isApproved() + " | Suspended: " + annonce.isSuspended());
         });
+        System.out.println("annonces after approved or not: " + annonces);
 
         // Map Annonce to fr.parisnanterre.noah.DTO.AnnonceRequest.AnnonceResponse
         return annonces.stream().map(annonce -> {

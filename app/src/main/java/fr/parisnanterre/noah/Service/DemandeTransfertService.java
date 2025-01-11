@@ -2,6 +2,7 @@ package fr.parisnanterre.noah.Service;
 
 import fr.parisnanterre.noah.Entity.Segment;
 import fr.parisnanterre.noah.Entity.Voyage;
+import fr.parisnanterre.noah.Entity.Annonce;
 import fr.parisnanterre.noah.Repository.SegmentRepository;
 import fr.parisnanterre.noah.Repository.VoyageRepository;
 import org.slf4j.Logger;
@@ -32,7 +33,6 @@ public class DemandeTransfertService {
         // Récupérer tous les voyages existants
         List<Voyage> voyages = voyageRepository.findAll();
         log.info("Nombre de voyages trouvés dans la base de données : {}", voyages.size());
-        // Ajout du log pour afficher tous les voyages récupérés
         log.info("Liste des voyages récupérés : {}", voyages);
 
         // Convertir les voyages en segments
@@ -55,40 +55,31 @@ public class DemandeTransfertService {
     }
 
     // Conversion des voyages en segments
-    // Conversion des voyages en segments
     private List<Segment> convertirVoyagesEnSegments(List<Voyage> voyages) {
         List<Segment> segments = new ArrayList<>();
 
         for (Voyage voyage : voyages) {
-            // Assurez-vous que le voyageur n'est pas null
-            if (voyage.getVoyageur() == null) {
-                log.warn("Voyageur est null pour le voyage id: {}", voyage.getId());
-                continue; // Ignore ce voyage si le voyageur est null
-            }
-
             Segment segment = new Segment();
             segment.setPointDepart(voyage.getPaysDepart().getNom());
             segment.setPointArrivee(voyage.getPaysDestination().getNom());
+            segment.setVoyageur(voyage.getVoyageur());
 
-            // Vérifier que le voyageur existe et affecter son ID au segment
-            if (voyage.getVoyageur().getId() != null) {
-                segment.setVoyageur(voyage.getVoyageur());  // Affecter l'objet Voyageur
-            } else {
-                log.warn("Le voyageur du voyage {} n'a pas d'ID valide", voyage.getId());
-                continue; // Ignorer ce voyage si l'ID du voyageur est invalide
+            // Associer uniquement l'ID du voyage (convertir en Long)
+            segment.setVoyageId((long) voyage.getId()); // Conversion explicite de int à Long
+
+            // Associer uniquement l'ID de l'annonce
+            if (voyage.getAnnonces() != null && !voyage.getAnnonces().isEmpty()) {
+                Annonce annonce = voyage.getAnnonces().get(0); // Récupérer la première annonce
+                segment.setAnnonceId(annonce.getId()); // Associer l'ID de l'annonce
             }
-            // Ajouter une relation explicite entre le voyage et le segment
-            segment.setVoyage(voyage);  // Associer le voyage au segment
 
-            // Afficher les informations du segment avant de l'enregistrer
             log.info("Segment à enregistrer : {}", segment);
 
             // Sauvegarder le segment dans la base de données
-            segmentRepository.save(segment);
-            segments.add(segment);
-            // Récupérer et afficher le segment après la sauvegarde
-            Segment savedSegment = segmentRepository.findById(segment.getId()).orElse(null);
-            log.info("Segment après sauvegarde : {}", savedSegment);
+            Segment savedSegment = segmentRepository.save(segment);
+            log.info("Segment sauvegardé : {}", savedSegment);
+
+            segments.add(savedSegment); // Ajouter le segment sauvegardé à la liste
         }
 
         log.info("Conversion de {} voyages en segments", voyages.size());
@@ -108,7 +99,7 @@ public class DemandeTransfertService {
     // Fonction récursive DFS pour explorer tous les chemins
     private void findPathsDFS(Map<String, List<Segment>> graph, String current, String end, List<Segment> currentPath, List<List<Segment>> allPaths, Set<String> visited) {
         if (current.equals(end)) {
-            allPaths.add(new ArrayList<>(currentPath));  // Ajouter le chemin trouvé
+            allPaths.add(new ArrayList<>(currentPath));
             log.debug("Chemin trouvé : {}", currentPath);
             return;
         }
@@ -136,7 +127,6 @@ public class DemandeTransfertService {
     public void enregistrerChaine(List<Segment> segmentsChoisis) {
         log.info("Enregistrement de la chaîne choisie contenant {} segments", segmentsChoisis.size());
         segmentsChoisis.forEach(segment -> {
-            // Sauvegarder chaque segment dans la base de données
             segmentRepository.save(segment);
         });
         log.info("Chaîne enregistrée avec succès");

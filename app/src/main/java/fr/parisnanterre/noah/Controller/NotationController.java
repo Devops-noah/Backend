@@ -4,7 +4,9 @@ import fr.parisnanterre.noah.Entity.Notation;
 import fr.parisnanterre.noah.DTO.NotationRequest;
 import fr.parisnanterre.noah.Service.NotationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,11 +18,11 @@ public class NotationController {
     @Autowired
     private NotationService notationService;
 
-    // API pour ajouter ou mettre à jour une notation
-    @PostMapping("/update-or-create")
-    public ResponseEntity<Notation> updateOrCreateNotation(@RequestBody NotationRequest notationRequest) {
+    // API pour créer une nouvelle notation
+    @PostMapping("/create")
+    public ResponseEntity<Notation> createNotation(@RequestBody NotationRequest notationRequest) {
         try {
-            Notation notation = notationService.updateOrCreateNotation(notationRequest);
+            Notation notation = notationService.createNotation(notationRequest);
             return ResponseEntity.ok(notation);
         } catch (Exception e) {
             return ResponseEntity.status(400).body(null);
@@ -28,11 +30,17 @@ public class NotationController {
     }
 
     // API pour récupérer toutes les notations
-    @GetMapping("/")
+    @GetMapping("/get-notations")
     public ResponseEntity<List<Notation>> getAllNotations() {
-        List<Notation> notations = notationService.getAllNotations();
-        return ResponseEntity.ok(notations);
+        try {
+            List<Notation> notations = notationService.getAllNotations();
+            return ResponseEntity.ok(notations);
+        } catch (AccessDeniedException e) {
+            System.err.println("Access Denied: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
+
 
     // API pour récupérer les notations par utilisateur
     @GetMapping("/user/{utilisateurId}")

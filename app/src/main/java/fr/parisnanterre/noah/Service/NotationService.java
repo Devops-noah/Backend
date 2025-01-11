@@ -20,8 +20,14 @@ public class NotationService {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
-    // Méthode pour ajouter ou mettre à jour une notation
-    public Notation updateOrCreateNotation(NotationRequest notationRequest) throws Exception {
+    public NotationService(NotationRepository notationRepository, UtilisateurRepository utilisateurRepository) {
+        this.notationRepository = notationRepository;
+        this.utilisateurRepository = utilisateurRepository;
+    }
+
+    // Méthode pour créer une notation
+    public Notation createNotation(NotationRequest notationRequest) throws Exception {
+        // Vérifier si l'utilisateur existe
         Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findById(notationRequest.getUtilisateurId());
         if (!utilisateurOpt.isPresent()) {
             throw new Exception("Utilisateur non trouvé");
@@ -29,24 +35,15 @@ public class NotationService {
 
         Utilisateur utilisateur = utilisateurOpt.get();
 
-        // Vérification si l'utilisateur a déjà une notation
-        List<Notation> notations = utilisateur.getNotations();
-        if (!notations.isEmpty()) {
-            // Si une notation existe déjà, on la met à jour
-            Notation existingNotation = notations.get(0);
-            existingNotation.setNote(notationRequest.getNote());
-            existingNotation.setCommentaire(notationRequest.getCommentaire());
-            existingNotation.setDatePublication(notationRequest.getDatePublication());
-            return notationRepository.save(existingNotation);
-        } else {
-            // Si aucune notation, on crée une nouvelle
-            Notation newNotation = new Notation();
-            newNotation.setNote(notationRequest.getNote());
-            newNotation.setCommentaire(notationRequest.getCommentaire());
-            newNotation.setDatePublication(notationRequest.getDatePublication());
-            newNotation.setUtilisateur(utilisateur);
-            return notationRepository.save(newNotation);
-        }
+        // Créer une nouvelle notation
+        Notation newNotation = new Notation();
+        newNotation.setNote(notationRequest.getNote());
+        newNotation.setCommentaire(notationRequest.getCommentaire());
+        newNotation.setDatePublication(notationRequest.getDatePublication());
+        newNotation.setUtilisateur(utilisateur);
+
+        // Enregistrer et retourner la nouvelle notation
+        return notationRepository.save(newNotation);
     }
 
     // Méthode pour récupérer toutes les notations
