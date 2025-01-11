@@ -54,6 +54,7 @@ public class InformationColisService {
         informationColis.setAnnonce(annonce);
         informationColis.setExpediteur((Expediteur) utilisateur); // Set the expediteur
 
+
         // Save the entity in the database
         InformationColis savedColis = informationColisRepository.save(informationColis);
 
