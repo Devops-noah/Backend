@@ -1,5 +1,6 @@
 package fr.parisnanterre.noah.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.Date;
@@ -21,10 +22,12 @@ public class InformationColis {
     private String plageHoraire;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "annonce_id", nullable = false)
     private Annonce annonce; // Liée à une annonce
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "expediteur_id", nullable = false)
     private Utilisateur expediteur; // L'expéditeur ayant proposé le colis
 }

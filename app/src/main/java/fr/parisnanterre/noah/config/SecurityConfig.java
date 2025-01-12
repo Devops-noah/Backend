@@ -60,6 +60,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/voyages/**").authenticated()
                         .requestMatchers("/api/utilisateurs/profile").authenticated()
                         .requestMatchers("/api/information_colis/**").authenticated() // Autorisation pour les expéditeurs
+                        .requestMatchers("/api/notifications/unread").authenticated()
+                        .requestMatchers("/api/demandes/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

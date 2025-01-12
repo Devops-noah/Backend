@@ -1,9 +1,12 @@
 package fr.parisnanterre.noah.Controller;
 
+import fr.parisnanterre.noah.DTO.NotificationResponseDto;
 import fr.parisnanterre.noah.Entity.Notification;
 import fr.parisnanterre.noah.Service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,21 +18,27 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    // Récupérer les notifications non lues pour un voyageur
-    @GetMapping("/unread/{voyageurId}")
-    public ResponseEntity<List<Notification>> getUnreadNotifications(@PathVariable Long voyageurId) {
+    @GetMapping("/unread")
+    public ResponseEntity<List<NotificationResponseDto>> getUnreadNotifications() {
         try {
-            // Récupérer toutes les notifications non lues pour le voyageur avec l'ID spécifié
-            List<Notification> notifications = notificationService.getUnreadNotifications(voyageurId);
-            if (notifications.isEmpty()) {
-                return ResponseEntity.noContent().build();  // Si aucune notification, retourne 204 No Content
+            // Retrieve unread notifications from the service
+            List<NotificationResponseDto> unreadNotifications = notificationService.getUnreadNotifications();
+
+            // Return 204 No Content if no notifications are found
+            if (unreadNotifications.isEmpty()) {
+                return ResponseEntity.noContent().build();
             }
-            return ResponseEntity.ok(notifications);  // Retourner les notifications non lues
+
+            // Return the list of notifications
+            return ResponseEntity.ok(unreadNotifications);
         } catch (Exception e) {
-            // Retourner une erreur HTTP 400 en cas d'échec
-            return ResponseEntity.badRequest().body(null);
+            // Log the exception if necessary
+            e.printStackTrace();
+            // Return 400 Bad Request in case of any errors
+            return ResponseEntity.badRequest().build();
         }
     }
+
 
     // Marquer une notification comme lue
     @PutMapping("/read/{notificationId}")

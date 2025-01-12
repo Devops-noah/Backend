@@ -12,5 +12,6 @@ public class DemandeResponse {
     private Statut status;
     private Date createdAt;
     private String voyageurNom;
+    private InformationColisResponse informationColis;
 
 }
