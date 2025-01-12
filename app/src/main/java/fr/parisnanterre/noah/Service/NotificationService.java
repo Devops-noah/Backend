@@ -1,9 +1,9 @@
 package fr.parisnanterre.noah.Service;
 
-import fr.parisnanterre.noah.Entity.InformationColis;
+import fr.parisnanterre.noah.Entity.Demande;
 import fr.parisnanterre.noah.Entity.Notification;
 import fr.parisnanterre.noah.Entity.Utilisateur;
-import fr.parisnanterre.noah.Repository.InformationColisRepository;
+import fr.parisnanterre.noah.Repository.DemandeRepository;
 import fr.parisnanterre.noah.Repository.NotificationRepository;
 import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,34 +18,47 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UtilisateurRepository utilisateurRepository;
-    private final InformationColisRepository informationColisRepository;
+    private final DemandeRepository demandeRepository;
 
-    public void createNotification(Utilisateur voyageur, String message, Long informationColisId) {
-        // Charger l'objet InformationColis depuis la base de données
-        InformationColis informationColis = informationColisRepository.findById(informationColisId)
-                .orElseThrow(() -> new RuntimeException("InformationColis non trouvé avec l'ID : " + informationColisId));
+    // Créer la notification après la création d'une demande
+    public void createNotification(Long demandeId) {
+        // Récupérer la demande
+        Demande demande = demandeRepository.findById(demandeId)
+                .orElseThrow(() -> new RuntimeException("Demande non trouvée"));
+
+        // Récupérer le voyageur à qui la notification appartient
+        Utilisateur voyageur = demande.getInformationColis().getAnnonce().getVoyageur(); // C'est le voyageur qui reçoit la notification
+
+        // Créer le message pour la notification
+        String message = "Nouvelle demande reçue pour votre colis proposé : " + demande.getInformationColis().getDimensions();
 
         // Créer la notification
         Notification notification = new Notification();
         notification.setMessage(message);
-        notification.setRead(false);
+        notification.setVoyageur(voyageur);  // Le voyageur qui reçoit la notification
+        notification.setDemande(demande);  // Lier la notification à la demande
         notification.setCreatedAt(new Date());
-        notification.setVoyageur(voyageur);
-        notification.setInformationColis(informationColis); // Associer l'objet InformationColis
+        notification.setRead(false);
 
-        // Sauvegarder la notification
+        // Sauvegarder la notification dans la base de données
         notificationRepository.save(notification);
+
+        // Mettre à jour le compteur de notifications non lues pour le voyageur
+        voyageur.setNotificationCount(voyageur.getNotificationCount() + 1);
+        utilisateurRepository.save(voyageur);  // Sauvegarder l'utilisateur avec le nouveau compteur
     }
 
-
+    // Récupérer les notifications non lues pour un voyageur
     public List<Notification> getUnreadNotifications(Long voyageurId) {
         return notificationRepository.findByVoyageurIdAndIsReadFalse(voyageurId);
     }
 
+
+    // Marquer une notification comme lue
     public void markAsRead(Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new RuntimeException("Notification non trouvée"));
-        notification.setRead(true);
+        notification.setRead(true); // Marquer la notification comme lue
         notificationRepository.save(notification);
     }
 }

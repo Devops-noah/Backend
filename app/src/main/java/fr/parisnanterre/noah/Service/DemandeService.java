@@ -1,11 +1,8 @@
 package fr.parisnanterre.noah.Service;
 
 import fr.parisnanterre.noah.DTO.DemandeRequest;
-import fr.parisnanterre.noah.Entity.Demande;
+import fr.parisnanterre.noah.Entity.*;
 import fr.parisnanterre.noah.DTO.DemandeResponse; // Importer la classe DemandeResponse
-import fr.parisnanterre.noah.Entity.InformationColis;
-import fr.parisnanterre.noah.Entity.Statut;
-import fr.parisnanterre.noah.Entity.Utilisateur;
 import fr.parisnanterre.noah.Repository.DemandeRepository;
 import fr.parisnanterre.noah.Repository.InformationColisRepository;
 import fr.parisnanterre.noah.Repository.UtilisateurRepository;
@@ -23,6 +20,7 @@ public class DemandeService {
     private final DemandeRepository demandeRepository;
     private final InformationColisRepository informationColisRepository;
     private final UtilisateurRepository utilisateurRepository;
+    private final NotificationService notificationService;
 
     // Récupérer les demandes par voyageur
     public List<Demande> getDemandesByVoyageur(String email) {
@@ -68,7 +66,9 @@ public class DemandeService {
 
         // Sauvegarder la demande dans la base de données
         Demande savedDemande = demandeRepository.save(demande);
-        System.out.println("save demande: " + savedDemande);
+
+        // Créer automatiquement la notification associée à la demande
+        notificationService.createNotification(savedDemande.getId()); // Crée la notification pour la demande
 
         // Retourner la réponse sous forme de DTO
         DemandeResponse response = new DemandeResponse();

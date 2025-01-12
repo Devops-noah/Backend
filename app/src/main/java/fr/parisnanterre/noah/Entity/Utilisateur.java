@@ -1,18 +1,14 @@
-// Utilisateur entity
 package fr.parisnanterre.noah.Entity;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -22,9 +18,9 @@ import java.util.Set;
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 
 @JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,    // Use a property to indicate the type
+        use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
-        property = "type"             // This field will determine the subtype
+        property = "type"
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = Voyageur.class, name = "voyageur"),
@@ -50,18 +46,20 @@ public abstract class Utilisateur {
     private String email;
 
     @NotBlank(message = "Mot de passe cannot be blank")
-    //@Size(min = 6, max = 100, message = "Mot de passe must be between 6 and 100 characters")
     private String motDePasse;
 
     private String telephone;
     private String adresse;
 
-  
     private boolean enabled = true; // Default to true (enabled)
+
+    // Ajout du champ notificationCount
+    //@JoinColumn(name = "notification_count", nullable = true)
+    private int notificationCount = 0;  // Compteur des notifications non lues
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false) // Foreign key for Role
-    private Role role; // Single Role for the user
+    private Role role;
 
     @OneToMany(mappedBy = "expediteur", cascade = CascadeType.ALL)
     private List<Livraison> livraisonsExpediteur;
@@ -69,15 +67,11 @@ public abstract class Utilisateur {
     @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
     private List<Livraison> livraisonsVoyageur;
 
-//    @OneToMany(mappedBy = "receveur", cascade = CascadeType.ALL)
-//    private List<Livraison> livraisonsReceveur;
-
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private List<Notation> notations;
 
     @OneToMany(mappedBy = "expediteur", cascade = CascadeType.ALL)
     private List<Demande> demandes;
-
 
     @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
     private List<Annonce> annonces;
@@ -87,4 +81,3 @@ public abstract class Utilisateur {
 
 
 }
-

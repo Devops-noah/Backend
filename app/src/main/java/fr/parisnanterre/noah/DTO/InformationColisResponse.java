@@ -14,4 +14,5 @@ public class InformationColisResponse {
     private Date datePriseEnCharge;
     private String plageHoraire;
     private String message; // Message de confirmation ou d'erreur
+    private DemandeResponse demande; // Ajouter ce champ pour inclure la demande dans la réponse
 }

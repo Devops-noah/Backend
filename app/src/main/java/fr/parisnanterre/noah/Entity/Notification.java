@@ -7,24 +7,23 @@ import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "notifications")
 public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String message;
-
-    private boolean isRead;
-
-    private Date createdAt;
+    private String message;  // Message de notification
 
     @ManyToOne
     @JoinColumn(name = "voyageur_id", nullable = false)
-    private Utilisateur voyageur;
+    private Utilisateur voyageur;  // Voyageur qui reçoit la notification
 
     @ManyToOne
-    @JoinColumn(name = "information_colis_id", nullable = false)
-    private InformationColis informationColis; // Lien avec InformationColis
+    @JoinColumn(name = "demande_id", nullable = false)
+    private Demande demande;  // Lien vers la Demande pour laquelle la notification a été créée
+
+    private boolean isRead = false;  // Statut de la notification : lue ou non lue
+
+    private Date createdAt;  // Date de création de la notification
 }

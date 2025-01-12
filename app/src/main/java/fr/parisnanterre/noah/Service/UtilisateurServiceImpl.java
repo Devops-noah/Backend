@@ -21,14 +21,14 @@ public class UtilisateurServiceImpl {
     }
 
     public UtilisateurProfileResponse getUserProfile(String email) {
-        // Fetch the user by email
+        // Récupérer l'utilisateur par email
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur not found"));
 
-        // Create a response object
+        // Créer un objet de réponse
         UtilisateurProfileResponse profile = new UtilisateurProfileResponse();
 
-        // Common fields for all users
+        // Remplir les informations communes pour tous les utilisateurs
         profile.setId(utilisateur.getId());
         profile.setNom(utilisateur.getNom());
         profile.setPrenom(utilisateur.getPrenom());
@@ -36,11 +36,15 @@ public class UtilisateurServiceImpl {
         profile.setTelephone(utilisateur.getTelephone());
         profile.setAdresse(utilisateur.getAdresse());
 
-        // Set the type based on the actual class of the user
-        if (utilisateur instanceof Voyageur voyageur) {
-            profile.setType("voyageur");  // Set type as "voyageur"
+        // Récupérer le nombre de notifications non lues pour l'utilisateur
+        int notificationCount = utilisateur.getNotificationCount();  // Le compteur de notifications non lues
+        profile.setNotificationCount(notificationCount);
 
-            // Map Voyageur-specific data
+        // Déterminer le type d'utilisateur et remplir les données correspondantes
+        if (utilisateur instanceof Voyageur voyageur) {
+            profile.setType("voyageur");
+
+            // Mapper les annonces pour le voyageur
             List<AnnonceResponse> annonces = voyageur.getAnnonces().stream().map(annonce -> {
                 AnnonceResponse annonceResponse = new AnnonceResponse();
                 annonceResponse.setId(annonce.getId());
@@ -58,6 +62,7 @@ public class UtilisateurServiceImpl {
             }).toList();
             profile.setAnnonces(annonces);
 
+            // Mapper les voyages pour le voyageur
             List<Voyage> voyages = voyageur.getVoyages().stream().map(voyage -> {
                 Voyage voyageResponse = new Voyage();
                 voyageResponse.setId(voyage.getId());
@@ -70,16 +75,15 @@ public class UtilisateurServiceImpl {
             profile.setVoyages(voyages);
 
         } else if (utilisateur instanceof Expediteur) {
-            profile.setType("expediteur");  // Set type as "expediteur"
-
-            // For Expediteur, display a message
+            profile.setType("expediteur");
             profile.setMessage("L'utilisateur est un expediteur. Les colis ne sont pas disponibles pour le moment.");
         } else if (utilisateur instanceof AdminType) {
-            profile.setType("admin"); // Set type ass "admin"
+            profile.setType("admin");
         }
 
         return profile;
     }
+
 
 
 //    public Optional<Utilisateur> getUtilisateurById(Integer id) {

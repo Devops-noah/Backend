@@ -1,12 +1,9 @@
 package fr.parisnanterre.noah.Controller;
 
 import fr.parisnanterre.noah.Entity.Notification;
-import fr.parisnanterre.noah.Entity.Utilisateur;
-import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import fr.parisnanterre.noah.Service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,20 +14,33 @@ import java.util.List;
 public class NotificationController {
 
     private final NotificationService notificationService;
-    private final UtilisateurRepository utilisateurRepository;
 
-    @GetMapping
-    public ResponseEntity<List<Notification>> getNotifications(Authentication authentication) {
-        String email = authentication.getName();
-        Utilisateur voyageur = utilisateurRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-        List<Notification> notifications = notificationService.getUnreadNotifications(voyageur.getId());
-        return ResponseEntity.ok(notifications);
+    // Récupérer les notifications non lues pour un voyageur
+    @GetMapping("/unread/{voyageurId}")
+    public ResponseEntity<List<Notification>> getUnreadNotifications(@PathVariable Long voyageurId) {
+        try {
+            // Récupérer toutes les notifications non lues pour le voyageur avec l'ID spécifié
+            List<Notification> notifications = notificationService.getUnreadNotifications(voyageurId);
+            if (notifications.isEmpty()) {
+                return ResponseEntity.noContent().build();  // Si aucune notification, retourne 204 No Content
+            }
+            return ResponseEntity.ok(notifications);  // Retourner les notifications non lues
+        } catch (Exception e) {
+            // Retourner une erreur HTTP 400 en cas d'échec
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
-    @PostMapping("/mark-as-read/{id}")
-    public ResponseEntity<Void> markNotificationAsRead(@PathVariable Long id) {
-        notificationService.markAsRead(id);
-        return ResponseEntity.ok().build();
+    // Marquer une notification comme lue
+    @PutMapping("/read/{notificationId}")
+    public ResponseEntity<String> markAsRead(@PathVariable Long notificationId) {
+        try {
+            // Marquer la notification comme lue
+            notificationService.markAsRead(notificationId);
+            return ResponseEntity.ok("Notification marquée comme lue");
+        } catch (Exception e) {
+            // Retourner une erreur HTTP 400 si l'opération échoue
+            return ResponseEntity.badRequest().body("Erreur lors de la mise à jour du statut de notification");
+        }
     }
 }

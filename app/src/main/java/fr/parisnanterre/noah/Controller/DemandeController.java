@@ -6,6 +6,7 @@ import fr.parisnanterre.noah.DTO.DemandeRequest;
 import fr.parisnanterre.noah.Entity.Statut;
 import fr.parisnanterre.noah.Service.DemandeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,18 @@ import java.util.Map;
 public class DemandeController {
 
     private final DemandeService demandeService;
+
+    // Récupérer toutes les demandes du voyageur
+    @GetMapping("/demande/{voyageurId}")
+    public HttpEntity<List<Demande>> getDemandesByVoyageur(@PathVariable String voyageurId) {
+        try {
+            List<Demande> demandes = demandeService.getDemandesByVoyageur(voyageurId);
+            return ResponseEntity.ok(demandes);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
 
     /**
      * Récupérer les demandes pour l'expéditeur connecté.
