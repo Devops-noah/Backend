@@ -12,11 +12,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/notations")
+@RequestMapping("/api/notations")
 public class NotationController {
 
+    private final NotationService notationService;
+
     @Autowired
-    private NotationService notationService;
+    public NotationController(NotationService notationService) {
+        this.notationService = notationService;
+    }
 
     // API pour créer une nouvelle notation
     @PostMapping("/create")
@@ -34,6 +38,7 @@ public class NotationController {
     public ResponseEntity<List<Notation>> getAllNotations() {
         try {
             List<Notation> notations = notationService.getAllNotations();
+            System.out.println("notations controller: " + notations.get(0).getUtilisateur().getNom());
             return ResponseEntity.ok(notations);
         } catch (AccessDeniedException e) {
             System.err.println("Access Denied: " + e.getMessage());

@@ -15,10 +15,10 @@ import java.util.Optional;
 public class NotationService {
 
     @Autowired
-    private NotationRepository notationRepository;
+    private final NotationRepository notationRepository;
 
     @Autowired
-    private UtilisateurRepository utilisateurRepository;
+    private final UtilisateurRepository utilisateurRepository;
 
     public NotationService(NotationRepository notationRepository, UtilisateurRepository utilisateurRepository) {
         this.notationRepository = notationRepository;
@@ -48,6 +48,7 @@ public class NotationService {
 
     // Méthode pour récupérer toutes les notations
     public List<Notation> getAllNotations() {
+        System.out.println("notations repository: " + notationRepository.findAll());
         return notationRepository.findAll();
     }
 
