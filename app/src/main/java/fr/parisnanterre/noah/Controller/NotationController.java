@@ -57,8 +57,11 @@ public class NotationController {
         }
     }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 82180182a3a1167f0472a6ea45b8fb6dd309ca80
     // API pour récupérer les notations par utilisateur
     @GetMapping("/user/{utilisateurId}")
     public ResponseEntity<List<Notation>> getNotationsByUtilisateurId(@PathVariable Long utilisateurId) {
