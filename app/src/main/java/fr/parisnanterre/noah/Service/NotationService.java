@@ -1,5 +1,6 @@
 package fr.parisnanterre.noah.Service;
 
+import fr.parisnanterre.noah.DTO.NotationResponse;
 import fr.parisnanterre.noah.Entity.Notation;
 import fr.parisnanterre.noah.Entity.Utilisateur;
 import fr.parisnanterre.noah.Repository.NotationRepository;
@@ -47,18 +48,58 @@ public class NotationService {
     }
 
     // Méthode pour récupérer toutes les notations
-    public List<Notation> getAllNotations() {
-        System.out.println("notations repository: " + notationRepository.findAll());
-        return notationRepository.findAll();
+    public List<NotationResponse> getAllNotations() {
+        try {
+            // Fetch all notations from the repository
+            List<Notation> notations = notationRepository.findAll();
+
+            // Map each `Notation` entity to `NotationResponse` DTO
+            return notations.stream()
+                    .map(notation -> {
+                        NotationResponse response = new NotationResponse();
+                        response.setUtilisateurId(notation.getUtilisateur().getId());
+                        response.setUserName(notation.getUtilisateur().getNom());
+                        response.setUserFirstName(notation.getUtilisateur().getPrenom());
+                        response.setNote(notation.getNote());
+                        response.setCommentaire(notation.getCommentaire());
+                        response.setDatePublication(notation.getDatePublication().toString()); // Format date as String
+                        return response;
+                    })
+                    .toList();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des notations", e);
+        }
     }
+
 
     // Méthode pour récupérer les notations par utilisateur
     public List<Notation> getNotationsByUtilisateurId(Long utilisateurId) {
         return notationRepository.findByUtilisateurId(utilisateurId);
     }
 
-    // Méthode pour récupérer les 3 dernières notations (si disponibles)
-    public List<Notation> getLastThreeNotations() {
-        return notationRepository.findTop3ByOrderByDatePublicationDesc();
+    // Méthode pour récupérer les 3 dernières notations avec utilisateur details
+    public List<NotationResponse> getLastThreeNotations() {
+        try {
+            // Fetch the 3 most recent notations
+            List<Notation> notations = notationRepository.findTop3ByOrderByDatePublicationDesc();
+
+            // Map the `Notation` entities to `NotationResponse` DTOs
+            return notations.stream()
+                    .map(notation -> {
+                        NotationResponse response = new NotationResponse();
+                        response.setUtilisateurId(notation.getUtilisateur().getId());
+                        response.setUserName(notation.getUtilisateur().getNom());
+                        response.setUserFirstName(notation.getUtilisateur().getPrenom());
+                        response.setNote(notation.getNote());
+                        response.setCommentaire(notation.getCommentaire());
+                        response.setDatePublication(notation.getDatePublication().toString()); // Assuming `datePublication` is of type `Date`
+
+                        return response;
+                    })
+                    .toList();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des dernières notations", e);
+        }
     }
+
 }

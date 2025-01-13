@@ -1,5 +1,6 @@
 package fr.parisnanterre.noah.Controller;
 
+import fr.parisnanterre.noah.DTO.NotationResponse;
 import fr.parisnanterre.noah.Entity.Notation;
 import fr.parisnanterre.noah.DTO.NotationRequest;
 import fr.parisnanterre.noah.Service.NotationService;
@@ -35,16 +36,27 @@ public class NotationController {
 
     // API pour récupérer toutes les notations
     @GetMapping("/get-notations")
-    public ResponseEntity<List<Notation>> getAllNotations() {
+    public ResponseEntity<List<NotationResponse>> getAllNotations() {
         try {
-            List<Notation> notations = notationService.getAllNotations();
-            System.out.println("notations controller: " + notations.get(0).getUtilisateur().getNom());
+            // Fetch notations using the service
+            List<NotationResponse> notations = notationService.getAllNotations();
+
+            // Log the first user's name (optional, for debugging)
+            if (!notations.isEmpty()) {
+                System.out.println("First user's name: " + notations.get(0).getUserName());
+            }
+
+            // Return the list of notations
             return ResponseEntity.ok(notations);
         } catch (AccessDeniedException e) {
             System.err.println("Access Denied: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
 
     // API pour récupérer les notations par utilisateur
@@ -56,8 +68,8 @@ public class NotationController {
 
     // API pour récupérer les 3 dernières notations
     @GetMapping("/last-three")
-    public ResponseEntity<List<Notation>> getLastThreeNotations() {
-        List<Notation> notations = notationService.getLastThreeNotations();
-        return ResponseEntity.ok(notations);
+    public ResponseEntity<List<NotationResponse>> getLastThreeNotations() {
+        List<NotationResponse> responses = notationService.getLastThreeNotations();
+        return ResponseEntity.ok(responses);
     }
 }
