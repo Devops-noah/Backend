@@ -1,5 +1,4 @@
 package fr.parisnanterre.noah.Service;
-
 import fr.parisnanterre.noah.DTO.DemandeResponse;
 import fr.parisnanterre.noah.DTO.InformationColisResponse;
 import fr.parisnanterre.noah.DTO.NotificationResponseDto;
@@ -109,10 +108,6 @@ public class NotificationService {
             throw new RuntimeException("Erreur lors de la récupération des notifications non lues", e);
         }
     }
-
-
-
-
     // Marquer une notification comme lue
     public void markAsRead(Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
