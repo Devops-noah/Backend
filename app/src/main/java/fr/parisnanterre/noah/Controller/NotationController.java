@@ -34,34 +34,17 @@ public class NotationController {
         }
     }
 
-    // API pour récupérer toutes les notations
-    @GetMapping("/get-notations")
-    public ResponseEntity<List<NotationResponse>> getAllNotations() {
-        try {
-            // Fetch notations using the service
-            List<NotationResponse> notations = notationService.getAllNotations();
 
-            // Log the first user's name (optional, for debugging)
-            if (!notations.isEmpty()) {
-                System.out.println("First user's name: " + notations.get(0).getUserName());
-            }
-
-            // Return the list of notations
-            return ResponseEntity.ok(notations);
-        } catch (AccessDeniedException e) {
-            System.err.println("Access Denied: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    @GetMapping("/approved")
+    public ResponseEntity<List<NotationResponse>> getAllNotationsWithApprovedComments() {
+        List<NotationResponse> notations = notationService.getAllNotationsWithApprovedComments();
+        if (notations.isEmpty()) {
+            return ResponseEntity.noContent().build(); // HTTP 204: No Content
         }
+        return ResponseEntity.ok(notations);
     }
 
-<<<<<<< HEAD
 
-
-=======
->>>>>>> 82180182a3a1167f0472a6ea45b8fb6dd309ca80
     // API pour récupérer les notations par utilisateur
     @GetMapping("/user/{utilisateurId}")
     public ResponseEntity<List<Notation>> getNotationsByUtilisateurId(@PathVariable Long utilisateurId) {
@@ -70,9 +53,9 @@ public class NotationController {
     }
 
     // API pour récupérer les 3 dernières notations
-    @GetMapping("/last-three")
-    public ResponseEntity<List<NotationResponse>> getLastThreeNotations() {
-        List<NotationResponse> responses = notationService.getLastThreeNotations();
+    @GetMapping("/last-three-approved")
+    public ResponseEntity<List<NotationResponse>> getLastThreeNotationsWithApprovedComments() {
+        List<NotationResponse> responses = notationService.getLastThreeNotationsWithApprovedComments();
         return ResponseEntity.ok(responses);
     }
 }

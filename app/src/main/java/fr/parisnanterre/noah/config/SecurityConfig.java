@@ -47,8 +47,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/notations/last-three").permitAll()
-                        .requestMatchers("/api/notations/get-notations").permitAll()
+                        .requestMatchers("/api/notations/last-three-approved").permitAll()
+                        .requestMatchers("/api/notations/approved").permitAll()
                         .requestMatchers("/api/annonces").permitAll() // Allow public access to `getAllAnnonces`
                         .requestMatchers("/api/demandeTransfert/recherche").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

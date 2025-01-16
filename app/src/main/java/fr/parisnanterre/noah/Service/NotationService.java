@@ -2,6 +2,7 @@ package fr.parisnanterre.noah.Service;
 
 import fr.parisnanterre.noah.DTO.NotationResponse;
 import fr.parisnanterre.noah.Entity.Notation;
+import fr.parisnanterre.noah.Entity.StatutNotation;
 import fr.parisnanterre.noah.Entity.Utilisateur;
 import fr.parisnanterre.noah.Repository.NotationRepository;
 import fr.parisnanterre.noah.Repository.UtilisateurRepository;
@@ -48,7 +49,7 @@ public class NotationService {
     }
 
     // Méthode pour récupérer toutes les notations
-    public List<NotationResponse> getAllNotations() {
+    public List<NotationResponse> getAllNotationsWithConditionalComments() {
         try {
             // Fetch all notations from the repository
             List<Notation> notations = notationRepository.findAll();
@@ -61,7 +62,7 @@ public class NotationService {
                         response.setUserName(notation.getUtilisateur().getNom());
                         response.setUserFirstName(notation.getUtilisateur().getPrenom());
                         response.setNote(notation.getNote());
-                        response.setCommentaire(notation.getCommentaire());
+                        //response.setCommentaire(notation.getCommentaire());
                         response.setDatePublication(notation.getDatePublication().toString()); // Format date as String
                         return response;
                     })
@@ -71,20 +72,11 @@ public class NotationService {
         }
     }
 
-
-    // Méthode pour récupérer les notations par utilisateur
-    public List<Notation> getNotationsByUtilisateurId(Long utilisateurId) {
-        return notationRepository.findByUtilisateurId(utilisateurId);
-    }
-
-    // Méthode pour récupérer les 3 dernières notations avec utilisateur details
-    public List<NotationResponse> getLastThreeNotations() {
+    public List<NotationResponse> getAllNotationsWithApprovedComments() {
         try {
-            // Fetch the 3 most recent notations
-            List<Notation> notations = notationRepository.findTop3ByOrderByDatePublicationDesc();
-
-            // Map the `Notation` entities to `NotationResponse` DTOs
-            return notations.stream()
+            // Map each `Notation` entity to `NotationResponse` DTO
+            return notationRepository.findAll().stream()
+                    .filter(notation -> notation.getStatus() == StatutNotation.APPROVED) // Include only approved notations
                     .map(notation -> {
                         NotationResponse response = new NotationResponse();
                         response.setUtilisateurId(notation.getUtilisateur().getId());
@@ -92,14 +84,49 @@ public class NotationService {
                         response.setUserFirstName(notation.getUtilisateur().getPrenom());
                         response.setNote(notation.getNote());
                         response.setCommentaire(notation.getCommentaire());
-                        response.setDatePublication(notation.getDatePublication().toString()); // Assuming `datePublication` is of type `Date`
+                        response.setDatePublication(notation.getDatePublication().toString()); // Format date as String
 
                         return response;
                     })
                     .toList();
         } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de la récupération des dernières notations", e);
+            throw new RuntimeException("Erreur lors de la récupération des notations", e);
         }
     }
 
+
+
+
+    // Méthode pour récupérer les notations par utilisateur
+    public List<Notation> getNotationsByUtilisateurId(Long utilisateurId) {
+        return notationRepository.findByUtilisateurId(utilisateurId);
+    }
+
+    // Service method to fetch the last three approved notations
+    public List<NotationResponse> getLastThreeNotationsWithApprovedComments() {
+        try {
+            // Fetch the 3 most recent approved notations
+            List<Notation> approvedNotations = notationRepository.findTop3ByStatusOrderByDatePublicationDesc(StatutNotation.APPROVED);
+
+            // Map the `Notation` entities to `NotationResponse` DTOs
+            return approvedNotations.stream()
+                    .map(notation -> {
+                        NotationResponse response = new NotationResponse();
+                        response.setUtilisateurId(notation.getUtilisateur().getId());
+                        response.setUserName(notation.getUtilisateur().getNom());
+                        response.setUserFirstName(notation.getUtilisateur().getPrenom());
+                        response.setNote(notation.getNote());
+                        response.setCommentaire(notation.getCommentaire()); // Only approved comments are fetched
+                        response.setDatePublication(notation.getDatePublication().toString());
+
+                        return response;
+                    })
+                    .toList();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des dernières notations approuvées", e);
+        }
+    }
+
+
 }
+
