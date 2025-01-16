@@ -46,22 +46,22 @@ public class SecurityConfig {
                         .requestMatchers("/api/annonces/filter").permitAll()
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/").permitAll()
                         .requestMatchers("/api/notations/last-three-approved").permitAll()
                         .requestMatchers("/api/notations/approved").permitAll()
-                        .requestMatchers("/api/annonces").permitAll() // Allow public access to `getAllAnnonces`
+                        .requestMatchers("/api/annonces").permitAll() // Allow public access to getAllAnnonces
                         .requestMatchers("/api/demandeTransfert/recherche").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/annonces/**").authenticated()
+                        .requestMatchers("/api/admin/").hasRole("ADMIN")
+                        .requestMatchers("/api/annonces/").authenticated()
                         .requestMatchers("/api/notations").authenticated()
                         .requestMatchers("/api/pays").authenticated()
-                        .requestMatchers("/api/pays/**").authenticated()
+                        .requestMatchers("/api/pays/").authenticated()
                         .requestMatchers("/api/voyages").authenticated()
-                        .requestMatchers("/api/voyages/**").authenticated()
+                        .requestMatchers("/api/voyages/").authenticated()
                         .requestMatchers("/api/utilisateurs/profile").authenticated()
-                        .requestMatchers("/api/information_colis/**").authenticated() // Autorisation pour les expéditeurs
+                        .requestMatchers("/api/information_colis/").authenticated() // Autorisation pour les expéditeurs
                         .requestMatchers("/api/notifications/unread").authenticated()
-                        .requestMatchers("/api/demandes/**").authenticated()
+                        .requestMatchers("/api/demandes/").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
@@ -112,7 +112,7 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
+}
 
 
 }
