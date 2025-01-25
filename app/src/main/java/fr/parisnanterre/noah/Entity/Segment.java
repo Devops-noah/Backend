@@ -2,6 +2,8 @@ package fr.parisnanterre.noah.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.Date;
+
 
 @Entity
 @Data
@@ -20,30 +22,16 @@ public class Segment {
     @JoinColumn(name = "voyageur_id", nullable = true)
     private Utilisateur voyageur; // Voyageur ayant créé ce segment
 
-    private String etat; // État du segment : "Disponible", "Réservé", etc.
-
     @Column(nullable = true)
     private Long chaineId; // ID de la chaîne associée (null si non utilisé)
 
-    private Long voyageId; // ID du voyage (au lieu de l'entité Voyage)
+    @ManyToOne
+    @JoinColumn(name = "annonce_id", nullable = true) // Relie un Segment à une Annonce
+    private Annonce annonce;
 
-    private Long annonceId; // ID de l'annonce (au lieu de l'entité Annonce)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateDepart; // Date de départ
 
-    // Getter et Setter pour 'voyageId'
-    public Long getVoyageId() {
-        return voyageId;
-    }
-
-    public void setVoyageId(Long voyageId) {
-        this.voyageId = voyageId;
-    }
-
-    // Getter et Setter pour 'annonceId'
-    public Long getAnnonceId() {
-        return annonceId;
-    }
-
-    public void setAnnonceId(Long annonceId) {
-        this.annonceId = annonceId;
-    }
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateArrivee; // Date d'arrivée
 }

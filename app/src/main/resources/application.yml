@@ -17,3 +17,5 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         default_schema: public
     show-sql: true
+
+

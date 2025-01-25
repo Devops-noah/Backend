@@ -16,7 +16,7 @@ public class DemandeTransfertController {
     @Autowired
     private DemandeTransfertService demandeTransfertService;
 
-    // Recherche des segments possibles
+    // Recherche des segments possibles en fonction des annonces
     @PostMapping("/recherche")
     public List<List<Segment>> rechercherSegments(@RequestParam String paysDepart, @RequestParam String paysArrivee) {
         return demandeTransfertService.rechercherSegments(paysDepart, paysArrivee);
