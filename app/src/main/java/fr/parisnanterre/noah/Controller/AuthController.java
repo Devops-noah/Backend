@@ -71,43 +71,58 @@ public class AuthController {
 
         // Extract user details
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        System.out.println("user details: " + userDetails);
         String userType = userDetails.getUserType();  // Get the user type (expediteur/voyageur)
         Long userId = userDetails.getId(); // Ajoutez ceci si vous avez un getter pour l'ID utilisateur
-        String jwt = jwtUtil.generateToken(userDetails.getUsername(), userType, userId);
-
+        String profileImageUrl = userDetails.getProfileImageUrl();
+        String jwt = jwtUtil.generateToken(userDetails.getUsername(), userType, userId, profileImageUrl);
+        System.out.println("jwt valeur: " + jwt);
         return ResponseEntity.ok(new AuthenticationResponse(jwt, userType, userId));
     }
 
 
     @GetMapping("/me")
     public ResponseEntity<?> getUserDetails(Authentication authentication) {
-        // Obtenir l'utilisateur connecté à partir du contexte d'authentification
-        String email = authentication.getName();
+        // Check if the authentication object is null or not authenticated
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("status", "error", "message", "Unauthorized access"));
+        }
 
-        // Rechercher l'utilisateur dans la base de données
+        // Log basic authentication details
+        String email = authentication.getName();
+        System.out.println("Authenticated user: " + email);
+        System.out.println("Authorities: " + authentication.getAuthorities());
+
+        // Fetch the user from the database
         Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findByEmail(email);
+
         if (utilisateurOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    Map.of("status", "error", "message", "User not found")
-            );
+            System.out.println("User not found for email: " + email);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("status", "error", "message", "User not found"));
         }
 
         Utilisateur utilisateur = utilisateurOpt.get();
-        System.out.println("utilisateur list: " + utilisateur);
-        // Créer une réponse utilisateur simplifiée
+
+        // Log the user details
+        System.out.println("Retrieved user: " + utilisateur);
+
+        // Construct a simplified user response with null checks
         Map<String, Object> response = Map.of(
                 "id", utilisateur.getId(),
-                "nom", utilisateur.getNom(),
-                "prenom", utilisateur.getPrenom(),
-                "email", utilisateur.getEmail(),
-                //"voyageur", utilisateur.getVoyageur,
-                "role", utilisateur.getRole().getName(),
-                "type", utilisateur.getClass().getSimpleName().toLowerCase()
+                "nom", utilisateur.getNom() != null ? utilisateur.getNom() : "N/A",
+                "prenom", utilisateur.getPrenom() != null ? utilisateur.getPrenom() : "N/A",
+                "email", utilisateur.getEmail() != null ? utilisateur.getEmail() : "N/A",
+                "role", utilisateur.getRole() != null ? utilisateur.getRole().getName() : "N/A",
+                "type", utilisateur.getClass().getSimpleName().toLowerCase(),
+                "profileImageUrl", utilisateur.getProfileImageUrl() != null ? utilisateur.getProfileImageUrl() : "N/A"
         );
+
+        // Log the final user response
+        System.out.println("User response: " + response);
 
         return ResponseEntity.ok(response);
     }
-
-
 
 }

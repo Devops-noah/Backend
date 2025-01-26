@@ -49,9 +49,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/notations/last-three-approved").permitAll()
                         .requestMatchers("/api/notations/approved").permitAll()
-                        .requestMatchers("/api/annonces").permitAll() // Allow public access to `getAllAnnonces`
+                        .requestMatchers("/api/annonces").permitAll() // Allow public acc
+                        // ess to `getAllAnnonces`
                         .requestMatchers("/api/demandeTransfert/recherche").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()  // Allow public access to uploaded files
+                        .requestMatchers("/api/utilisateurs/profiles/images/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/auth/me").hasAnyRole("Voyageur", "Expediteur")
                         .requestMatchers("/api/annonces/**").authenticated()
                         .requestMatchers("/api/notations").authenticated()
                         .requestMatchers("/api/pays").authenticated()
@@ -59,8 +63,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/voyages").authenticated()
                         .requestMatchers("/api/voyages/**").authenticated()
                         .requestMatchers("/api/utilisateurs/profile").authenticated()
+                        .requestMatchers("/api/utilisateurs/profile/update/**").authenticated()
+                        .requestMatchers("/api/utilisateurs/profile/upload-image").authenticated()
+                        .requestMatchers("/api/utilisateurs/profile/update-image").authenticated()
                         .requestMatchers("/api/information_colis/**").authenticated() // Autorisation pour les expéditeurs
                         .requestMatchers("/api/notifications/unread").authenticated()
+                        .requestMatchers("/api/notifications/read/**").authenticated()
                         .requestMatchers("/api/demandes/**").authenticated()
                         .anyRequest().authenticated()
                 )

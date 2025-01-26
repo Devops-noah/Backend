@@ -38,5 +38,8 @@ public class CustomUserDetails extends User implements UserDetails {
     public Long getId() {
         return utilisateur.getId(); // Supposons que votre objet Utilisateur a un champ id
     }
+    public String getProfileImageUrl() {
+        return utilisateur.getProfileImageUrl();
+    }
 
 }

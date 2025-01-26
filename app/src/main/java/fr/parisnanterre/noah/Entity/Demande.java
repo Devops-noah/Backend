@@ -33,4 +33,5 @@ public class Demande {
     private Statut status; // Statut de la demande : EN_ATTENTE, ACCEPTE, REFUSE
 
     private Date createdAt;
+
 }

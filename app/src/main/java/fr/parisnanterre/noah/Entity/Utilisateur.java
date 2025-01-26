@@ -51,6 +51,8 @@ public abstract class Utilisateur {
     private String telephone;
     private String adresse;
 
+    private String profileImageUrl; // URL or path to the image
+
     private boolean enabled = true; // Default to true (enabled)
 
     // Ajout du champ notificationCount
@@ -78,6 +80,7 @@ public abstract class Utilisateur {
 
     @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
     private List<Voyage> voyages;
+
 
 
 }

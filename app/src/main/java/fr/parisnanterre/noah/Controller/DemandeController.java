@@ -7,6 +7,7 @@ import fr.parisnanterre.noah.Entity.Statut;
 import fr.parisnanterre.noah.Service.DemandeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -37,19 +38,26 @@ public class DemandeController {
      * Récupérer les demandes pour l'expéditeur connecté.
      */
     @GetMapping
-    public ResponseEntity<List<Demande>> getDemandesByExpediteur(Authentication authentication) {
+    public ResponseEntity<?> getDemandesByExpediteur(Authentication authentication) {
         try {
             // Récupérer l'email de l'utilisateur connecté (l'expéditeur)
             String email = authentication.getName();
 
             // Appeler le service pour récupérer les demandes de cet expéditeur
-            List<Demande> demandes = demandeService.getDemandesByExpediteur(email);
+            List<DemandeResponse> demandes = demandeService.getDemandesByExpediteur(email);
+
+            // Retourner la liste des demandes si tout va bien
             return ResponseEntity.ok(demandes);
+        } catch (RuntimeException e) {
+            // En cas d'erreur d'accès non autorisé ou autre exception métier, retourner un message clair
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Vous devez être connecté en tant qu'expéditeur pour accéder aux demandes.");
         } catch (Exception e) {
-            // En cas d'erreur, retourner une réponse HTTP 400
-            return ResponseEntity.badRequest().body(null);
+            // Pour toute autre erreur, retourner une réponse générique
+            return ResponseEntity.badRequest().body("Une erreur est survenue lors de la récupération des demandes.");
         }
     }
+
+
 
     /**
      * Créer une nouvelle demande (l'expéditeur crée la demande pour son colis).

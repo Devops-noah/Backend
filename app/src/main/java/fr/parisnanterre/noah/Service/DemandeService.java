@@ -1,6 +1,7 @@
 package fr.parisnanterre.noah.Service;
 
 import fr.parisnanterre.noah.DTO.DemandeRequest;
+import fr.parisnanterre.noah.DTO.InformationColisResponse;
 import fr.parisnanterre.noah.Entity.*;
 import fr.parisnanterre.noah.DTO.DemandeResponse; // Importer la classe DemandeResponse
 import fr.parisnanterre.noah.Repository.DemandeRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +31,57 @@ public class DemandeService {
         return demandeRepository.findByVoyageurId(voyageur.getId());
     }
 
-    // Récupérer les demandes pour un expéditeur spécifique
-    public List<Demande> getDemandesByExpediteur(String expediteurEmail) {
-        Utilisateur expediteur = utilisateurRepository.findByEmail(expediteurEmail)
-                .orElseThrow(() -> new RuntimeException("Expéditeur non trouvé"));
-        return demandeRepository.findByExpediteurId(expediteur.getId());
+    public List<DemandeResponse> getDemandesByExpediteur(String expediteurEmail) {
+        // Retrieve the user by email
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(expediteurEmail)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        // Check if the user type is "expediteur"
+        if (!(utilisateur instanceof Expediteur)) {
+            // If not an expediteur, throw an error
+            throw new RuntimeException("Vous devez être connecté en tant qu'expéditeur pour accéder aux demandes.");
+        }
+
+        // Fetch demandes for the expediteur
+        List<Demande> demandes = demandeRepository.findByExpediteurId(utilisateur.getId());
+
+        // Map each Demande entity to a DemandeResponse DTO
+        return demandes.stream().map(demande -> {
+            DemandeResponse demandeResponse = new DemandeResponse();
+            demandeResponse.setId(demande.getId());
+            demandeResponse.setExpediteurEmail(demande.getExpediteur().getEmail());
+            demandeResponse.setStatus(demande.getStatus());
+            demandeResponse.setCreatedAt(demande.getCreatedAt());
+
+            // Set voyageur name (if a voyageur has been assigned)
+            if (demande.getVoyageur() != null) {
+                demandeResponse.setVoyageurNom(demande.getVoyageur().getNom());
+            } else {
+                demandeResponse.setVoyageurNom("Aucun voyageur assigné");
+            }
+
+            // Map InformationColis to InformationColisResponse
+            InformationColisResponse colisResponse = new InformationColisResponse();
+            if (demande.getInformationColis() != null) {
+                colisResponse.setId(demande.getInformationColis().getId());
+                colisResponse.setPoids(demande.getInformationColis().getPoids());
+                colisResponse.setDimensions(demande.getInformationColis().getDimensions());
+                colisResponse.setNature(demande.getInformationColis().getNature());
+                colisResponse.setCategorie(demande.getInformationColis().getCategorie());
+                colisResponse.setDatePriseEnCharge(demande.getInformationColis().getDatePriseEnCharge());
+                colisResponse.setPlageHoraire(demande.getInformationColis().getPlageHoraire());
+                colisResponse.setMessage("Colis lié à la demande");
+            } else {
+                colisResponse.setMessage("Aucun colis associé à cette demande");
+            }
+
+            demandeResponse.setInformationColis(colisResponse);
+
+            return demandeResponse;
+        }).collect(Collectors.toList());
     }
+
+
 
     // Créer une nouvelle demande
     @Transactional

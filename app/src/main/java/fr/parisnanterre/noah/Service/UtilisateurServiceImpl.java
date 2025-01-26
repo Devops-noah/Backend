@@ -6,6 +6,7 @@ import fr.parisnanterre.noah.Entity.*;
 import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,9 @@ public class UtilisateurServiceImpl {
 
     @Autowired
     private UtilisateurRepository utilisateurRepository;
+
+    @Autowired
+    private ImageServiceImpl imageServiceImpl;
 
     public List<Utilisateur> getAllUtilisateurs() {
         return utilisateurRepository.findAll();
@@ -35,6 +39,8 @@ public class UtilisateurServiceImpl {
         profile.setEmail(utilisateur.getEmail());
         profile.setTelephone(utilisateur.getTelephone());
         profile.setAdresse(utilisateur.getAdresse());
+        profile.setProfileImageUrl(utilisateur.getProfileImageUrl()); // Include the image URL
+
 
         // Récupérer le nombre de notifications non lues pour l'utilisateur
         int notificationCount = utilisateur.getNotificationCount();  // Le compteur de notifications non lues
@@ -85,35 +91,47 @@ public class UtilisateurServiceImpl {
     }
 
 
+    public void updateUserProfileImage(Long userId, String imageUrl) {
+        // Find the user by ID
+        Utilisateur utilisateur = utilisateurRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur not found"));
 
-//    public Optional<Utilisateur> getUtilisateurById(Integer id) {
-//        return utilisateurRepository.findById(id);
-//    }
+        // Update the profile image URL
+        utilisateur.setProfileImageUrl(imageUrl);
 
-//    public Utilisateur createUtilisateur(Utilisateur utilisateur) {
-//        return utilisateurRepository.save(utilisateur);
-//    }
-//
-//    public Utilisateur updateUtilisateur(Integer id, Utilisateur utilisateurDetails) {
-//        return utilisateurRepository.findById(id)
-//                .map(utilisateur -> {
-//                    utilisateur.setNom(utilisateurDetails.getNom());
-//                    utilisateur.setPrenom(utilisateurDetails.getPrenom());
-//                    utilisateur.setEmail(utilisateurDetails.getEmail());
-//                    utilisateur.setMotDePasse(utilisateurDetails.getMotDePasse());
-//                    utilisateur.setTelephone(utilisateurDetails.getTelephone());
-//                    utilisateur.setAdresse(utilisateurDetails.getAdresse());
-//                    //utilisateur.setRole(utilisateurDetails.getRole());
-//                    return utilisateurRepository.save(utilisateur);
-//
-//                }).orElseThrow(() -> new RuntimeException("Utilisateur not found"));
-//    }
-//
-//    public void deleteUtilisateur(Integer id) {
-//        utilisateurRepository.deleteById(id);
-//    }
-//
-//    public Optional<Utilisateur> getUtilisateurByEmail(String email) {
-//        return utilisateurRepository.findByEmail(email);
-//    }
+        // Save the updated user entity
+        utilisateurRepository.save(utilisateur);
+    }
+
+    public Long getUserIdByEmail(String email) {
+        // Find the user by email
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utilisateur not found"));
+
+        // Return the user's ID
+        return utilisateur.getId();
+    }
+
+    public String getProfileImageByUserId(Long userId) {
+        return utilisateurRepository.findById(userId)
+                .map(Utilisateur::getProfileImageUrl)
+                .orElse(null);
+    }
+
+    @Transactional
+    public Utilisateur updateUtilisateur(Long userId, String nom, String prenom, String telephone, String adresse) {
+        // Find the user by ID
+        Utilisateur utilisateur = utilisateurRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur not found"));
+
+        // Update the fields if provided
+        if (nom != null && !nom.isEmpty()) utilisateur.setNom(nom);
+        if (prenom != null && !prenom.isEmpty()) utilisateur.setPrenom(prenom);
+        if (telephone != null && !telephone.isEmpty()) utilisateur.setTelephone(telephone);
+        if (adresse != null && !adresse.isEmpty()) utilisateur.setAdresse(adresse);
+
+        // Save the updated user
+        return utilisateurRepository.save(utilisateur);
+    }
+
 }
