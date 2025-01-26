@@ -70,6 +70,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/notifications/unread").authenticated()
                         .requestMatchers("/api/notifications/read/**").authenticated()
                         .requestMatchers("/api/demandes/**").authenticated()
+                        .requestMatchers("/api/utilisateurs/expediteur/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

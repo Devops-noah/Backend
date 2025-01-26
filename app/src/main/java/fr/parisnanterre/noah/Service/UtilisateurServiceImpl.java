@@ -118,6 +118,15 @@ public class UtilisateurServiceImpl {
                 .orElse(null);
     }
 
+    // Méthode pour récupérer le nom de l'expéditeur par ID
+    public String getExpediteurNom(Long expediteurId) {
+        // Vérifier si l'utilisateur avec l'ID donné existe
+        Utilisateur expediteur = utilisateurRepository.findById(expediteurId)
+                .orElseThrow(() -> new RuntimeException("Expéditeur non trouvé"));
+
+        return expediteur.getNom();  // Retourner le nom de l'expéditeur
+    }
+
     @Transactional
     public Utilisateur updateUtilisateur(Long userId, String nom, String prenom, String telephone, String adresse) {
         // Find the user by ID

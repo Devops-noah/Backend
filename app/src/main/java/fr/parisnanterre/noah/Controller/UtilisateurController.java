@@ -60,6 +60,12 @@ public class UtilisateurController {
         }
     }
 
+    // Récupérer le nom de l'expéditeur par son ID
+    @GetMapping("/expediteur/{expediteurId}")
+    public String getExpediteurNom(@PathVariable Long expediteurId) {
+        return utilisateurService.getExpediteurNom(expediteurId);
+    }
+
     private static final String UPLOADS_DIR = "C:\\Users\\dell\\Desktop\\Nanterre-miage\\Master 1\\semestre 1\\Methodes-outils-developpement-logiciel\\Model-devops-Damien\\Devops-noah\\Backend\\app\\uploads\\";
 
 
