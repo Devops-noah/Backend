@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SuiviRepository extends JpaRepository<Suivi, Long> {
-    // Vous pouvez ajouter des méthodes personnalisées si nécessaire
+
 }

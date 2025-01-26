@@ -31,6 +31,12 @@ public class NotificationService {
         Demande demande = demandeRepository.findById(demandeId)
                 .orElseThrow(() -> new RuntimeException("Demande non trouvée"));
 
+        // Vérifier si l'expéditeur est bien récupéré
+        Utilisateur expediteur = demande.getExpediteur();  // Assurez-vous que l'expéditeur est bien récupéré ici
+        if (expediteur == null) {
+            throw new RuntimeException("Expéditeur non trouvé pour la demande");
+        }
+
         // Récupérer le voyageur à qui la notification appartient
         Utilisateur voyageur = demande.getInformationColis().getAnnonce().getVoyageur(); // C'est le voyageur qui reçoit la notification
 
@@ -41,6 +47,7 @@ public class NotificationService {
         Notification notification = new Notification();
         notification.setMessage(message);
         notification.setVoyageur(voyageur);  // Le voyageur qui reçoit la notification
+        notification.setExpediteur(expediteur);  // L'expéditeur qui a fait la demande
         notification.setDemande(demande);  // Lier la notification à la demande
         notification.setCreatedAt(new Date());
         notification.setRead(false);
