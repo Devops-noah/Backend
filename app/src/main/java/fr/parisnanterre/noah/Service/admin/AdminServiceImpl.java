@@ -1,8 +1,10 @@
 package fr.parisnanterre.noah.Service.admin;
 
 import fr.parisnanterre.noah.DTO.AnnonceResponse;
+import fr.parisnanterre.noah.DTO.NotationResponse;
 import fr.parisnanterre.noah.Entity.*;
 import fr.parisnanterre.noah.Repository.AnnonceRepository;
+import fr.parisnanterre.noah.Repository.NotationRepository;
 import fr.parisnanterre.noah.Repository.RoleRepository;
 import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,16 +24,19 @@ public class AdminServiceImpl {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AnnonceRepository annonceRepository;
+    private final NotationRepository notationRepository;
 
     @Autowired
     public AdminServiceImpl(UtilisateurRepository utilisateurRepository,
                             RoleRepository roleRepository,
                             PasswordEncoder passwordEncoder,
-                            AnnonceRepository annonceRepository) {
+                            AnnonceRepository annonceRepository,
+                            NotationRepository notationRepository) {
         this.utilisateurRepository = utilisateurRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.annonceRepository = annonceRepository;
+        this.notationRepository = notationRepository;
     }
 
     // Method to create an admin user
@@ -180,6 +185,83 @@ public class AdminServiceImpl {
                 .orElseThrow(() -> new IllegalArgumentException("Annonce not found with ID: " + annonceId));
         annonce.setSuspended(!annonce.isSuspended()); // Set suspended state to true or false based on the parameter
         return annonceRepository.save(annonce);
+    }
+
+    public List<NotationResponse> getAllNotations() {
+        try {
+            // Fetch all notations from the repository
+            List<Notation> notations = notationRepository.findAll();
+
+            // Map each `Notation` entity to `NotationResponse` DTO
+            return notations.stream()
+                    .map(notation -> {
+                        NotationResponse response = new NotationResponse();
+                        System.out.println("response notation getall: " + response);
+                        response.setId(notation.getId());
+                        response.setUtilisateurId(notation.getUtilisateur().getId());
+                        response.setUserName(notation.getUtilisateur().getNom());
+                        response.setUserFirstName(notation.getUtilisateur().getPrenom());
+                        response.setNote(notation.getNote());
+                        response.setCommentaire(notation.getCommentaire());
+                        response.setDatePublication(notation.getDatePublication().toString()); // Format date as String
+                        response.setStatus(notation.getStatus());
+                        return response;
+                    })
+                    .toList();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des notations", e);
+        }
+    }
+
+    // Approve a comment
+    public NotationResponse approveNotation(Long id) throws Exception {
+        // Fetch the notation entity
+        Notation notation = notationRepository.findById(id)
+                .orElseThrow(() -> new Exception("Notation not found"));
+
+        // Update the status
+        notation.setStatus(StatutNotation.APPROVED);
+
+        // Save the updated entity
+        Notation updatedNotation = notationRepository.save(notation);
+
+        // Convert the updated entity to a DTO
+        return convertToDto(updatedNotation);
+    }
+
+    // Approve a comment
+    public NotationResponse suspendNotation(Long id) throws Exception {
+        // Fetch the notation entity
+        Notation notation = notationRepository.findById(id)
+                .orElseThrow(() -> new Exception("Notation not found"));
+
+        // Update the status
+        notation.setStatus(StatutNotation.SUSPENDED);
+
+        // Save the updated entity
+        Notation updatedNotation = notationRepository.save(notation);
+
+        // Convert the updated entity to a DTO
+        return convertToDto(updatedNotation);
+    }
+
+    // Helper method to convert a Notation entity to a NotationResponse DTO
+    private NotationResponse convertToDto(Notation notation) {
+        NotationResponse response = new NotationResponse();
+        response.setId(notation.getId());
+        response.setUtilisateurId(notation.getUtilisateur().getId());
+        response.setUserName(notation.getUtilisateur().getNom());
+        response.setUserFirstName(notation.getUtilisateur().getPrenom());
+        response.setNote(notation.getNote());
+        response.setCommentaire(notation.getCommentaire());
+        response.setDatePublication(notation.getDatePublication().toString());
+        response.setStatus(StatutNotation.valueOf(notation.getStatus().toString()));
+        return response;
+    }
+
+    // Fetch pending comments for admin review
+    public List<Notation> getPendingNotations() {
+        return notationRepository.findByStatus(StatutNotation.PENDING);
     }
 
 

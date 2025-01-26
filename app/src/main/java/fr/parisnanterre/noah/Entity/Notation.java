@@ -17,6 +17,9 @@ public class Notation {
     private String commentaire;
     private String datePublication;
 
+    @Enumerated(EnumType.STRING)
+    private StatutNotation status = StatutNotation.PENDING; // Default to PENDING
+
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "utilisateur_id", nullable = false)

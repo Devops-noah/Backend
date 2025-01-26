@@ -1,5 +1,6 @@
 package fr.parisnanterre.noah.Controller;
 
+import fr.parisnanterre.noah.DTO.NotationResponse;
 import fr.parisnanterre.noah.Entity.Notation;
 import fr.parisnanterre.noah.DTO.NotationRequest;
 import fr.parisnanterre.noah.Service.NotationService;
@@ -33,18 +34,16 @@ public class NotationController {
         }
     }
 
-    // API pour récupérer toutes les notations
-    @GetMapping("/get-notations")
-    public ResponseEntity<List<Notation>> getAllNotations() {
-        try {
-            List<Notation> notations = notationService.getAllNotations();
-            System.out.println("notations controller: " + notations.get(0).getUtilisateur().getNom());
-            return ResponseEntity.ok(notations);
-        } catch (AccessDeniedException e) {
-            System.err.println("Access Denied: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+    @GetMapping("/approved")
+    public ResponseEntity<List<NotationResponse>> getAllNotationsWithApprovedComments() {
+        List<NotationResponse> notations = notationService.getAllNotationsWithApprovedComments();
+        if (notations.isEmpty()) {
+            return ResponseEntity.noContent().build(); // HTTP 204: No Content
         }
+        return ResponseEntity.ok(notations);
     }
+
 
     // API pour récupérer les notations par utilisateur
     @GetMapping("/user/{utilisateurId}")
@@ -54,9 +53,9 @@ public class NotationController {
     }
 
     // API pour récupérer les 3 dernières notations
-    @GetMapping("/last-three")
-    public ResponseEntity<List<Notation>> getLastThreeNotations() {
-        List<Notation> notations = notationService.getLastThreeNotations();
-        return ResponseEntity.ok(notations);
+    @GetMapping("/last-three-approved")
+    public ResponseEntity<List<NotationResponse>> getLastThreeNotationsWithApprovedComments() {
+        List<NotationResponse> responses = notationService.getLastThreeNotationsWithApprovedComments();
+        return ResponseEntity.ok(responses);
     }
 }

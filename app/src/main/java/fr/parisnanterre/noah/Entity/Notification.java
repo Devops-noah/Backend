@@ -23,6 +23,11 @@ public class Notification {
 
     @ManyToOne
     @JsonIgnore
+    @JoinColumn(name = "expediteur_id", nullable = false) // Ajoutez cette ligne pour l'expéditeur
+    private Utilisateur expediteur;  // L'expéditeur qui a créé la demande
+
+    @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "demande_id", nullable = false)
     private Demande demande;  // Lien vers la Demande pour laquelle la notification a été créée
 
