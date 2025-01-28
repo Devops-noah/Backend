@@ -20,56 +20,119 @@
 Ce projet constitue la partie Backend de l'application Travel Carry, développée avec Spring Boot. Il gère les API pour la gestion des utilisateurs, des colis et des voyages.
 ```
 Backend/
-├── app
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── fr/
-│   │   │       └── parisnanterre/
-│   │   │           └── noah (travelcarry)/
-│   │   │               ├── TravelCarryApplication.java           # Main application class
-│   │   │               ├── config/                               # Configuration files
-│   │   │               │   ├── DatabaseConfig.java               # Database-related configuration (if customizing beyond application.properties)
-│   │   │               │   ├── MailConfig.java                   # Email service configuration (if sending emails)
-│   │   │               ├── controller/                           # REST controllers
-│   │   │               │   ├── UtilisateurController.java        # Handles user-related requests
-│   │   │               │   ├── AnnonceController.java            # Handles annonce-related requests
-│   │   │               │   ├── VoyageController.java             # Handles voyage-related requests
-│   │   │               │   └── PaysController.java               # Handles pays-related requests
-│   │   │               ├── model/                                # Entity classes matching the class diagram
-│   │   │               │   ├── Utilisateur.java                  # User entity with properties and roles
-│   │   │               │   ├── Annonce.java                      # Annonce entity
-│   │   │               │   ├── Voyage.java                       # Voyage entity
-│   │   │               │   └── Pays.java                         # Country entity
-│   │   │               ├── DTO/  
-│   │   │               │   ├── Filtre.java                                                     
-│   │   │               ├── repository/                           # Data access layer (JPA repositories)
-│   │   │               │   ├── UtilisateurRepository.java        # Repository for users
-│   │   │               │   ├── AnnonceRepository.java            # Repository for annonces
-│   │   │               │   ├── VoyageRepository.java             # Repository for voyages
-│   │   │               │   └── PaysRepository.java               # Repository for country info
-│   │   │               ├── service/                              # Business logic layer
-│   │   │               │   ├── UtilisateurService.java           # Service for user-related operations
-│   │   │               │   ├── AnnonceService.java               # Service for annonces
-│   │   │               │   ├── VoyageService.java                # Service for voyages
-│   │   │               ├── security/                             # Security configuration (if applicable)
-│   │   │               │   ├── JwtAuthenticationFilter.java      # JWT filter to validate tokens on requests
-│   │   │               │   ├── JwtTokenProvider.java             # Utility for generating and validating JWT tokens
-│   │   │               │   ├── CustomUserDetailsService.java     # Service for loading user-specific data during authentication
-│   │   │               │   ├── SecurityConstants.java            # Constants for security (e.g., secret key, token expiration time)
-│   │   │               │   ├── SecurityConfig.java               # Main security configuration class for HTTP security
-│   │   │               │   └── RolePermissions.java              # Defines permissions for roles (if using role-based access control)
-│   │   └── resources/
-│   │       ├── application.yml                            # Application configuration
-│   │       └── static/                                           # Static files (if needed)
-│   └── test/                                                     # Unit and integration tests
-│       └── java/
-│           └── com/
-│               └── yourcompany/
-│                   └── travelcarry/
-│                       ├── controller/                      # Tests for controllers
-│                       ├── service/                         # Tests for services
-└── build.gradle                                             # build.gradle for Gradle dependencies
+│
+├── .github/               # Dossier pour les fichiers de configuration GitHub (actions, workflows, etc.)
+├── .gradle/               # Dossier de configuration de Gradle
+├── .settings/              # Dossier pour les paramètres d'IDE (par exemple, Eclipse)
+├── app/                    # Dossier contenant le code principal de l'application
+│   ├── bin/                # Dossier pour les fichiers binaires générés
+│   ├── build/              # Dossier pour les fichiers de construction (build)
+│   ├── gradle/             # Dossier de configuration de Gradle spécifique à l'application
+│   └── src/                # Dossier source contenant tout le code Java
+│       ├── docs/           # Dossier pour la documentation
+│       └── main/           # Code source principal de l'application
+│           ├── java/      # Dossier contenant tout le code Java
+│           │   └── fr/    # Dossier pour les packages Java organisés par domaine
+│           │       └── parisnanterre/ # Dossier pour ton projet spécifique
+│           │           └── noah/   # Dossier pour ton package personnel
+│           │               ├── config/     # Dossier pour la configuration de l'application
+│           │               │   └── SecurityConfig.java  # Fichier de configuration de sécurité
+│           │               ├── Controller/ # Dossier pour les contrôleurs (API)
+│           │               │   └── admin/ # Dossier pour les contrôleurs d'administration
+│           │               │       ├── AdminAnnounceController.java  # Gestion des annonces admin
+│           │               │       ├── AdminController.java           # Contrôleur principal admin
+│           │               │       ├── AdminNotationCommentsController.java  # Gestion des commentaires de notation
+│           │               │       ├── AnnonceController.java         # Contrôleur pour la gestion des annonces
+│           │               │       ├── AuthController.java           # Contrôleur pour l'authentification
+│           │               │       ├── DemandeController.java        # Contrôleur pour les demandes
+│           │               │       ├── DemandeTransferController.java # Contrôleur pour les transferts de demandes
+│           │               │       ├── HelloController.java          # Contrôleur de test (Hello)
+│           │               │       ├── InformationColisController.java # Contrôleur pour les informations de colis
+│           │               │       ├── LivraisonController.java      # Contrôleur pour la gestion des livraisons
+│           │               │       ├── NotationController.java       # Contrôleur pour les notations
+│           │               │       ├── NotificationController.java   # Contrôleur pour les notifications
+│           │               │       ├── PaysController.java           # Contrôleur pour les pays
+│           │               │       ├── UtilisateurController.java    # Contrôleur pour les utilisateurs
+│           │               │       └── VoyageController.java         # Contrôleur pour les voyages
+│           │               ├── DTO/        # Dossier pour les Data Transfer Objects
+│           │               │   ├── AnnonceRequest.java        # DTO pour les requêtes d'annonces
+│           │               │   ├── AnnonceResponse.java       # DTO pour les réponses d'annonces
+│           │               │   ├── AuthenticationRequest.java  # DTO pour les requêtes d'authentification
+│           │               │   ├── AuthenticationResponse.java # DTO pour les réponses d'authentification
+│           │               │   ├── DemandeRequest.java        # DTO pour les requêtes de demande
+│           │               │   ├── DemandeResponse.java       # DTO pour les réponses de demande
+│           │               │   ├── Filtre.java                # DTO pour les filtres de recherche
+│           │               │   ├── InformationColisRequest.java  # DTO pour les requêtes d'information colis
+│           │               │   ├── InformationColisResponse.java # DTO pour les réponses d'information colis
+│           │               │   ├── NotationRequest.java       # DTO pour les requêtes de notation
+│           │               │   ├── NotationResponse.java      # DTO pour les réponses de notation
+│           │               │   ├── NotificationResponseDto.java  # DTO pour les réponses de notification
+│           │               │   ├── UtilisateurProfileResponse.java # DTO pour la réponse du profil utilisateur
+│           │               │   ├── UtilisateurRequest.java    # DTO pour les requêtes utilisateur
+│           │               │   ├── VoyageRequest.java         # DTO pour les requêtes de voyage
+│           │               │   └── VoyageResponse.java        # DTO pour les réponses de voyage
+│           │               ├── Entity/     # Dossier pour les entités de la base de données
+│           │               │   ├── Annonce.java    # Entité pour une annonce
+│           │               │   ├── Demande.java    # Entité pour une demande
+│           │               │   ├── Expedition.java # Entité pour un expéditeur
+│           │               │   ├── Feedback.java  # Entité pour un retour d'utilisateur
+│           │               │   ├── InformationColis.java # Entité pour l'information des colis
+│           │               │   ├── Livraison.java  # Entité pour les livraisons
+│           │               │   ├── Notation.java  # Entité pour les notations
+│           │               │   ├── Notification.java # Entité pour les notifications
+│           │               │   ├── Pays.java      # Entité pour les pays
+│           │               │   ├── Role.java      # Entité pour les rôles des utilisateurs
+│           │               │   ├── Segment.java   # Entité pour les segments de transport
+│           │               │   ├── Statut.java    # Entité pour les statuts
+│           │               │   ├── Suivi.java     # Entité pour les suivis
+│           │               │   ├── TypeNotification.java # Entité pour les types de notification
+│           │               │   ├── Utilisateur.java # Entité pour un utilisateur
+│           │               │   ├── Voyage.java    # Entité pour un voyage
+│           │               │   └── Voyageur.java  # Entité pour un voyageur
+│           │               ├── Repository/ # Dossier pour les classes d'accès aux données
+│           │               │   ├── AnnonceRepository.java  # Repository pour les annonces
+│           │               │   ├── DemandeRepository.java  # Repository pour les demandes
+│           │               │   ├── InformationColisRepository.java  # Repository pour l'information des colis
+│           │               │   ├── LivraisonRepository.java  # Repository pour les livraisons
+│           │               │   ├── NotationRepository.java  # Repository pour les notations
+│           │               │   ├── NotificationRepository.java  # Repository pour les notifications
+│           │               │   ├── PaysRepository.java  # Repository pour les pays
+│           │               │   ├── SegmentRepository.java  # Repository pour les segments
+│           │               │   ├── SuiviRepository.java  # Repository pour les suivis
+│           │               │   ├── UtilisateurRepository.java  # Repository pour les utilisateurs
+│           │               │   └── VoyageRepository.java  # Repository pour les voyages
+│           │               ├── Service/    # Dossier pour la logique métier
+│           │               │   ├── admin/  # Dossier pour les services d'administration
+│           │               │   │   ├── AdminServiceImpl.java   # Implémentation des services d'admin
+│           │               │   │   ├── AnnonceServiceImpl.java  # Service pour les annonces
+│           │               │   │   ├── DemandeService.java      # Service pour les demandes
+│           │               │   │   ├── DemandeTransferService.java # Service pour les transferts de demandes
+│           │               │   │   ├── ImageServiceImpl.java    # Service pour la gestion des images
+│           │               │   │   ├── InformationColisService.java # Service pour les informations de colis
+│           │               │   │   ├── LivraisonService.java    # Service pour les livraisons
+│           │               │   │   ├── NotationService.java     # Service pour les notations
+│           │               │   │   ├── NotificationService.java  # Service pour les notifications
+│           │               │   │   ├── PaysServiceImpl.java    # Service pour les pays
+│           │               │   │   ├── UtilisateurServiceImpl.java  # Service pour les utilisateurs
+│           │               │   │   └── VoyageServiceImpl.java   # Service pour les voyages
+│           │               │   └── autres services (par exemple, des services non administratifs)
+│           │               └── util/       # Dossier pour les utilitaires généraux
+│           │                   ├── JwtAuthenticationFilter.java  # Filtre pour l'authentification JWT
+│           │                   ├── JwtUtil.java                   # Utilitaires pour la gestion de JWT
+│           │                   └── TravelCarryApplication.java   # Classe principale de l'application
+│           └── resources/   # Dossier pour les fichiers de ressources comme la configuration (fichiers YAML, properties, etc.)
+│               └── scripts/  # Dossier pour les scripts (par exemple, pour l'automatisation)
+│                   ├── gitfame.rb        # Script Ruby pour l'outil Gitfame
+│                   └── application.yml   # Fichier de configuration pour l'application
+├── test/                                                     # Unit and integration tests
+│   └── java/
+│       └── com/
+│           └── yourcompany/
+│               └── travelcarry/
+│                   ├── controller/                      # Tests for controllers
+│                   ├── service/                         # Tests for services
+└── build.gradle                              # Configuration de Gradle pour les tests
+
 
 ```
 
