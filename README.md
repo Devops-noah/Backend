@@ -209,6 +209,7 @@ Pour exécuter les tests unitaires et d'intégration, utilisez la commande suiva
 
     IDE : IntelliJ IDEA / Eclipse / VS Code.
     Base de Données : PostgreSQL.
+    Neon pour la base de donnée en ligne :https://console.neon.tech/app/projects/misty-paper-89322152/branches/br-little-shape-a2dhwb4o/tables?database=travel_carry_db
     Postman : Test des API.
 
 
