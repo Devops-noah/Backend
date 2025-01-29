@@ -14,7 +14,9 @@ public class Notation {
     private Long id;
 
     private int note;
+
     private String commentaire;
+
     private String datePublication;
 
     @Enumerated(EnumType.STRING)
