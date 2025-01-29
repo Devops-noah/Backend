@@ -10,6 +10,7 @@ public class NotificationResponseDto {
     private String message;
     private boolean isRead;
     private Date createdAt;
+    private Long expediteurId;
     private DemandeResponse demande; // Nested DTO for Demande
 
 }

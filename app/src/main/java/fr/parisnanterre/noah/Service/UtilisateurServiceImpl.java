@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UtilisateurServiceImpl {
@@ -39,8 +39,15 @@ public class UtilisateurServiceImpl {
         profile.setEmail(utilisateur.getEmail());
         profile.setTelephone(utilisateur.getTelephone());
         profile.setAdresse(utilisateur.getAdresse());
-        profile.setProfileImageUrl(utilisateur.getProfileImageUrl()); // Include the image URL
 
+        // Handle the profile image
+        if (utilisateur.getProfileImage() != null) {
+            byte[] profileImage = utilisateur.getProfileImage().getBytes();
+            byte[] base64Image = Base64.getEncoder().encodeToString(profileImage).getBytes();
+            profile.setProfileImage(base64Image);
+        } else {
+            profile.setProfileImage("https://picsum.photos/50/50".getBytes()); // Default image URL
+        }
 
         // Récupérer le nombre de notifications non lues pour l'utilisateur
         int notificationCount = utilisateur.getNotificationCount();  // Le compteur de notifications non lues
@@ -91,17 +98,19 @@ public class UtilisateurServiceImpl {
     }
 
 
-    public void updateUserProfileImage(Long userId, String imageUrl) {
-        // Find the user by ID
+    public void updateUserProfileImage(Long userId, String imgurImageUrl) {
         Utilisateur utilisateur = utilisateurRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Utilisateur not found"));
-
-        // Update the profile image URL
-        utilisateur.setProfileImageUrl(imageUrl);
-
-        // Save the updated user entity
+        utilisateur.setProfileImage(imgurImageUrl);  // Store the Imgur URL instead of byte[]
         utilisateurRepository.save(utilisateur);
     }
+
+    public String getUserProfileImageUrl(Long userId) {
+        Utilisateur utilisateur = utilisateurRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur not found"));
+        return utilisateur.getProfileImage();  // Get the URL
+    }
+
 
     public Long getUserIdByEmail(String email) {
         // Find the user by email
@@ -112,11 +121,6 @@ public class UtilisateurServiceImpl {
         return utilisateur.getId();
     }
 
-    public String getProfileImageByUserId(Long userId) {
-        return utilisateurRepository.findById(userId)
-                .map(Utilisateur::getProfileImageUrl)
-                .orElse(null);
-    }
 
     // Méthode pour récupérer le nom de l'expéditeur par ID
     public String getExpediteurNom(Long expediteurId) {

@@ -37,6 +37,7 @@ public class NotationService {
 
         Utilisateur utilisateur = utilisateurOpt.get();
 
+
         // Créer une nouvelle notation
         Notation newNotation = new Notation();
         newNotation.setNote(notationRequest.getNote());

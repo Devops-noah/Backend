@@ -17,4 +17,5 @@ public interface NotationRepository extends JpaRepository<Notation, Long> {
     List<Notation> findTop3ByStatusOrderByDatePublicationDesc(StatutNotation status);
 
     List<Notation> findByStatus(StatutNotation status);
+
 }

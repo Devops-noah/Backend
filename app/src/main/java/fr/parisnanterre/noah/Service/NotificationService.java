@@ -82,7 +82,9 @@ public class NotificationService {
                         Demande demande = notification.getDemande();
                         DemandeResponse demandeResponse = new DemandeResponse();
                         demandeResponse.setId(demande.getId());
+                        demandeResponse.setExpediteurId(demande.getExpediteur().getId());
                         demandeResponse.setExpediteurEmail(demande.getExpediteur().getEmail());
+                        demandeResponse.setExpediteurNom(demande.getExpediteur().getNom());
                         demandeResponse.setStatus(demande.getStatus());
                         demandeResponse.setCreatedAt(demande.getCreatedAt());
                         demandeResponse.setVoyageurNom(demande.getVoyageur().getNom());

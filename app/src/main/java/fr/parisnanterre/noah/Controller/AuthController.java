@@ -65,6 +65,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
+        System.out.println("waaaaaaaaaaaaaaayyyyyyyyyyyyyyy");
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getMotDePasse())
         );
@@ -73,12 +74,15 @@ public class AuthController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         System.out.println("user details: " + userDetails);
         String userType = userDetails.getUserType();  // Get the user type (expediteur/voyageur)
-        Long userId = userDetails.getId(); // Ajoutez ceci si vous avez un getter pour l'ID utilisateur
-        String profileImageUrl = userDetails.getProfileImageUrl();
-        String jwt = jwtUtil.generateToken(userDetails.getUsername(), userType, userId, profileImageUrl);
+        Long userId = userDetails.getId(); // Get the user's ID
+
+        // Generate JWT (exclude profileImage byte[])
+        String jwt = jwtUtil.generateToken(userDetails.getUsername(), userType, userId);
         System.out.println("jwt valeur: " + jwt);
+
         return ResponseEntity.ok(new AuthenticationResponse(jwt, userType, userId));
     }
+
 
 
     @GetMapping("/me")
@@ -116,7 +120,7 @@ public class AuthController {
                 "email", utilisateur.getEmail() != null ? utilisateur.getEmail() : "N/A",
                 "role", utilisateur.getRole() != null ? utilisateur.getRole().getName() : "N/A",
                 "type", utilisateur.getClass().getSimpleName().toLowerCase(),
-                "profileImageUrl", utilisateur.getProfileImageUrl() != null ? utilisateur.getProfileImageUrl() : "N/A"
+                "profileImage", utilisateur.getProfileImage() != null ? utilisateur.getProfileImage() : "N/A"
         );
 
         // Log the final user response
