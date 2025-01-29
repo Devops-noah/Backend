@@ -12,7 +12,7 @@ ifndef::modeldir[:modeldir : model]
 == Application goal
 
 == Architecture
-plantuml::src/docs/model/archi.puml[svg]
+plantuml::model/archi.puml[svg]
 
 
 
