@@ -123,6 +123,7 @@ public class UtilisateurServiceImpl {
         // Vérifier si l'utilisateur avec l'ID donné existe
         Utilisateur expediteur = utilisateurRepository.findById(expediteurId)
                 .orElseThrow(() -> new RuntimeException("Expéditeur non trouvé"));
+        System.out.println("hawa uuuuuuuuuuuu: " + expediteur.getNom());
 
         return expediteur.getNom();  // Retourner le nom de l'expéditeur
     }

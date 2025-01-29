@@ -1,43 +1,163 @@
 @startuml
 
-package fr.parisnanterre {
-    class App {
-        + main(String[] args)
+package "fr.parisnanterre.noah.Entity" {
+    class Utilisateur {
+        +Long id
+        +String nom
+        +String prenom
+        +String email
+        +String motDePasse
+        +String telephone
+        +String adresse
+        +String profileImageUrl
+        +boolean enabled
+        +int notificationCount
+        +Role role
+        +List<Livraison> livraisonsExpediteur
+        +List<Livraison> livraisonsVoyageur
+        +List<Notation> notations
+        +List<Demande> demandes
+        +List<Annonce> annonces
+        +List<Voyage> voyages
     }
 
-    package controllers {
-        class HelloController {
-            + getHello() : String
-        }
+    class AdminType {
+        +deactivateUser(Utilisateur user)
+        +approveAnnonce(Annonce annonce)
     }
 
-    package models {
-            class HelloModel {
-                + sayHello() : String
-            }
-        }
-    ' Relationships
-    App --> HelloController : "creates"
-    HelloController --> HelloModel
-}
+    class Annonce {
+        +Long id
+        +Date datePublication
+        +Double poidsDisponible
+        +boolean approved
+        +boolean suspended
+        +Voyageur voyageur
+        +Voyage voyage
+    }
 
-' Adding Spring Boot dependencies to highlight Spring context
-package org.springframework {
-    interface SpringApplication
-    interface RestController
-    interface GetMapping
+    class Demande {
+        +Long id
+        +InformationColis informationColis
+        +Utilisateur voyageur
+        +Utilisateur expediteur
+        +Statut status
+        +Date createdAt
+    }
 
-    App --> SpringApplication : "run()"
-    HelloController --> RestController
-    HelloController --> GetMapping
-}
+    class Expediteur {
+        +rechercherAnnonces(String filtre)
+        +envoyerDemande(Long idAnnonce)
+    }
 
-package io.swagger.v3.oas.annotations{
-    interface Operation
-    interface Tag
+    class InformationColis {
+        +Long id
+        +float poids
+        +String dimensions
+        +String nature
+        +String categorie
+        +Date datePriseEnCharge
+        +String plageHoraire
+        +Annonce annonce
+        +Utilisateur expediteur
+    }
 
-    HelloController --> Operation
-    HelloController --> Tag
+    class Notation {
+        +Long id
+        +int note
+        +String commentaire
+        +String datePublication
+        +StatutNotation status
+        +Utilisateur utilisateur
+    }
+
+    class Notification {
+        +Long id
+        +String message
+        +Utilisateur voyageur
+        +Utilisateur expediteur
+        +Demande demande
+        +boolean isRead
+        +Date createdAt
+    }
+
+    class Pays {
+        +Long id
+        +String nom
+        +String codeISO
+        +String ville
+        +List<Voyage> voyagesDepart
+        +List<Voyage> voyagesDestination
+    }
+
+    class Role {
+        +Long id
+        +RoleType name
+    }
+
+    class Segment {
+        +Long id
+        +String pointDepart
+        +String pointArrivee
+        +Utilisateur voyageur
+        +Long chaineId
+        +Annonce annonce
+        +Date dateDepart
+        +Date dateArrivee
+    }
+
+    class Voyage {
+        +int id
+        +Date dateDepart
+        +Date dateArrivee
+        +List<Annonce> annonces
+        +Pays paysDepart
+        +Pays paysDestination
+        +Utilisateur voyageur
+    }
+
+    class Voyageur {
+        +creerAnnonce(String paysDepart, String paysArrivee, String dateDepart, String dateArrivee)
+        +supprimerAnnonce(Long idAnnonce)
+    }
+
+    enum Statut {
+        EN_ATTENTE, ACCEPTE, REFUSE
+    }
+
+    enum RoleType {
+        ROLE_USER, ROLE_ADMIN
+    }
+
+    enum StatutNotation {
+        PENDING, APPROVED, REJECTED
+    }
+
+    Utilisateur <|-- AdminType
+    Utilisateur <|-- Expediteur
+    Utilisateur <|-- Voyageur
+    Annonce --> Voyage
+    Annonce --> Voyageur
+    Annonce --> Demande
+    Annonce --> InformationColis
+    Demande --> Utilisateur
+    Demande --> InformationColis
+    Demande --> Utilisateur
+    Demande --> Statut
+    Notification --> Utilisateur
+    Notification --> Demande
+    InformationColis --> Annonce
+    InformationColis --> Utilisateur
+    Notation --> Utilisateur
+    Role --> Utilisateur
+    Segment --> Voyageur
+    Segment --> Annonce
+    Segment --> Voyage
+    Voyage --> Pays
+    Voyage --> Voyageur
+    Voyage --> Annonce
+    Pays --> Voyage
+    Pays --> Voyage
 }
 
 @enduml
