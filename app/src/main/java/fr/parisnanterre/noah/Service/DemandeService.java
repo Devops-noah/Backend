@@ -49,7 +49,9 @@ public class DemandeService {
         return demandes.stream().map(demande -> {
             DemandeResponse demandeResponse = new DemandeResponse();
             demandeResponse.setId(demande.getId());
+            demandeResponse.setExpediteurId(demande.getExpediteur().getId());
             demandeResponse.setExpediteurEmail(demande.getExpediteur().getEmail());
+            demandeResponse.setExpediteurNom(demande.getExpediteur().getNom());
             demandeResponse.setStatus(demande.getStatus());
             demandeResponse.setCreatedAt(demande.getCreatedAt());
 
@@ -76,6 +78,7 @@ public class DemandeService {
             }
 
             demandeResponse.setInformationColis(colisResponse);
+            System.out.println("demande response: " + demandeResponse);
 
             return demandeResponse;
         }).collect(Collectors.toList());
@@ -119,12 +122,12 @@ public class DemandeService {
 
         // Retourner la réponse sous forme de DTO
         DemandeResponse response = new DemandeResponse();
+        System.out.println("reponse demande: " + response);
         response.setId(savedDemande.getId());
         response.setExpediteurEmail(savedDemande.getExpediteur().getEmail());
         response.setStatus(savedDemande.getStatus());
         response.setCreatedAt(savedDemande.getCreatedAt());
         response.setVoyageurNom(String.valueOf(colis.getAnnonce().getVoyageur().getNom()));
-        System.out.println("reponse demande: " + response);
 
         return response;
     }

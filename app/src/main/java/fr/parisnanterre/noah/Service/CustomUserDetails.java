@@ -1,5 +1,6 @@
 package fr.parisnanterre.noah.Service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.parisnanterre.noah.Entity.AdminType;
 import fr.parisnanterre.noah.Entity.Expediteur;
 import fr.parisnanterre.noah.Entity.Utilisateur;
@@ -38,8 +39,11 @@ public class CustomUserDetails extends User implements UserDetails {
     public Long getId() {
         return utilisateur.getId(); // Supposons que votre objet Utilisateur a un champ id
     }
-    public String getProfileImageUrl() {
-        return utilisateur.getProfileImageUrl();
+
+    @JsonIgnore
+    public byte[] getProfileImage() {
+        return utilisateur.getProfileImage() != null ? utilisateur.getProfileImage().getBytes() : new byte[0];
     }
+
 
 }

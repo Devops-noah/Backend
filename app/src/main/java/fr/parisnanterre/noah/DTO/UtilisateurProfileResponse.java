@@ -14,7 +14,7 @@ public class UtilisateurProfileResponse {
     private String telephone;
     private String adresse;
     private String type;
-    private String profileImageUrl;
+    private byte[] profileImage;
 
     // Pour le type Voyageur
     private List<AnnonceResponse> annonces;

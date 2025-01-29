@@ -70,6 +70,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    implementation 'org.json:json:20210307'  // Use the latest version
+
+
     // Testing dependency
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.3'
     testImplementation 'org.springframework.security:spring-security-test:6.1.0'

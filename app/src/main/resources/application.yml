@@ -27,3 +27,13 @@ spring:
       static-locations:
         - classpath:/static/
         - file:C:/Users/dell/Desktop/Nanterre-miage/Master 1/semestre 1/Methodes-outils-developpement-logiciel/Model-devops-Damien/Devops-noah/Backend/app/uploads/
+  logging:
+    level:
+      org:
+        springframework:
+          security: DEBUG
+      io:
+        jsonwebtoken: DEBUG
+  imgur:
+    client-id: 36a7180fcb9a12c
+

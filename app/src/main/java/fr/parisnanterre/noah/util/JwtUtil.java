@@ -19,11 +19,11 @@ public class JwtUtil {
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
     // Generate JWT token
-    public String generateToken(String username, String userType,Long userId, String profileImageUrl) {
+    public String generateToken(String username, String userType, Long userId) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", username);// Add userType to the claims
-        claims.put("user_id", userId);
-        claims.put("profile_image_url", profileImageUrl);
+        claims.put("sub", username);  // Subject
+        claims.put("userId", userId); // User ID
+        claims.put("role", userType); // Add user type (role) to the token
 
         return Jwts.builder()
                 .setClaims(claims)
