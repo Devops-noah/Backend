@@ -1,44 +1,42 @@
-// Voyage entity
 package fr.parisnanterre.noah.Entity;
 
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import jakarta.persistence.Id;
-import lombok.*;
+import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Voyage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @Temporal(TemporalType.DATE)
     private Date dateDepart;
-
-    @Temporal(TemporalType.DATE)
     private Date dateArrivee;
 
-    private Double poidsDisponible;
+    @OneToMany(mappedBy = "voyage")
+    @JsonIgnore // Forward serialization for Voyage -> Annonce
+    @JsonInclude(JsonInclude.Include.NON_NULL) // Include only if not null
+    @ToString.Exclude // Avoid recursion in toString()
+    private List<Annonce> annonces;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "destination_id")
-    private Pays destination;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "pays_depart_id", nullable = false)
+    @JsonProperty("paysDepart") // Ensure serialization
+    private Pays paysDepart;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "pays_destination_id", nullable = false)
+    @JsonProperty("paysDestination") // Ensure serialization
+    private Pays paysDestination;
 
     @ManyToOne
-    @JoinColumn(name="voyageur_id")
+    @JoinColumn(name = "voyageur_id")
+    @JsonIgnore
+    @ToString.Exclude
     private Utilisateur voyageur;
-
-    // Business Logic
-    public boolean creerVoyage(Date dateDepart, Date dateArrivee, Double poidsDisponible, Pays destination, Utilisateur voyageur) {
-        this.dateDepart = dateDepart;
-        this.dateArrivee = dateArrivee;
-        this.poidsDisponible = poidsDisponible;
-        this.destination = destination;
-        this.voyageur = voyageur;
-        return true;
-    }
 }

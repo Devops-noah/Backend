@@ -8,7 +8,11 @@ ifndef::modeldir[:modeldir : model]
 - Amare NIGATU
 - Oumar MAHAMAT
 
+
 == Application goal
 
 == Architecture
-plantuml::src/docs/model/archi.puml[svg]
+plantuml::model/archi.puml[svg]
+
+
+

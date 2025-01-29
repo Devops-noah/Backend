@@ -14,8 +14,8 @@ import lombok.*;
 @AllArgsConstructor
 public class Filtre {
     private Date dateDepart;
-    private Double prixMax;
-    private Double poidsMin;
-    private String destinationNom;
+    private Date dateArrivee;
+    private String paysDepart;
+    private String paysDestination;
 
 }

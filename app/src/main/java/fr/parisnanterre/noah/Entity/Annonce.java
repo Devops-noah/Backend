@@ -1,10 +1,13 @@
 package fr.parisnanterre.noah.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,41 +18,49 @@ public class Annonce {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double poids;
-    private Double prix;
+    @NotNull
+    private Date datePublication;
 
-    @Temporal(TemporalType.DATE)
-    private Date dateCreation;
+    @NotNull
+    private Double poidsDisponible;
 
-    @PrePersist
-    protected void onCreate() {
-        this.dateCreation = new Date();
+    private boolean approved = false; // Default to false, must be approved by admin
+
+    private boolean suspended = false; // Default to false, can be toggled by admin
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore // Prevent serialization of voyageur to avoid recursion
+    @ToString.Exclude // Avoid recursion in toString()
+    private Voyageur voyageur;
+
+    //@NotNull
+    //@OneToMany(mappedBy = "annonce", cascade = CascadeType.ALL)
+    //private List<Demande> demandes;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER) // or FetchType.LAZY if you handle the fetch explicitly in the query
+    @JoinColumn(name = "voyage_id", referencedColumnName = "id") // Ensure this matches your actual column name
+    @JsonIgnore // Prevent recursion for Voyage -> Annonce
+    @ToString.Exclude // Avoid recursion in toString()
+    private Voyage voyage;
+
+    // Getter and Setter for 'approved'
+    public boolean isApproved() {
+        return approved;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "expediteur_id")
-    private Utilisateur expediteur;
-
-    @ManyToOne
-    @JoinColumn(name = "voyageur_id")
-    private Utilisateur voyageur;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "pays_depart_id")
-    private Pays paysDepart;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "pays_destination_id")
-    private Pays paysDestination;
-
-    // Business Logic
-    public boolean createAnnonceExpediteur(Utilisateur expediteur, Double poids, Double prix, Pays paysDepart, Pays paysDestination) {
-        this.expediteur = expediteur;
-        this.poids = poids;
-        this.prix = prix;
-        this.paysDepart = paysDepart;
-        this.paysDestination = paysDestination;
-        this.dateCreation = new Date();
-        return true;
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
+
+    // Getter and Setter for 'suspended'
+    public boolean isSuspended() {
+        return suspended;
+    }
+
+    public void setSuspended(boolean suspended) {
+        this.suspended = suspended;
+    }
+
 }
