@@ -73,6 +73,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/demandes/**").authenticated()
                         .requestMatchers("/api/utilisateurs/expediteur/**").authenticated()
                         .anyRequest().authenticated()
+
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
