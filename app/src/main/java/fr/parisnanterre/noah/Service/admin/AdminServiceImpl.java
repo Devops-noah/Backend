@@ -191,27 +191,33 @@ public class AdminServiceImpl {
         try {
             // Fetch all notations from the repository
             List<Notation> notations = notationRepository.findAll();
+            System.out.println("Fetched notations: " + notations.size()); // Log the number of notations
 
             // Map each `Notation` entity to `NotationResponse` DTO
             return notations.stream()
                     .map(notation -> {
                         NotationResponse response = new NotationResponse();
-                        System.out.println("response notation getall: " + response);
+                        System.out.println("Mapping notation: " + notation); // Log the current notation
                         response.setId(notation.getId());
-                        response.setUtilisateurId(notation.getUtilisateur().getId());
-                        response.setUserName(notation.getUtilisateur().getNom());
-                        response.setUserFirstName(notation.getUtilisateur().getPrenom());
+
+                        // Check for null values before accessing them
+                        response.setUtilisateurId(notation.getUtilisateur() != null ? notation.getUtilisateur().getId() : null);
+                        response.setUserName(notation.getUtilisateur() != null ? notation.getUtilisateur().getNom() : "Unknown");
+                        response.setUserFirstName(notation.getUtilisateur() != null ? notation.getUtilisateur().getPrenom() : "Unknown");
                         response.setNote(notation.getNote());
                         response.setCommentaire(notation.getCommentaire());
-                        response.setDatePublication(notation.getDatePublication().toString()); // Format date as String
+                        response.setDatePublication(notation.getDatePublication() != null ? notation.getDatePublication().toString() : "No Date");
                         response.setStatus(notation.getStatus());
                         return response;
                     })
-                    .toList();
+                    .collect(Collectors.toList()); // Collect to a list
         } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();  // Print the stack trace for better debugging
             throw new RuntimeException("Erreur lors de la récupération des notations", e);
         }
     }
+
 
     // Approve a comment
     public NotationResponse approveNotation(Long id) throws Exception {

@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/me").hasAnyRole("Voyageur", "Expediteur")
                         .requestMatchers("/api/annonces/**").authenticated()
                         .requestMatchers("/api/notations/**").authenticated()
+                        .requestMatchers("/api/notations/user/{userId}").authenticated()
                         .requestMatchers("/api/pays").authenticated()
                         .requestMatchers("/api/pays/**").authenticated()
                         .requestMatchers("/api/voyages").authenticated()

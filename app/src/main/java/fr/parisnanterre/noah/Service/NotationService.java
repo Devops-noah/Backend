@@ -37,6 +37,11 @@ public class NotationService {
 
         Utilisateur utilisateur = utilisateurOpt.get();
 
+        // Vérifier si une notation existe déjà pour cet utilisateur
+        boolean alreadyExists = notationRepository.existsByUtilisateurId(utilisateur.getId());
+        if (alreadyExists) {
+            throw new Exception("Vous avez déjà soumis une notation.");
+        }
 
         // Créer une nouvelle notation
         Notation newNotation = new Notation();
@@ -99,8 +104,8 @@ public class NotationService {
 
 
     // Méthode pour récupérer les notations par utilisateur
-    public List<Notation> getNotationsByUtilisateurId(Long utilisateurId) {
-        return notationRepository.findByUtilisateurId(utilisateurId);
+    public List<Notation> getNotationsByUtilisateurId(Long userId) {
+        return notationRepository.findByUtilisateurId(userId);
     }
 
     // Service method to fetch the last three approved notations
