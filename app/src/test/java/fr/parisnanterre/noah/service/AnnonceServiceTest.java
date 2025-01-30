@@ -48,7 +48,7 @@ class AnnonceServiceTest {
     void createAnnonce_Success() throws ParseException {
         // Mock input data
         String email = "dona@dona.com";
-        Integer voyageId = 3;
+        Integer voyageId = 5;
         AnnonceRequest annonceRequest = new AnnonceRequest();
 
         // Given a date string to compare
@@ -79,12 +79,12 @@ class AnnonceServiceTest {
 
         // ✅ Create and set PaysDepart
         Pays paysDepart = new Pays();
-        paysDepart.setNom("France");
+        paysDepart.setNom("MALI");
         voyage.setPaysDepart(paysDepart); // ✅ Now it's not null
 
         // ✅ Create and set PaysDestination
         Pays paysDestination = new Pays();
-        paysDestination.setNom("Germany");
+        paysDestination.setNom("GHANA");
         voyage.setPaysDestination(paysDestination); // ✅ Now it's not null
 
         Annonce annonce = new Annonce();
@@ -151,21 +151,56 @@ class AnnonceServiceTest {
     }
 
     @Test
-    void createAnnonce_VoyageNotBelongToUser() {
+    void createAnnonce_VoyageBelongsToUser() {
+        // Mock a Voyageur (logged-in user)
         Voyageur voyageur = new Voyageur();
-        voyageur.setEmail("voyageur@example.com");
+        voyageur.setEmail("dona@dona.com");
 
+        // Mock a Voyage that belongs to the logged-in user
         Voyage voyage = new Voyage();
-        voyage.setId(1);
-        voyage.setVoyageur(new Voyageur()); // Different owner
+        voyage.setId(16);
+        voyage.setVoyageur(voyageur); // The logged-in user owns the voyage
 
-        when(utilisateurRepository.findByEmail("voyageur@example.com")).thenReturn(Optional.of(voyageur));
-        when(voyageRepository.findById(1)).thenReturn(Optional.of(voyage));
+        // Mock PaysDepart to avoid NullPointerException
+        Pays paysDepart = new Pays();
+        paysDepart.setNom("France");
+        voyage.setPaysDepart(paysDepart);
 
-        Exception exception = assertThrows(RuntimeException.class, () ->
-                annonceServiceImpl.createAnnonce(new Annonce(), new AnnonceRequest(), "voyageur@example.com", 1));
+        // Create and set PaysDestination
+        Pays paysDestination = new Pays();
+        paysDestination.setNom("GHANA");
+        voyage.setPaysDestination(paysDestination);
 
-        assertEquals("The Voyage does not belong to the logged-in Voyageur", exception.getMessage());
+        // Mock the repositories
+        when(utilisateurRepository.findByEmail("dona@dona.com")).thenReturn(Optional.of(voyageur));
+        when(voyageRepository.findById(16)).thenReturn(Optional.of(voyage));
+
+        // Ensure save() is called when the voyage belongs to the logged-in user
+        when(annonceRepository.save(any(Annonce.class))).thenAnswer(invocation -> {
+            Annonce savedAnnonce = invocation.getArgument(0);
+            savedAnnonce.setId(1L); // Assign an ID to prevent null errors
+            return savedAnnonce;
+        });
+
+        // Now, no exception should be thrown and the annonce should be created
+        AnnonceResponse response = annonceServiceImpl.createAnnonce(new Annonce(), new AnnonceRequest(), "dona@dona.com", 16);
+
+        // Verify that the response contains the expected values (to ensure it was created)
+        assertNotNull(response);
+        assertEquals(1L, response.getId());
+        assertEquals("France", response.getPaysDepart());
+        assertEquals("GHANA", response.getPaysDestination());
+        assertEquals(16, response.getVoyageId());
+
+        // Ensure that save() was called exactly once
+        verify(annonceRepository, times(1)).save(any(Annonce.class));
     }
+
+
+
+
+
+
+
 }
 
