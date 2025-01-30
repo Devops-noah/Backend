@@ -18,4 +18,6 @@ public interface NotationRepository extends JpaRepository<Notation, Long> {
 
     List<Notation> findByStatus(StatutNotation status);
 
+    boolean existsByUtilisateurId(Long utilisateurId);
+
 }

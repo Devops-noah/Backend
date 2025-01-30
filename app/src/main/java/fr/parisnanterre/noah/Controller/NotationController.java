@@ -5,6 +5,7 @@ import fr.parisnanterre.noah.Entity.Notation;
 import fr.parisnanterre.noah.DTO.NotationRequest;
 import fr.parisnanterre.noah.Service.NotationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,23 +25,21 @@ public class NotationController {
 
     // API pour créer une nouvelle notation
     @PostMapping("/create")
-    public ResponseEntity<Notation> createNotation(@RequestBody NotationRequest notationRequest /*Principal principal*/) {
+    public ResponseEntity<?> createNotation(@RequestBody NotationRequest notationRequest /*Principal principal*/) {
         try {
             Notation notation = notationService.createNotation(notationRequest);
             return ResponseEntity.ok(notation);
         } catch (Exception e) {
-            return ResponseEntity.status(400).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     // API pour récupérer les notations de l'utilisateur connecté
-    @GetMapping("/user")
-    public ResponseEntity<List<Notation>> getNotationsForLoggedUser(Principal principal) {
-        Long utilisateurId = Long.valueOf(principal.getName());
-        List<Notation> notations = notationService.getNotationsByUtilisateurId(utilisateurId);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Notation>> getNotationsByUserId(@PathVariable Long userId) {
+        List<Notation> notations = notationService.getNotationsByUtilisateurId(userId);
         return ResponseEntity.ok(notations);
     }
-
     // API pour récupérer toutes les notations approuvées
     @GetMapping("/approved")
     public ResponseEntity<List<NotationResponse>> getAllNotationsWithApprovedComments() {
