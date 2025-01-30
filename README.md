@@ -201,15 +201,18 @@ Pour exécuter les tests unitaires et d'intégration, utilisez la commande suiva
 ## 📢 Fonctionnalités Principales
 
     Authentification sécurisée (Spring Security + JWT).
-    Gestion des colis : création, soumission et validation.
-    Notifications des feedbacks pour les expéditeurs.
+    Creation de voyage et d'annonce avec validation et soumission.
+    Gestion des colis ( proposition de colis ):  création, soumission et validation.
+    Notifications des proposition de colis et des feedbacks de reponse d'acceptation ou de rejet pour les expéditeurs.
     Gestion des annonces et voyages pour les voyageurs.
+    recherche de chaine de transfere pour des segments d'annonce qui existe et qui constituent ensemble un chemin complet.
+    Notation des utilisateur qui sera accepter ou rejeter par l'admin avant qu'il soit visible par tous le monde.
 
 ## 🛠️ Outils de Développement
 
     IDE : IntelliJ IDEA / Eclipse / VS Code.
     Base de Données : PostgreSQL.
-    Neon pour la base de donnée en ligne :https://console.neon.tech/app/projects/misty-paper-89322152/branches/br-little-shape-a2dhwb4o/tables?database=travel_carry_db
+    Neon pour la base de donnée en ligne : https://console.neon.tech/app/projects/misty-paper-89322152/branches/br-little-shape-a2dhwb4o/tables?database=travel_carry_db
     Postman : Test des API.
 
 
