@@ -14,6 +14,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,7 +51,6 @@ public class AnnonceServiceImpl {
         annonces.forEach(annonce -> {
             System.out.println("Annonce ID: " + annonce.getId() + " | Approved: " + annonce.isApproved() + " | Suspended: " + annonce.isSuspended());
         });
-        System.out.println("annonces after approved or not: " + annonces);
 
         // Map Annonce to fr.parisnanterre.noah.DTO.AnnonceRequest.AnnonceResponse
         return annonces.stream().map(annonce -> {
@@ -140,51 +140,44 @@ public class AnnonceServiceImpl {
                 });
     }
 
+    @Transactional
+    public AnnonceResponse createAnnonce(AnnonceRequest annonceRequest, String email, Integer voyageId) {
 
-    public AnnonceResponse createAnnonce(Annonce annonce, AnnonceRequest annonceRequest, String email, Integer voyageId) {
-
-        // Fetch the Voyageur by ID and ensure they are of the correct type
+        // Fetch the user by email
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Voyageur not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check if the user is a Voyageur
-        if (!(utilisateur instanceof Voyageur)) {
-            throw new RuntimeException("Only Voyageurs can create annonces");
+        // Check if the user is a Voyageur, if not, set them as one
+        if (!utilisateur.isVoyageur()) {
+            utilisateur.becomeVoyageur();  // Make the user a Voyageur if they are not one
+            utilisateurRepository.save(utilisateur);  // Save the updated user
         }
 
         // Fetch the related Voyage
         Voyage voyage = voyageRepository.findById(voyageId)
-                .orElseThrow(() -> new RuntimeException("Voyage with ID " + voyageId + " not found"));
+                .orElseThrow(() -> new RuntimeException("Voyage not found"));
 
-        // Ensure the logged-in Voyageur owns the Voyage
+        // Ensure the user owns the voyage
         if (!voyage.getVoyageur().equals(utilisateur)) {
-            throw new RuntimeException("The Voyage does not belong to the logged-in Voyageur");
+            throw new RuntimeException("Voyage does not belong to the user");
         }
 
-        // Associate the Voyageur with the Annonce
-        annonce.setVoyageur((Voyageur) utilisateur);
+        // Create a new Annonce and set properties
+        Annonce annonce = new Annonce();
+        annonce.setVoyageur(utilisateur);  // Now using the Utilisateur (who is a Voyageur)
 
-        // Create and populate the Annonce
         annonce.setDatePublication(annonceRequest.getDatePublication());
         annonce.setPoidsDisponible(annonceRequest.getPoidsDisponible());
         annonce.setVoyage(voyage);
 
-        // Save the Annonce
+        // Save the annonce
         Annonce savedAnnonce = annonceRepository.save(annonce);
 
-        // Build and return the response DTO
-        AnnonceResponse response = new AnnonceResponse();
-        response.setId(savedAnnonce.getId());
-        response.setDatePublication(savedAnnonce.getDatePublication());
-        response.setPoidsDisponible(savedAnnonce.getPoidsDisponible());
-        response.setDateDepart(voyage.getDateDepart()); // Get from Voyage
-        response.setDateArrivee(voyage.getDateArrivee()); // Get from Voyage
-        response.setPaysDepart(voyage.getPaysDepart().getNom()); // Get from Voyage
-        response.setPaysDestination(voyage.getPaysDestination().getNom()); // Get from Voyage
-        response.setVoyageId(voyage.getId());
-
-        return response;
+        // Build and return the response
+        return new AnnonceResponse(savedAnnonce, utilisateur);
     }
+
+
 
 
 

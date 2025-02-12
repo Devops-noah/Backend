@@ -1,10 +1,7 @@
 package fr.parisnanterre.noah.Service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import fr.parisnanterre.noah.Entity.AdminType;
-import fr.parisnanterre.noah.Entity.Expediteur;
-import fr.parisnanterre.noah.Entity.Utilisateur;
-import fr.parisnanterre.noah.Entity.Voyageur;
+import fr.parisnanterre.noah.Entity.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +21,16 @@ public class CustomUserDetails extends User implements UserDetails {
         return utilisateur;
     }
 
+    public RoleType getRole() {
+        return utilisateur.getRole() != null ? utilisateur.getRole().getName() : null;
+    }
+
     public String getUserType() {
+        // If the user has no type, return a default or null
+        if (utilisateur.getUserTypes() == null) {
+            return null;  // or return a default value like "user"
+        }
+
         if (utilisateur instanceof Voyageur) {
             return "voyageur";
         } else if (utilisateur instanceof Expediteur) {
@@ -33,7 +39,7 @@ public class CustomUserDetails extends User implements UserDetails {
             return "admin";
         }
 
-        return null; // or throw an exception if neither is found
+        return null;  // or throw an exception if neither is found
     }
 
     public Long getId() {

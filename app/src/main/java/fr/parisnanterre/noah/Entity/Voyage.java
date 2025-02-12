@@ -18,7 +18,7 @@ public class Voyage {
     private Date dateDepart;
     private Date dateArrivee;
 
-    @OneToMany(mappedBy = "voyage")
+    @OneToMany(mappedBy = "voyage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore // Forward serialization for Voyage -> Annonce
     @JsonInclude(JsonInclude.Include.NON_NULL) // Include only if not null
     @ToString.Exclude // Avoid recursion in toString()

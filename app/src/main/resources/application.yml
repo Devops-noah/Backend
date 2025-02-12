@@ -31,9 +31,13 @@ spring:
     level:
       org:
         springframework:
+          web:
+            socket: DEBUG
+          messaging: DEBUG
           security: DEBUG
       io:
         jsonwebtoken: DEBUG
   imgur:
     client-id: 36a7180fcb9a12c
+
 

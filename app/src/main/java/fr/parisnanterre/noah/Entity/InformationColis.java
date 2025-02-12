@@ -20,6 +20,7 @@ public class InformationColis {
     private String categorie;
     private Date datePriseEnCharge;
     private String plageHoraire;
+    private String message;
 
     @ManyToOne
     @JsonIgnore

@@ -8,26 +8,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
+@ToString(exclude = {"notations", "livraisonsExpediteur", "livraisonsVoyageur", "demandes", "annonces", "voyages"})  // ✅ Exclude the list to prevent recursion
 @NoArgsConstructor
 @AllArgsConstructor
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
-
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "type"
-)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = Voyageur.class, name = "voyageur"),
-        @JsonSubTypes.Type(value = Expediteur.class, name = "expediteur"),
-        @JsonSubTypes.Type(value = AdminType.class, name = "admin")
-})
-public abstract class Utilisateur {
+public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,38 +40,62 @@ public abstract class Utilisateur {
 
     private String telephone;
     private String adresse;
-
     private String profileImage;
-
-
     private boolean enabled = true; // Default to true (enabled)
 
-    // Ajout du champ notificationCount
-    //@JoinColumn(name = "notification_count", nullable = true)
-    private int notificationCount = 0;  // Compteur des notifications non lues
+    private int notificationCount = 0; // Default to 0
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false) // Foreign key for Role
     private Role role;
 
-    @OneToMany(mappedBy = "expediteur", cascade = CascadeType.ALL)
+    // Instead of using a String set, use an Enum for better type safety
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_types", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING) // Store as String instead of Integer
+    @Column(name = "dtype")
+    private Set<UserType> userTypes = new HashSet<>();
+
+
+    @OneToMany(mappedBy = "expediteur", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Livraison> livraisonsExpediteur;
 
-    @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Livraison> livraisonsVoyageur;
 
-    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Notation> notations;
 
-    @OneToMany(mappedBy = "expediteur", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "expediteur", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Demande> demandes;
 
-    @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Annonce> annonces;
 
-    @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Voyage> voyages;
 
+    // === Methods to manage user type dynamically ===
 
+    public void becomeVoyageur() {
+        this.userTypes.add(UserType.VOYAGEUR);
+    }
+
+    public void becomeExpediteur() {
+        this.userTypes.add(UserType.EXPEDITEUR);
+    }
+
+    public boolean isVoyageur() {
+        return userTypes.contains(UserType.VOYAGEUR);
+    }
+
+    public boolean isExpediteur() {
+        return userTypes.contains(UserType.EXPEDITEUR);
+    }
+
+    public boolean isAdmin() {
+        return this.role.getName() == RoleType.ROLE_ADMIN;
+    }
 
 }

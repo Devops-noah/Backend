@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -38,23 +39,30 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody Utilisateur utilisateur) {
-        // Check if the email is already in use
+        // Check if the email already exists
         if (utilisateurRepository.findByEmail(utilisateur.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body(
                     Map.of("status", "error", "message", "Email already exists")
             );
         }
 
-        // Assign the default "ROLE_USER" role if no role is provided
-        Role role = roleRepository.findByName(utilisateur.getRole() != null ?
-                        utilisateur.getRole().getName() : RoleType.ROLE_USER)
+        // Determine the role (default to ROLE_USER if not specified)
+        RoleType requestedRole = (utilisateur.getRole() != null) ? utilisateur.getRole().getName() : RoleType.ROLE_USER;
+        Role role = roleRepository.findByName(requestedRole)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
-        // Assign the role and encode the password
+        // Assign the role
         utilisateur.setRole(role);
+
+        // Encode password before saving
         utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
 
-        // Save the user
+        // Ensure that ROLE_USER starts with no type (Voyageur/Expediteur)
+        if (role.getName() == RoleType.ROLE_USER) {
+            utilisateur.setUserTypes(new HashSet<>()); // Empty set (no type at registration)
+        }
+
+        // ROLE_ADMIN is fixed and does not have Voyageur/Expediteur types
         utilisateurRepository.save(utilisateur);
 
         // Return success response
@@ -63,25 +71,39 @@ public class AuthController {
         );
     }
 
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
-        System.out.println("waaaaaaaaaaaaaaayyyyyyyyyyyyyyy");
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getMotDePasse())
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getMotDePasse())
+            );
 
-        // Extract user details
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        System.out.println("user details: " + userDetails);
-        String userType = userDetails.getUserType();  // Get the user type (expediteur/voyageur)
-        Long userId = userDetails.getId(); // Get the user's ID
+            // Extract user details
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long userId = userDetails.getId();
+            RoleType roleType = userDetails.getRole(); // ROLE_USER or ROLE_ADMIN
+            String role = roleType != null ? roleType.name() : "ROLE_USER"; // Convert Enum to String (ROLE_USER / ROLE_ADMIN)
 
-        // Generate JWT (exclude profileImage byte[])
-        String jwt = jwtUtil.generateToken(userDetails.getUsername(), userType, userId);
-        System.out.println("jwt valeur: " + jwt);
+            // Handle user type (Voyageur, Expediteur, or Admin)
+            String userType = userDetails.getUserType(); // This might be null if the user hasn't acted yet
 
-        return ResponseEntity.ok(new AuthenticationResponse(jwt, userType, userId));
+            // Generate JWT token
+            String jwt = jwtUtil.generateToken(userDetails.getUsername(), role, userType, userId);
+
+            // Return success response
+            String roleString = userDetails.getRole().name(); // Convert enum to string
+            return ResponseEntity.ok(new AuthenticationResponse(jwt, roleString, userType, userId));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    Map.of("status", "error", "message", "Invalid email or password")
+            );
+        }
     }
+
+
+
 
 
 

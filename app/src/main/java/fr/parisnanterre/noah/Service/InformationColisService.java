@@ -32,12 +32,15 @@ public class InformationColisService {
 
     public InformationColisResponse proposerColis(InformationColisRequest colisRequest, String email, Long annonceId) throws Exception {
         // Récupérer l'utilisateur authentifié par email
-        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur avec email " + email + " non trouvé"));
+        Utilisateur expediteur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Expéditeur non trouvé"));
 
-        // Vérifier que l'utilisateur est bien un expéditeur
-        if (!(utilisateur instanceof Expediteur)) {
-            throw new RuntimeException("Seul un expéditeur peut proposer un colis");
+        // 🔹 Vérifier si l'utilisateur a le type EXPEDITEUR
+        boolean isExpediteur = expediteur.getUserTypes().stream()
+                .anyMatch(userType -> userType.equals(UserType.EXPEDITEUR));
+
+        if (!isExpediteur) {
+            throw new RuntimeException("L'utilisateur n'est pas un expéditeur");
         }
 
         // Récupérer l'annonce associée
@@ -52,34 +55,47 @@ public class InformationColisService {
         informationColis.setCategorie(colisRequest.getCategorie());
         informationColis.setDatePriseEnCharge(colisRequest.getDatePriseEnCharge());
         informationColis.setPlageHoraire(colisRequest.getPlageHoraire());
+        informationColis.setMessage(colisRequest.getMessage());
         informationColis.setAnnonce(annonce);
-        informationColis.setExpediteur((Expediteur) utilisateur); // Définir l'expéditeur
+        informationColis.setExpediteur(expediteur); // 🔹 Cast à Expéditeur
 
         // Sauvegarder l'InformationColis dans la base de données
-        // Créer et sauvegarder l'information colis
         InformationColis savedColis = informationColisRepository.save(informationColis);
 
-// Créer automatiquement la demande associée
-        String expediteurEmail = utilisateur.getEmail();  // Utiliser l'email de l'expéditeur
+        // ✅ Créer automatiquement la demande associée
+        String expediteurEmail = expediteur.getEmail();
         DemandeRequest demandeRequest = new DemandeRequest();
-        demandeRequest.setExpediteurEmail(expediteurEmail);  // L'email de l'expéditeur
-        demandeRequest.setStatus(Statut.EN_ATTENTE);  // Le statut de la demande (par défaut)
-        demandeRequest.setCreatedAt(new Date());  // Date de création de la demande
+        demandeRequest.setExpediteurEmail(expediteurEmail);
+        demandeRequest.setStatus(Statut.EN_ATTENTE);
+        demandeRequest.setCreatedAt(new Date());
 
-// Appeler le service DemandeService pour créer la demande
+        // 🔹 Appeler le service DemandeService pour créer la demande
         DemandeResponse demandeResponse = demandeService.createDemande(demandeRequest, savedColis.getId(), expediteurEmail);
 
-// Retourner la réponse avec l'information colis et la demande créée
-        InformationColisResponse response = new InformationColisResponse();
-        response.setId(savedColis.getId());
-        response.setPoids(savedColis.getPoids());
-        response.setDimensions(savedColis.getDimensions());
-        response.setNature(savedColis.getNature());
-        response.setCategorie(savedColis.getCategorie());
-        response.setDatePriseEnCharge(savedColis.getDatePriseEnCharge());
-        response.setPlageHoraire(savedColis.getPlageHoraire());
-        response.setDemande(demandeResponse); // Inclure la demande dans la réponse
+        // 🔹 Mapper l'entité en DTO
+        InformationColisResponse response = mapToInformationColisResponse(savedColis);
+        response.setDemande(demandeResponse); // Inclure la demande
 
         return response;
     }
+
+    // 🔹 Helper method to convert InformationColis to InformationColisResponse
+    InformationColisResponse mapToInformationColisResponse(InformationColis colis) {
+        if (colis == null) {
+            return null;
+        }
+
+        InformationColisResponse response = new InformationColisResponse();
+        response.setId(colis.getId());
+        response.setPoids(colis.getPoids());
+        response.setDimensions(colis.getDimensions());
+        response.setNature(colis.getNature());
+        response.setCategorie(colis.getCategorie());
+        response.setDatePriseEnCharge(colis.getDatePriseEnCharge());
+        response.setPlageHoraire(colis.getPlageHoraire());
+        response.setMessage(colis.getMessage());
+
+        return response;
+    }
+
 }

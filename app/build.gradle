@@ -72,6 +72,10 @@ dependencies {
 
     implementation 'org.json:json:20210307'  // Use the latest version
 
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.security:spring-security-messaging'
+
+
 
     // Testing dependency
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.3'

@@ -44,6 +44,7 @@ public class SecurityConfig {
                     return corsConfig;
                 }))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/ws/**", "/ws*").permitAll() // Allow WebSocket
                         .requestMatchers("/api/annonces/filter").permitAll()
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
@@ -72,6 +73,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/notifications/unread").authenticated()
                         .requestMatchers("/api/notifications/read/**").authenticated()
                         .requestMatchers("/api/demandes/**").authenticated()
+                        .requestMatchers("/api/demandes/{demandeId}/status").authenticated()
                         .requestMatchers("/api/utilisateurs/expediteur/**").authenticated()
                         .anyRequest().authenticated()
 

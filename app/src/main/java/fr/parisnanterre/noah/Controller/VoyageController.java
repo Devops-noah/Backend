@@ -45,7 +45,7 @@ public class VoyageController {
             String email = principal.getName();
 
             // Call the service method to create the Voyage
-            Voyage createdVoyage = voyageServiceImpl.createVoyage(
+            VoyageResponse createdVoyage = voyageServiceImpl.createVoyage(
                     voyageRequest.getVoyage(),
                     voyageRequest.getPaysDepart(),
                     voyageRequest.getPaysDestination(),
@@ -63,6 +63,7 @@ public class VoyageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
         }
     }
+
 
     @PutMapping("/update/{voyageId}")
     public ResponseEntity<?> updateVoyage(

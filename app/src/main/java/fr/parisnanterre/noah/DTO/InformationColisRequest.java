@@ -14,6 +14,7 @@ public class InformationColisRequest {
     private String categorie;
     private Date datePriseEnCharge;
     private String plageHoraire;
+    private String message;
     private Long annonceId; // ID de l'annonce associée
     private Long expediteurId; // ID de l'utilisateur (expéditeur)
 }

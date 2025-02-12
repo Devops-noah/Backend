@@ -4,10 +4,7 @@ package fr.parisnanterre.noah.Service;
 import fr.parisnanterre.noah.DTO.AnnonceResponse;
 import fr.parisnanterre.noah.DTO.VoyageRequest;
 import fr.parisnanterre.noah.DTO.VoyageResponse;
-import fr.parisnanterre.noah.Entity.Pays;
-import fr.parisnanterre.noah.Entity.Utilisateur;
-import fr.parisnanterre.noah.Entity.Voyage;
-import fr.parisnanterre.noah.Entity.Voyageur;
+import fr.parisnanterre.noah.Entity.*;
 import fr.parisnanterre.noah.Repository.PaysRepository;
 import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import fr.parisnanterre.noah.Repository.VoyageRepository;
@@ -83,47 +80,57 @@ public class VoyageServiceImpl {
     }
 
 
-    public Voyage createVoyage(Voyage voyage, String paysDepart, String paysDestination, String email) {
+    @Transactional
+    public VoyageResponse createVoyage(Voyage voyage, String paysDepart, String paysDestination, String email) {
         // Find the Logged-in user
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
-               .orElseThrow(() -> new RuntimeException("User with email " + email + " not found"));
+                .orElseThrow(() -> new RuntimeException("User with email " + email + " not found"));
 
-        // Ensure the user is a Voyageur
-        if (!(utilisateur instanceof Voyageur)) {
-            throw new RuntimeException("Only Voyageurs can create voyages");
+        System.out.println("Before update - User types: " + utilisateur.getUserTypes());
+
+        // Ensure the user is a Voyageur, if not, make them one
+        if (!utilisateur.isVoyageur()) {
+            utilisateur.becomeVoyageur();
+            utilisateurRepository.save(utilisateur); // Persist the change
+            System.out.println("User is now a Voyageur");
         }
 
+        System.out.println("After update - User types: " + utilisateur.getUserTypes());
+
+        // Check if the departure country is provided and valid
         if (paysDepart == null || paysDepart.isEmpty()) {
             throw new RuntimeException("Pays depart is missing");
         }
-        // Fetch the existing Pays instance by ID
-        Pays paysDepartNom= paysRepository.findByNom(paysDepart)
+        Pays paysDepartNom = paysRepository.findByNom(paysDepart)
                 .orElseThrow(() -> new RuntimeException("Pays depart with Name " + paysDepart + " not found"));
 
-        System.out.println("paysDepart: " + paysDepart);
-
+        // Check if the destination country is provided and valid
         if (paysDestination == null || paysDestination.isEmpty()) {
             throw new RuntimeException("Pays destination is missing");
         }
-        Pays paysDestinationNom= paysRepository.findByNom(paysDestination)
+        Pays paysDestinationNom = paysRepository.findByNom(paysDestination)
                 .orElseThrow(() -> new RuntimeException("Pays destination with Name " + paysDestination + " not found"));
 
-        // Set the existing Pays as the destination of the Voyage
+        // Set the countries as destination for the Voyage
         voyage.setPaysDepart(paysDepartNom);
         voyage.setPaysDestination(paysDestinationNom);
 
         // Set the logged-in Voyageur as the owner of the Voyage
         voyage.setVoyageur(utilisateur);
-        System.out.println("voyage value: " + voyage);
 
+        System.out.println("Voyage value: " + voyage);
+
+        // Save the Voyage entity
         Voyage savedVoyage = voyageRepository.save(voyage);
 
-        // Return the saved voyage with country names
-        savedVoyage.setPaysDepart(paysDepartNom);
-        savedVoyage.setPaysDestination(paysDestinationNom);
-        // Save the voyage
-        return savedVoyage;
+        // Check if Annonces are linked correctly
+        System.out.println("Voyage annonces after save: " + savedVoyage.getAnnonces());
+
+        // Return the saved Voyage with country names
+        return new VoyageResponse(savedVoyage);
     }
+
+
 
     // Update voyage
     @Transactional

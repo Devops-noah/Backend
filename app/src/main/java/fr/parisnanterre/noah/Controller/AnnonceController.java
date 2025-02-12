@@ -10,6 +10,7 @@ import fr.parisnanterre.noah.Entity.Voyageur;
 import fr.parisnanterre.noah.Repository.AnnonceRepository;
 import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import fr.parisnanterre.noah.Service.AnnonceServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -59,26 +60,30 @@ public class AnnonceController {
     }
 
     @PostMapping("/{voyageId}")
-    public ResponseEntity<?> createAnnonce(@PathVariable Integer voyageId, @Valid @RequestBody AnnonceRequest annonceRequest, Principal principal) {
+    public ResponseEntity<?> createAnnonce(@PathVariable Integer voyageId,
+                                           @Valid @RequestBody AnnonceRequest annonceRequest,
+                                           Principal principal) {
         try {
-            // Extract email of the logged-in user
-            String email = principal.getName();
+            String email = principal.getName(); // Get user email
+            Annonce annonce = new Annonce(); // Create an empty Annonce object
 
-            // Create a new Annonce object (this could be passed from the frontend as well)
-            Annonce annonce = new Annonce();
+            // Call the service method with the correct number of arguments
+            AnnonceResponse response = annonceServiceImpl.createAnnonce(annonceRequest, email, voyageId);
 
-            // Call the service to create the Annonce
-            AnnonceResponse response = annonceServiceImpl.createAnnonce(annonce, annonceRequest, email, voyageId);
-            System.out.println("annonce response received: " + response);
-
-            // Return the response with the created Annonce data
             return ResponseEntity.ok(response);
 
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request: " + e.getMessage());
+
         } catch (Exception e) {
-            // Handle error and return bad request response with the error message
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
         }
     }
+
+
 
 
 
