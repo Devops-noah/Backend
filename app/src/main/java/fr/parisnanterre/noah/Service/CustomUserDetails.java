@@ -26,21 +26,20 @@ public class CustomUserDetails extends User implements UserDetails {
     }
 
     public String getUserType() {
-        // If the user has no type, return a default or null
-        if (utilisateur.getUserTypes() == null) {
-            return null;  // or return a default value like "user"
-        }
-
-        if (utilisateur instanceof Voyageur) {
-            return "voyageur";
-        } else if (utilisateur instanceof Expediteur) {
-            return "expediteur";
-        } else if (utilisateur instanceof AdminType) {
+        // If userTypes is empty but the user is an ADMIN, return "admin"
+        if ((utilisateur.getUserTypes() == null || utilisateur.getUserTypes().isEmpty())
+                && utilisateur.getRole().getName() == RoleType.ROLE_ADMIN) {
             return "admin";
         }
 
-        return null;  // or throw an exception if neither is found
+        // Convert Set<UserType> to a comma-separated string
+        return utilisateur.getUserTypes().stream()
+                .map(Enum::name)
+                .map(String::toLowerCase)
+                .reduce((a, b) -> a + "," + b)
+                .orElse(null);
     }
+
 
     public Long getId() {
         return utilisateur.getId(); // Supposons que votre objet Utilisateur a un champ id

@@ -16,4 +16,15 @@ public class DemandeResponse {
     private String voyageurNom;
     private InformationColisResponse informationColis;
 
+    public DemandeResponse(Long id, Long expediteurId, String expediteurEmail, String expediteurNom, Statut status, Date createdAt, String voyageurNom, InformationColisResponse informationColis) {
+        this.id = id;
+        this.expediteurId = expediteurId;
+        this.expediteurEmail = expediteurEmail;
+        this.expediteurNom = expediteurNom;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.voyageurNom = voyageurNom;
+        this.informationColis = informationColis;
+    }
+    public DemandeResponse(){}
 }

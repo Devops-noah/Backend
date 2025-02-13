@@ -15,4 +15,18 @@ public class InformationColisResponse {
     private String plageHoraire;
     private String message; // Message de confirmation ou d'erreur
     private DemandeResponse demande; // Ajouter ce champ pour inclure la demande dans la réponse
+
+    public InformationColisResponse(Long id, float poids, String dimensions, String nature, String categorie, Date datePriseEnCharge, String plageHoraire, String message, DemandeResponse demande) {
+        this.id = id;
+        this.poids = poids;
+        this.dimensions = dimensions;
+        this.nature = nature;
+        this.categorie = categorie;
+        this.datePriseEnCharge = datePriseEnCharge;
+        this.plageHoraire = plageHoraire;
+        this.message = message;
+        this.demande = demande;
+    }
+
+    public InformationColisResponse() {}
 }

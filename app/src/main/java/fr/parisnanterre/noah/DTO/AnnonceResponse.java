@@ -11,41 +11,62 @@ public class AnnonceResponse {
         private Long id;
         private Double poidsDisponible;
         private Date datePublication;
-        private Date dateDepart; // Retrieved via the linked Voyage
-        private Date dateArrivee; // Retrieved via the linked Voyage
-        private String paysDepart;       // Retrieved via the linked Voyage
-        private String paysDestination; // Retrieved via the linked Voyage
-        private Integer voyageId;          // The ID of the linked Voyage
+        private Date dateDepart;
+        private Date dateArrivee;
+        private String paysDepart;
+        private String paysDestination;
+        private Integer voyageId;
         private Integer voyageurId;
         private String voyageurNom;
         private String voyageurEmail;
         private boolean approved;
         private boolean suspended;
 
-        // ✅ Constructor accepting Annonce and Utilisateur
+        // Constructor using only Annonce (when user details come from Annonce itself)
         public AnnonceResponse(Annonce annonce) {
                 this.id = annonce.getId();
-                this.datePublication = annonce.getDatePublication();
                 this.poidsDisponible = annonce.getPoidsDisponible();
-                this.voyageId = annonce.getVoyage().getId();
+                this.datePublication = annonce.getDatePublication();
                 this.dateDepart = annonce.getVoyage().getDateDepart();
                 this.dateArrivee = annonce.getVoyage().getDateArrivee();
                 this.paysDepart = annonce.getVoyage().getPaysDepart().getNom();
                 this.paysDestination = annonce.getVoyage().getPaysDestination().getNom();
+                this.voyageId = annonce.getVoyage().getId();
 
-                // Extract voyageur from the voyage
-                if (annonce.getVoyage().getVoyageur() != null) {
-                        this.voyageurId = Math.toIntExact(annonce.getVoyage().getVoyageur().getId());
-                        this.voyageurNom = annonce.getVoyage().getVoyageur().getNom();
-                        this.voyageurEmail = annonce.getVoyage().getVoyageur().getEmail();
+                // Set voyageur details from annonce
+                if (annonce.getVoyageur() != null) {
+                        this.voyageurId = Math.toIntExact(annonce.getVoyageur().getId());
+                        this.voyageurNom = annonce.getVoyageur().getNom();
+                        this.voyageurEmail = annonce.getVoyageur().getEmail();
                 }
+
+                this.approved = annonce.isApproved();
+                this.suspended = annonce.isSuspended();
         }
 
+        // Constructor for explicit Annonce and Utilisateur objects
+        public AnnonceResponse(Annonce annonce, Utilisateur utilisateur) {
+                this.id = annonce.getId();
+                this.poidsDisponible = annonce.getPoidsDisponible();
+                this.datePublication = annonce.getDatePublication();
+                this.dateDepart = annonce.getVoyage().getDateDepart();
+                this.dateArrivee = annonce.getVoyage().getDateArrivee();
+                this.paysDepart = annonce.getVoyage().getPaysDepart().getNom();
+                this.paysDestination = annonce.getVoyage().getPaysDestination().getNom();
+                this.voyageId = annonce.getVoyage().getId();
+
+                // Use the provided Utilisateur for voyageur details
+                if (utilisateur != null) {
+                        this.voyageurId = Math.toIntExact(utilisateur.getId());
+                        this.voyageurNom = utilisateur.getNom();
+                        this.voyageurEmail = utilisateur.getEmail();
+                }
+
+                this.approved = annonce.isApproved();
+                this.suspended = annonce.isSuspended();
+        }
+
+        // Default constructor for frameworks
         public AnnonceResponse() {
-                // Default constructor for frameworks and manual mapping
-        }
-
-
-        public AnnonceResponse(Annonce savedAnnonce, Utilisateur utilisateur) {
         }
 }

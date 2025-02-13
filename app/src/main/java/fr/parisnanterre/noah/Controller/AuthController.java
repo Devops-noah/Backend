@@ -85,15 +85,14 @@ public class AuthController {
             RoleType roleType = userDetails.getRole(); // ROLE_USER or ROLE_ADMIN
             String role = roleType != null ? roleType.name() : "ROLE_USER"; // Convert Enum to String (ROLE_USER / ROLE_ADMIN)
 
-            // Handle user type (Voyageur, Expediteur, or Admin)
-            String userType = userDetails.getUserType(); // This might be null if the user hasn't acted yet
+            // Instead of returning the actual userType, return null or "utilisateur"
+            String userType = null; // Ensuring userType is NOT returned at login
 
-            // Generate JWT token
+            // Generate JWT token (passing userType as null)
             String jwt = jwtUtil.generateToken(userDetails.getUsername(), role, userType, userId);
 
             // Return success response
-            String roleString = userDetails.getRole().name(); // Convert enum to string
-            return ResponseEntity.ok(new AuthenticationResponse(jwt, roleString, userType, userId));
+            return ResponseEntity.ok(new AuthenticationResponse(jwt, role, userType, userId));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
@@ -101,6 +100,7 @@ public class AuthController {
             );
         }
     }
+
 
 
 

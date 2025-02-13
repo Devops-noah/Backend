@@ -31,16 +31,14 @@ public class InformationColisService {
     private NotificationService notificationService; // Service pour envoyer des notifications
 
     public InformationColisResponse proposerColis(InformationColisRequest colisRequest, String email, Long annonceId) throws Exception {
-        // Récupérer l'utilisateur authentifié par email
-        Utilisateur expediteur = utilisateurRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Expéditeur non trouvé"));
+        // Fetch the user by email
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 🔹 Vérifier si l'utilisateur a le type EXPEDITEUR
-        boolean isExpediteur = expediteur.getUserTypes().stream()
-                .anyMatch(userType -> userType.equals(UserType.EXPEDITEUR));
-
-        if (!isExpediteur) {
-            throw new RuntimeException("L'utilisateur n'est pas un expéditeur");
+        // Check if the user is a Voyageur, if not, set them as one
+        if (!utilisateur.isExpediteur()) {
+            utilisateur.becomeExpediteur();  // Make the user a Voyageur if they are not one
+            utilisateurRepository.save(utilisateur);  // Save the updated user
         }
 
         // Récupérer l'annonce associée
@@ -57,13 +55,13 @@ public class InformationColisService {
         informationColis.setPlageHoraire(colisRequest.getPlageHoraire());
         informationColis.setMessage(colisRequest.getMessage());
         informationColis.setAnnonce(annonce);
-        informationColis.setExpediteur(expediteur); // 🔹 Cast à Expéditeur
+        informationColis.setExpediteur(utilisateur); // 🔹 Cast à Expéditeur
 
         // Sauvegarder l'InformationColis dans la base de données
         InformationColis savedColis = informationColisRepository.save(informationColis);
 
         // ✅ Créer automatiquement la demande associée
-        String expediteurEmail = expediteur.getEmail();
+        String expediteurEmail = utilisateur.getEmail();
         DemandeRequest demandeRequest = new DemandeRequest();
         demandeRequest.setExpediteurEmail(expediteurEmail);
         demandeRequest.setStatus(Statut.EN_ATTENTE);
@@ -95,7 +93,22 @@ public class InformationColisService {
         response.setPlageHoraire(colis.getPlageHoraire());
         response.setMessage(colis.getMessage());
 
+        // 🔹 Include demande if it exists
+        if (colis.getDemande() != null) {
+            DemandeResponse demandeResponse = new DemandeResponse();
+            demandeResponse.setId(colis.getDemande().getId());
+            demandeResponse.setExpediteurId(colis.getDemande().getExpediteur().getId());
+            demandeResponse.setExpediteurEmail(colis.getDemande().getExpediteur().getEmail());
+            demandeResponse.setExpediteurNom(colis.getDemande().getExpediteur().getNom());
+            demandeResponse.setStatus(colis.getDemande().getStatus());
+            demandeResponse.setCreatedAt(colis.getDemande().getCreatedAt());
+            demandeResponse.setVoyageurNom(colis.getDemande().getVoyageur().getNom());
+
+            response.setDemande(demandeResponse);
+        }
+
         return response;
     }
+
 
 }
