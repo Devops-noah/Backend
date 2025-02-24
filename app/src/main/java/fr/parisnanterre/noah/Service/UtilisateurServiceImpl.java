@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UtilisateurServiceImpl {
@@ -25,40 +26,66 @@ public class UtilisateurServiceImpl {
     }
 
     public UtilisateurProfileResponse getUserProfile(String email) {
-        // Récupérer l'utilisateur par email
+        // Fetch user by email
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur not found"));
 
-        // Créer un objet de réponse
+        // Create response object
         UtilisateurProfileResponse profile = new UtilisateurProfileResponse();
 
-        // Remplir les informations communes pour tous les utilisateurs
+        // Common user info
         profile.setId(utilisateur.getId());
         profile.setNom(utilisateur.getNom());
         profile.setPrenom(utilisateur.getPrenom());
         profile.setEmail(utilisateur.getEmail());
         profile.setTelephone(utilisateur.getTelephone());
         profile.setAdresse(utilisateur.getAdresse());
+        profile.setAdmin(utilisateur.isAdmin());
 
-        // Handle the profile image
+        // Handle profile image
         if (utilisateur.getProfileImage() != null) {
             byte[] profileImage = utilisateur.getProfileImage().getBytes();
             byte[] base64Image = Base64.getEncoder().encodeToString(profileImage).getBytes();
             profile.setProfileImage(base64Image);
         } else {
-            profile.setProfileImage("https://picsum.photos/50/50".getBytes()); // Default image URL
+            profile.setProfileImage("https://picsum.photos/50/50".getBytes());
         }
 
-        // Récupérer le nombre de notifications non lues pour l'utilisateur
-        int notificationCount = utilisateur.getNotificationCount();  // Le compteur de notifications non lues
-        profile.setNotificationCount(notificationCount);
+        // Get unread notifications count
+        profile.setNotificationCount(utilisateur.getNotificationCount());
 
-        // Déterminer le type d'utilisateur et remplir les données correspondantes
-        if (utilisateur instanceof Voyageur voyageur) {
-            profile.setType("voyageur");
+        // Determine if the user should be a Voyageur or Expediteur
+        boolean hasAnnonces = !utilisateur.getAnnonces().isEmpty();
+        boolean hasColis = !utilisateur.getDemandes().isEmpty();
+        Set<UserType> userType = utilisateur.getUserTypes(); // Get current user type
 
-            // Mapper les annonces pour le voyageur
-            List<AnnonceResponse> annonces = voyageur.getAnnonces().stream().map(annonce -> {
+        if (hasAnnonces || !utilisateur.isVoyageur()) {
+            // If user has annonces or is not yet a Voyageur, set them as one
+            utilisateur.becomeVoyageur();
+            utilisateurRepository.save(utilisateur); // Persist change
+        } else if (hasColis || !utilisateur.isExpediteur()) {
+            // If user has colis or is not yet an Expediteur, set them as one
+            utilisateur.becomeExpediteur();
+            utilisateurRepository.save(utilisateur); // Persist change
+        }
+
+        // ✅ Construct UserTypeResponse
+        UtilisateurProfileResponse.UserTypeResponse userTypeResponse = new UtilisateurProfileResponse.UserTypeResponse();
+        userTypeResponse.setUserId(utilisateur.getId()); // Set userId
+        userTypeResponse.setDType(utilisateur.getUserTypes().stream()
+                .map(Enum::name) // Convert ENUM to String
+                .toList()); // Convert Set<UserType> to List<String>
+
+        // ✅ Set userTypes in the profile response
+        profile.setUserTypes(userTypeResponse);
+
+        // ✅ Set demandes and notations properly
+        profile.setDemandes(utilisateur.getDemandes());
+        profile.setNotations(utilisateur.getNotations());
+
+        // Populate annonces if user is a Voyageur
+        if (utilisateur.isVoyageur()) {
+            List<AnnonceResponse> annonces = utilisateur.getAnnonces().stream().map(annonce -> {
                 AnnonceResponse annonceResponse = new AnnonceResponse();
                 annonceResponse.setId(annonce.getId());
                 annonceResponse.setDatePublication(annonce.getDatePublication());
@@ -74,9 +101,11 @@ public class UtilisateurServiceImpl {
                 return annonceResponse;
             }).toList();
             profile.setAnnonces(annonces);
+        }
 
-            // Mapper les voyages pour le voyageur
-            List<Voyage> voyages = voyageur.getVoyages().stream().map(voyage -> {
+        // Populate voyages if user is a Voyageur
+        if (utilisateur.isVoyageur()) {
+            List<Voyage> voyages = utilisateur.getVoyages().stream().map(voyage -> {
                 Voyage voyageResponse = new Voyage();
                 voyageResponse.setId(voyage.getId());
                 voyageResponse.setDateDepart(voyage.getDateDepart());
@@ -86,16 +115,16 @@ public class UtilisateurServiceImpl {
                 return voyageResponse;
             }).toList();
             profile.setVoyages(voyages);
+        }
 
-        } else if (utilisateur instanceof Expediteur) {
-            profile.setType("expediteur");
+        // Handle Expediteur case
+        if (utilisateur.isExpediteur()) {
             profile.setMessage("L'utilisateur est un expediteur. Les colis ne sont pas disponibles pour le moment.");
-        } else if (utilisateur instanceof AdminType) {
-            profile.setType("admin");
         }
 
         return profile;
     }
+
 
 
     public void updateUserProfileImage(Long userId, String imgurImageUrl) {

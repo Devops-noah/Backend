@@ -55,10 +55,15 @@ public class DemandeService {
         Utilisateur utilisateur = utilisateurRepository.findByEmail(expediteurEmail)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-        // Check if the user type is "expediteur"
-        if (!(utilisateur instanceof Expediteur)) {
-            // If not an expediteur, throw an error
-            throw new RuntimeException("Vous devez être connecté en tant qu'expéditeur pour accéder aux demandes.");
+//        // Check if the user type is "expediteur"
+//        if (!(utilisateur instanceof Expediteur)) {
+//            // If not an expediteur, throw an error
+//            throw new RuntimeException("Vous devez être connecté en tant qu'expéditeur pour accéder aux demandes.");
+//        }
+        // ✅ Vérifier et attribuer dynamiquement le rôle EXPEDITEUR
+        if (!utilisateur.isExpediteur()) {
+            utilisateur.becomeExpediteur(); // Ajoute le type EXPEDITEUR
+            utilisateurRepository.save(utilisateur); // Sauvegarde le changement
         }
 
         // Fetch demandes for the expediteur

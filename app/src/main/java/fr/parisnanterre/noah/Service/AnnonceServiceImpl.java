@@ -177,25 +177,22 @@ public class AnnonceServiceImpl {
         return new AnnonceResponse(savedAnnonce, utilisateur);
     }
 
-
-
-
-
     public AnnonceResponse updateAnnonce(Integer annonceId, AnnonceRequest annonceRequest, String email) {
-        // Fetch the Voyageur by email
+        // Fetch the user by email
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Voyageur not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check if the user is a Voyageur
-        if (!(utilisateur instanceof Voyageur)) {
-            throw new RuntimeException("Only Voyageurs can update annonces");
+        // Ensure the user is a Voyageur, otherwise make them one
+        if (!utilisateur.isVoyageur()) {
+            utilisateur.becomeVoyageur();
+            utilisateurRepository.save(utilisateur);
         }
 
         // Fetch the existing Annonce
         Annonce existingAnnonce = annonceRepository.findById(annonceId)
                 .orElseThrow(() -> new RuntimeException("Annonce with ID " + annonceId + " not found"));
 
-        // Ensure the logged-in Voyageur owns the Annonce
+        // Ensure the logged-in user owns the Annonce
         if (!existingAnnonce.getVoyageur().equals(utilisateur)) {
             throw new RuntimeException("The Annonce does not belong to the logged-in Voyageur");
         }
@@ -207,20 +204,10 @@ public class AnnonceServiceImpl {
         // Save the updated Annonce
         Annonce updatedAnnonce = annonceRepository.save(existingAnnonce);
 
-        // Build and return the response DTO
-        AnnonceResponse response = new AnnonceResponse();
-        response.setId(updatedAnnonce.getId());
-        response.setDatePublication(updatedAnnonce.getDatePublication());
-        response.setPoidsDisponible(updatedAnnonce.getPoidsDisponible());
-        response.setDateDepart(updatedAnnonce.getVoyage().getDateDepart()); // Get from Voyage
-        response.setDateArrivee(updatedAnnonce.getVoyage().getDateArrivee()); // Get from Voyage
-        response.setPaysDepart(updatedAnnonce.getVoyage().getPaysDepart().getNom()); // Get from Voyage
-        response.setPaysDestination(updatedAnnonce.getVoyage().getPaysDestination().getNom()); // Get from Voyage
-        response.setVoyageId(updatedAnnonce.getVoyage().getId());
-
-        return response;
-
+        // Return response consistent with createAnnonce
+        return new AnnonceResponse(updatedAnnonce, utilisateur);
     }
+
 
     public void deleteAnnonce(Integer annonceId, String email) {
         // Fetch the Voyageur by email

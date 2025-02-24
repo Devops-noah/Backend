@@ -98,4 +98,5 @@ public class Utilisateur {
         return this.role.getName() == RoleType.ROLE_ADMIN;
     }
 
+
 }

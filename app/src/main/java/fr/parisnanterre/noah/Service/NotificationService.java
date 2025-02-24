@@ -138,8 +138,9 @@ public class NotificationService {
             // Get unread notifications for the user
             List<Notification> notifications = notificationRepository.findByVoyageurIdAndIsReadFalse(connectedUser.getId());
 
-            // Map notifications to response DTOs
-            return notifications.stream()
+            // Filter out notifications where the demande sender (expéditeur) is the connected user
+            List<NotificationResponseDto> filteredNotifications = notifications.stream()
+                    .filter(notification -> !notification.getDemande().getExpediteur().getId().equals(connectedUser.getId())) // Exclude demandes made by the user
                     .map(notification -> {
                         Demande demande = notification.getDemande();
                         DemandeResponse demandeResponse = new DemandeResponse();
@@ -175,10 +176,13 @@ public class NotificationService {
                         return responseDto;
                     })
                     .toList();
+
+            return filteredNotifications;
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de la récupération des notifications non lues", e);
         }
     }
+
     // Marquer une notification comme lue pour le voyageur connecté
     public void markAsRead(Long notificationId, Long voyageurId) {
         Notification notification = notificationRepository.findById(notificationId)
