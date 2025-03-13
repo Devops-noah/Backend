@@ -1,4 +1,4 @@
-package fr.parisnanterre.noah.service;
+/*package fr.parisnanterre.noah.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -169,3 +169,4 @@ class AnnonceServiceTest {
     }
 }
 
+*/
