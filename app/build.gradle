@@ -6,6 +6,7 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
+
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
@@ -47,6 +48,15 @@ jacocoTestReport {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+}
+
+// Load the .env file
+def dotenv = new Properties()
+file('.env').withInputStream { dotenv.load(it) }
+
+ext {
+    googleClientId = dotenv.getProperty('GOOGLE_CLIENT_ID')
+    googleClientSecret = dotenv.getProperty('GOOGLE_CLIENT_SECRET')
 }
 
 dependencies {
@@ -103,4 +113,8 @@ version = '0.0.1'
 application {
     // Define the main class for the application.
     mainClass = 'fr.parisnanterre.noah.TravelCarryApplication'
+    applicationDefaultJvmArgs = [
+            "-DGOOGLE_CLIENT_ID=${googleClientId}",
+            "-DGOOGLE_CLIENT_SECRET=${googleClientSecret}"
+    ]
 }
