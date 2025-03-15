@@ -76,6 +76,13 @@ public class Utilisateur {
     @OneToMany(mappedBy = "voyageur", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Voyage> voyages;
 
+    // === Google OAuth Tokens ===
+    @Column(length = 2048)
+    private String googleRefreshToken;
+
+    @Column(length = 2048)
+    private String googleAccessToken; // Temporary, expires in 1 hour
+
     // === Methods to manage user type dynamically ===
 
     public void becomeVoyageur() {
