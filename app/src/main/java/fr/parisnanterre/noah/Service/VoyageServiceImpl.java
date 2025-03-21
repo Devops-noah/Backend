@@ -28,7 +28,6 @@ public class VoyageServiceImpl {
         this.paysRepository = paysRepository;
         this.utilisateurRepository = utilisateurRepository;
     }
-
     // Fetch all voyages and map them to VoyageResponse
     public List<VoyageResponse> getAllVoyages() {
         List<Voyage> voyages = voyageRepository.findAll();
@@ -47,19 +46,16 @@ public class VoyageServiceImpl {
             response.setPaysDepartId(Math.toIntExact(voyage.getPaysDepart().getId()));
             response.setPaysDepartNom(voyage.getPaysDepart().getNom());
         }
-
         if (voyage.getPaysDestination() != null) {
             response.setPaysDestinationId(Math.toIntExact(voyage.getPaysDestination().getId()));
             response.setPaysDestinationNom(voyage.getPaysDestination().getNom());
         }
-
         // Map Voyageur (User)
         if (voyage.getVoyageur() != null) {
             response.setVoyageurId(Math.toIntExact(voyage.getVoyageur().getId()));
             response.setVoyageurNom(voyage.getVoyageur().getNom());
             response.setVoyageurEmail(voyage.getVoyageur().getEmail());
         }
-
         // Map Annonces
         if (voyage.getAnnonces() != null) {
             response.setAnnonces(voyage.getAnnonces().stream().map(annonce -> {
@@ -74,11 +70,10 @@ public class VoyageServiceImpl {
 
         return response;
     }
-
     public Optional<Voyage> getVoyageById(Integer id) {
+
         return voyageRepository.findById(id);
     }
-
 
     @Transactional
     public VoyageResponse createVoyage(Voyage voyage, String paysDepart, String paysDestination, String email) {
@@ -130,8 +125,6 @@ public class VoyageServiceImpl {
         return new VoyageResponse(savedVoyage);
     }
 
-
-
     // Update voyage
     @Transactional
     public Voyage updateVoyage(Integer voyageId, VoyageRequest voyageRequest, String email) {
@@ -165,7 +158,6 @@ public class VoyageServiceImpl {
                     .orElseThrow(() -> new RuntimeException("Pays destination not found"));
             voyage.setPaysDestination(paysDestination);
         }
-
         if (voyageRequest.getVoyage().getDateDepart() != null) {
             voyage.setDateDepart(voyageRequest.getVoyage().getDateDepart());
         }
@@ -177,33 +169,25 @@ public class VoyageServiceImpl {
         // Save and return the updated voyage
         return voyageRepository.save(voyage);
     }
-
     // Delete voyage
     @Transactional
     public void deleteVoyage(Integer voyageId, String email) {
         // Find the logged-in user
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User with email " + email + " not found"));
-
         // Ensure the user is a Voyageur
         if (!(utilisateur instanceof Voyageur)) {
             throw new RuntimeException("Only Voyageurs can delete voyages");
         }
-
         // Find the voyage to delete
         Voyage voyage = voyageRepository.findById(voyageId)
                 .orElseThrow(() -> new RuntimeException("Voyage with ID " + voyageId + " not found"));
-
         // Ensure the logged-in Voyageur is the owner of the voyage
         if (!voyage.getVoyageur().equals(utilisateur)) {
             throw new RuntimeException("You can only delete voyages you own");
         }
-
         // Delete the voyage
         voyageRepository.delete(voyage);
     }
-
-
-
 }
 
