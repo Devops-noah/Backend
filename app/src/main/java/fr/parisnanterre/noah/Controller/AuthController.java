@@ -9,7 +9,9 @@ import fr.parisnanterre.noah.Repository.RoleRepository;
 import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import fr.parisnanterre.noah.Service.CustomUserDetails;
 import fr.parisnanterre.noah.Service.CustomUserDetailsService;
+import fr.parisnanterre.noah.Service.GoogleCalendarService;
 import fr.parisnanterre.noah.util.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +39,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final UtilisateurRepository utilisateurRepository;
     private final RoleRepository roleRepository;
+    private final GoogleCalendarService googleCalendarService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody Utilisateur utilisateur) {
@@ -79,32 +83,82 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getMotDePasse())
             );
 
-            // Extract user details
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String email = userDetails.getUsername();
             Long userId = userDetails.getId();
-            RoleType roleType = userDetails.getRole(); // ROLE_USER or ROLE_ADMIN
-            String role = roleType != null ? roleType.name() : "ROLE_USER"; // Convert Enum to String (ROLE_USER / ROLE_ADMIN)
+            RoleType roleType = userDetails.getRole();
+            String role = roleType != null ? roleType.name() : "ROLE_USER";
 
-            // Instead of returning the actual userType, return null or "utilisateur"
-            String userType = null; // Ensuring userType is NOT returned at login
+            // Check if the user has already authorized Google Calendar
+            Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findByEmail(email);
 
-            // Generate JWT token (passing userType as null)
-            String jwt = jwtUtil.generateToken(userDetails.getUsername(), role, userType, userId);
+            boolean isGmailUser = email.endsWith("@gmail.com");  // ✅ Check if user has a Gmail account
+            boolean needsGoogleAuth = utilisateurOpt.map(user -> user.getGoogleRefreshToken() == null).orElse(true);
 
-            // Return success response
-            return ResponseEntity.ok(new AuthenticationResponse(jwt, role, userType, userId));
+            // 🔴 Gmail users MUST authorize Google Calendar before logging in
+            if (isGmailUser && needsGoogleAuth) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                        "status", "error",
+                        "message", "Vous devez autoriser Google Calendar pour continuer.",
+                        "needsGoogleAuth", true
+                ));
+            }
+
+            // Generate JWT
+            String jwt = jwtUtil.generateToken(email, role, null, userId);
+
+            // Return response with Google Auth status
+            return ResponseEntity.ok(Map.of(
+                    "token", jwt,
+                    "role", role,
+                    "userId", userId
+            ));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    Map.of("status", "error", "message", "Invalid email or password")
-            );
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "status", "error",
+                    "message", "Invalid email or password"
+            ));
         }
     }
 
+    @GetMapping("/callback")
+    public void handleOAuthCallback(@RequestParam("code") String code,
+                                    @RequestParam(value = "state", required = false) String email,
+                                    HttpServletResponse response) throws IOException {
+        try {
+            System.out.println("🔵 OAuth Callback Triggered");
+            System.out.println("🔑 Received code: " + code);
+            if (email != null) {
+                System.out.println("📧 Email received: " + email);
+            }
 
+            // ✅ Exchange code and store refresh token
+            googleCalendarService.exchangeCodeAndStoreTokens(email, code);
 
+            // ✅ Fetch user details
+            Optional<Utilisateur> utilisateurOpt = utilisateurRepository.findByEmail(email);
+            if (utilisateurOpt.isEmpty()) {
+                response.sendRedirect("http://localhost:3000/login?error=user_not_found");
+                return;
+            }
 
+            Utilisateur utilisateur = utilisateurOpt.get();
+            String role = utilisateur.getRole().getName().name();
+            Long userId = utilisateur.getId();
 
+            // ✅ Generate a new JWT token
+            String jwt = jwtUtil.generateToken(email, role, null, userId);
+
+            // ✅ Redirect to frontend with JWT token in URL
+            String redirectUrl = "http://localhost:3000/login?token=" + jwt + "&userId=" + userId + "&role=" + role;
+            response.sendRedirect(redirectUrl);
+
+        } catch (IOException e) {
+            System.out.println("❌ OAuth Token Exchange Failed: " + e.getMessage());
+            response.sendRedirect("http://localhost:3000/login?error=token_exchange_failed");
+        }
+    }
 
 
     @GetMapping("/me")
