@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -175,6 +176,18 @@ public class UtilisateurServiceImpl {
 
         // Save the updated user
         return utilisateurRepository.save(utilisateur);
+    }
+
+    // ✅ Fetch the user's access token from the database
+    public String getAccessTokenByEmail(String email) {
+        Optional<Utilisateur> utilisateur = utilisateurRepository.findByEmail(email);
+        return utilisateur.map(Utilisateur::getGoogleAccessToken).orElse(null);
+    }
+
+    // ✅ Fetch the user's refresh token from the database
+    public String getRefreshTokenByEmail(String email) {
+        Optional<Utilisateur> utilisateur = utilisateurRepository.findByEmail(email);
+        return utilisateur.map(Utilisateur::getGoogleRefreshToken).orElse(null);
     }
 
 

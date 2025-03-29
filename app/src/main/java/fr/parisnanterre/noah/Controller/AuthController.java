@@ -126,6 +126,10 @@ public class AuthController {
     public void handleOAuthCallback(@RequestParam("code") String code,
                                     @RequestParam(value = "state", required = false) String email,
                                     HttpServletResponse response) throws IOException {
+
+        System.out.println("🔁 [CALLBACK] Reached callback endpoint");
+        System.out.println("🔑 Received code: " + code);
+        System.out.println("📧 Received state/email: " + email);
         try {
             System.out.println("🔵 OAuth Callback Triggered");
             System.out.println("🔑 Received code: " + code);

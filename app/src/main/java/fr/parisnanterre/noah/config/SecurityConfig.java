@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/pays/**").authenticated()
                         .requestMatchers("/api/voyages").authenticated()
                         .requestMatchers("/api/voyages/**").authenticated()
+                        .requestMatchers("/api/voyages/calendar/events").authenticated()
                         .requestMatchers("/api/utilisateurs/profile").authenticated()
                         .requestMatchers("/api/utilisateurs/profile/update/**").authenticated()
                         .requestMatchers("/api/utilisateurs/profile/upload-image").authenticated()

@@ -18,6 +18,9 @@ public class Voyage {
     private Date dateDepart;
     private Date dateArrivee;
 
+    @Column(name = "google_event_id")
+    private String googleEventId;
+
     @OneToMany(mappedBy = "voyage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore // Forward serialization for Voyage -> Annonce
     @JsonInclude(JsonInclude.Include.NON_NULL) // Include only if not null
