@@ -189,5 +189,56 @@ public class DemandeService {
 
         demande.setStatus(status);
         return demandeRepository.save(demande);
+
+    }
+
+    @Transactional
+    public void processExistingAcceptedRequests() {
+        // Récupérer l'utilisateur authentifié
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        // Récupérer les demandes acceptées où l'utilisateur est soit l'expéditeur, soit le voyageur
+        List<Demande> acceptedDemandes = demandeRepository.findByStatus(Statut.ACCEPTE).stream()
+                .filter(demande -> demande.getExpediteur().equals(utilisateur) || demande.getVoyageur().equals(utilisateur))
+                .toList();
+
+        System.out.println("Nombre de demandes acceptées trouvées pour l'utilisateur connecté : " + acceptedDemandes.size());
+
+        for (Demande demande : acceptedDemandes) {
+            Utilisateur expediteur = demande.getExpediteur();
+            Utilisateur voyageur = demande.getVoyageur();
+
+            // Vérifier que l'expéditeur et le voyageur ne sont pas la même personne
+            if (expediteur.equals(voyageur)) {
+                System.out.println(" Ignoré : L'expéditeur et le voyageur sont la même personne (" + expediteur.getEmail() + ")");
+                continue; // On saute cette itération
+            }
+
+            // Identifier l'ID de la conversation entre les deux utilisateurs
+            String conversationId = expediteur.getId() + "_" + voyageur.getId();
+            DatabaseReference conversationRef = FirebaseDatabase.getInstance().getReference("conversations").child(conversationId);
+
+            // Vérifier si la conversation existe déjà
+            conversationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        System.out.println("Conversation déjà existante entre " + expediteur.getEmail() + " et " + voyageur.getEmail());
+                    } else {
+                        System.out.println("Création d'une conversation entre " + expediteur.getEmail() + " et " + voyageur.getEmail());
+                        conversationService.createConversationIfNeeded(expediteur, voyageur);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    System.out.println("Erreur lors de la récupération de la conversation : " + error.getMessage());
+                }
+            });
+        }
     }
 }
