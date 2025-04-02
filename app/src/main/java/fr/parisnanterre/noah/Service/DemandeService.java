@@ -1,5 +1,6 @@
 package fr.parisnanterre.noah.Service;
 
+import com.google.firebase.database.*;
 import fr.parisnanterre.noah.DTO.DemandeRequest;
 import fr.parisnanterre.noah.DTO.InformationColisResponse;
 import fr.parisnanterre.noah.Entity.*;
@@ -27,17 +28,23 @@ public class DemandeService {
     private final InformationColisRepository informationColisRepository;
     private final UtilisateurRepository utilisateurRepository;
     private final NotificationService notificationService;
+    private final ConversationService conversationService;
+
     private final InformationColisService informationColisService;
 
     @Autowired
     public DemandeService(@Lazy InformationColisService informationColisService,
                           DemandeRepository demandeRepository,
                           InformationColisRepository informationColisRepository,
+                          ConversationService conversationService,
+
                           UtilisateurRepository utilisateurRepository,
                           NotificationService notificationService) {
         this.demandeRepository = demandeRepository;
         this.informationColisService = informationColisService;
         this.utilisateurRepository = utilisateurRepository;
+        this.conversationService = conversationService;
+
         this.notificationService = notificationService;
         this.informationColisRepository = informationColisRepository;
     }
