@@ -23,7 +23,7 @@ plugins {
 }
 
 // Load the .env file
-def dotenv = new Properties()
+/*def dotenv = new Properties()
 file('.env').withInputStream { dotenv.load(it) }
 
 ext {
@@ -34,7 +34,7 @@ ext {
 bootRun {
     systemProperty 'GOOGLE_CLIENT_ID', googleClientId
     systemProperty 'GOOGLE_CLIENT_SECRET', googleClientSecret
-}
+}*/
 
 
 jacoco {
