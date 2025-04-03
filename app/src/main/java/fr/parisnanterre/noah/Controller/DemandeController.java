@@ -22,16 +22,16 @@ public class DemandeController {
 
     private final DemandeService demandeService;
 
-    // Récupérer toutes les demandes du voyageur
-    @GetMapping("/demande/{voyageurId}")
-    public HttpEntity<List<Demande>> getDemandesByVoyageur(@PathVariable String voyageurId) {
-        try {
-            List<Demande> demandes = demandeService.getDemandesByVoyageur(voyageurId);
-            return ResponseEntity.ok(demandes);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
+//    // Récupérer toutes les demandes du voyageur
+//    @GetMapping("/demande/{voyageurId}")
+//    public HttpEntity<List<Demande>> getDemandesByVoyageur(@PathVariable String voyageurId) {
+//        try {
+//            List<Demande> demandes = demandeService.getDemandesByVoyageur(voyageurId);
+//            return ResponseEntity.ok(demandes);
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body(null);
+//        }
+//    }
 
 
     /**

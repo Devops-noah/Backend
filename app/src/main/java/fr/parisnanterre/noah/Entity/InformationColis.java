@@ -21,6 +21,9 @@ public class InformationColis {
     private Date datePriseEnCharge;
     private String plageHoraire;
 
+    @Column(nullable = true)
+    private String message;
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "annonce_id", nullable = false)
@@ -30,4 +33,8 @@ public class InformationColis {
     @JsonIgnore
     @JoinColumn(name = "expediteur_id", nullable = false)
     private Utilisateur expediteur; // L'expéditeur ayant proposé le colis
+
+    @OneToOne(mappedBy = "informationColis", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Demande demande;
+
 }

@@ -19,11 +19,12 @@ public class JwtUtil {
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
     // Generate JWT token
-    public String generateToken(String username, String userType, Long userId) {
+    public String generateToken(String username, String role, String userType, Long userId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", username);  // Subject
         claims.put("userId", userId); // User ID
-        claims.put("role", userType); // Add user type (role) to the token
+        claims.put("role", role);     // User's Role (ROLE_USER / ROLE_ADMIN)
+        claims.put("userType", userType != null ? userType : "undefined"); // Voyageur / Expediteur / Admin
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -32,6 +33,7 @@ public class JwtUtil {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     // Validate the token
     public boolean validateToken(String token, UserDetails userDetails) {

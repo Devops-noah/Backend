@@ -1,10 +1,7 @@
 package fr.parisnanterre.noah.Service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import fr.parisnanterre.noah.Entity.AdminType;
-import fr.parisnanterre.noah.Entity.Expediteur;
-import fr.parisnanterre.noah.Entity.Utilisateur;
-import fr.parisnanterre.noah.Entity.Voyageur;
+import fr.parisnanterre.noah.Entity.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,17 +21,25 @@ public class CustomUserDetails extends User implements UserDetails {
         return utilisateur;
     }
 
+    public RoleType getRole() {
+        return utilisateur.getRole() != null ? utilisateur.getRole().getName() : null;
+    }
+
     public String getUserType() {
-        if (utilisateur instanceof Voyageur) {
-            return "voyageur";
-        } else if (utilisateur instanceof Expediteur) {
-            return "expediteur";
-        } else if (utilisateur instanceof AdminType) {
+        // If userTypes is empty but the user is an ADMIN, return "admin"
+        if ((utilisateur.getUserTypes() == null || utilisateur.getUserTypes().isEmpty())
+                && utilisateur.getRole().getName() == RoleType.ROLE_ADMIN) {
             return "admin";
         }
 
-        return null; // or throw an exception if neither is found
+        // Convert Set<UserType> to a comma-separated string
+        return utilisateur.getUserTypes().stream()
+                .map(Enum::name)
+                .map(String::toLowerCase)
+                .reduce((a, b) -> a + "," + b)
+                .orElse(null);
     }
+
 
     public Long getId() {
         return utilisateur.getId(); // Supposons que votre objet Utilisateur a un champ id

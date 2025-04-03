@@ -44,6 +44,7 @@ public class SecurityConfig {
                     return corsConfig;
                 }))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/ws/**", "/ws*").permitAll() // Allow WebSocket
                         .requestMatchers("/api/annonces/filter").permitAll()
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
@@ -64,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/pays/**").authenticated()
                         .requestMatchers("/api/voyages").authenticated()
                         .requestMatchers("/api/voyages/**").authenticated()
+                        .requestMatchers("/api/voyages/calendar/events").authenticated()
                         .requestMatchers("/api/utilisateurs/profile").authenticated()
                         .requestMatchers("/api/utilisateurs/profile/update/**").authenticated()
                         .requestMatchers("/api/utilisateurs/profile/upload-image").authenticated()
@@ -72,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/notifications/unread").authenticated()
                         .requestMatchers("/api/notifications/read/**").authenticated()
                         .requestMatchers("/api/demandes/**").authenticated()
+                        .requestMatchers("/api/demandes/{demandeId}/status").authenticated()
                         .requestMatchers("/api/utilisateurs/expediteur/**").authenticated()
                         .anyRequest().authenticated()
 

@@ -2,6 +2,9 @@ package fr.parisnanterre.noah.Controller;
 
 import fr.parisnanterre.noah.DTO.NotificationResponseDto;
 import fr.parisnanterre.noah.Entity.Notification;
+import fr.parisnanterre.noah.Entity.Utilisateur;
+import fr.parisnanterre.noah.Entity.Voyageur;
+import fr.parisnanterre.noah.Repository.UtilisateurRepository;
 import fr.parisnanterre.noah.Service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -17,6 +21,7 @@ import java.util.List;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final UtilisateurRepository utilisateurRepository;
 
     @GetMapping("/unread")
     public ResponseEntity<List<NotificationResponseDto>> getUnreadNotifications() {
@@ -40,16 +45,20 @@ public class NotificationController {
     }
 
 
-    // Marquer une notification comme lue
     @PutMapping("/read/{notificationId}")
-    public ResponseEntity<String> markAsRead(@PathVariable Long notificationId) {
+    public ResponseEntity<String> markAsRead(@PathVariable Long notificationId, Principal principal) {
         try {
-            // Marquer la notification comme lue
-            notificationService.markAsRead(notificationId);
+            // Récupérer l'ID du voyageur connecté depuis l'authentification
+            Utilisateur voyageur = utilisateurRepository.findByEmail(principal.getName())
+                    .orElseThrow(() -> new RuntimeException("Voyageur non trouvé"));
+
+            // Marquer la notification comme lue seulement si elle appartient au voyageur connecté
+            notificationService.markAsRead(notificationId, voyageur.getId());
+
             return ResponseEntity.ok("Notification marquée comme lue");
         } catch (Exception e) {
-            // Retourner une erreur HTTP 400 si l'opération échoue
-            return ResponseEntity.badRequest().body("Erreur lors de la mise à jour du statut de notification");
+            return ResponseEntity.badRequest().body("Erreur : " + e.getMessage());
         }
     }
+
 }

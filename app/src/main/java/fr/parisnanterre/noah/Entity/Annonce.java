@@ -29,10 +29,9 @@ public class Annonce {
     private boolean suspended = false; // Default to false, can be toggled by admin
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnore // Prevent serialization of voyageur to avoid recursion
-    @ToString.Exclude // Avoid recursion in toString()
-    private Voyageur voyageur;
+    @ManyToOne
+    @JoinColumn(name = "voyageur_id", nullable = false)
+    private Utilisateur voyageur;  // ✅ Change from Voyageur to Utilisateur
 
     //@NotNull
     //@OneToMany(mappedBy = "annonce", cascade = CascadeType.ALL)
